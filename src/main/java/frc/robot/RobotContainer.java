@@ -1,6 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/**
+ * RobotContainer
+ *
+ * Defines the overall structure of the robot.
+ * - Creates subsystems (e.g. DriveBase)
+ * - Creates controllers and joysticks
+ * - Sets default commands
+ * RobotContainer handles all wiring between subsystems and commands.
+ */
 
 package frc.robot;
 
