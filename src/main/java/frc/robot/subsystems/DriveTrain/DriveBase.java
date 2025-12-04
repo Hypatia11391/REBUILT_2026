@@ -13,24 +13,23 @@
 package frc.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
-import edu.wpi.first.wpilibj.Joystick;
+
 //import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
 import edu.wpi.first.wpilibj.drive.MecanumDrive; // mecanum drive math
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax; // motor controller (spark max)
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
+  private final MecanumDrive m_Drive; // mecanum drive object
+  
   private static final int kFrontLeftChannel = 2; // front left port
   private static final int kRearLeftChannel = 3; // rear left port
   private static final int kFrontRightChannel = 1; // front right port
   private static final int kRearRightChannel = 0; // rear right port
 
-  private static final int kJoystickChannel = 0; // joystick port
-
   // rear right and joystick port are on different devices, so the ports can be the same
 
-  private final MecanumDrive m_Drive; // mecanum drive object
-  private final Joystick m_Stick; // joystick object
+
 
   /**it  Called once at the beginning of the robot program. */
   @SuppressWarnings("unused") // there's often a warning about not using some line or some variable, which is kinda annoying
@@ -48,8 +47,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     // TODO: look if method reference can be removed
     m_Drive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set); 
     
-        m_Stick = new Joystick(kJoystickChannel); // opens joystick
-    
         // for debugging
         SendableRegistry.addChild(m_Drive, frontLeft); // front left motor shows up on the shuffleboard
         SendableRegistry.addChild(m_Drive, rearLeft); // rear left motor shows up on the shuffleboard
@@ -57,7 +54,12 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         SendableRegistry.addChild(m_Drive, rearRight); // rear right motor shows up on the shuffleboard
       }
 
+    public void drive(double xSpeed, double ySpeed, double zRot){
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot);
+    }
+
   public void stop(){
       m_Drive.stopMotor();
     }
+  
 }
