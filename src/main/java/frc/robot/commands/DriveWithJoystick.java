@@ -34,12 +34,12 @@ public class DriveWithJoystick extends Command{
     double ySpeed = -m_stick.getRawAxis(JoystickAxes.LEFT_Y.ordinal());
     double zRot = m_stick.getRawAxis(JoystickAxes.RIGHT_X.ordinal());
 
-    m_drive.drive(xSpeed, ySpeed, zRot);
+    m_drive.driveCartesian(xSpeed, ySpeed, zRot);
     System.out.printf("%f,%f,%f\n",xSpeed,ySpeed,zRot);    
   }
   @Override
   public void end(boolean interrupted){
-    m_drive.drive(0,0,0);
+    m_drive.driveCartesian(0,0,0);
   }
   @Override
   public boolean isFinished(){
