@@ -16,14 +16,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class DriveWithJoystick extends Command{
+  private static final double MAX_SPEED = 0.2;
+  private static final double DEADZONE = 0.1;
+  private final DriveBase m_drive;
+  private final Joystick m_stick; // joystick object
 
-    private final DriveBase m_drive;
-    private final Joystick m_stick; // joystick object
-
-    public DriveWithJoystick(DriveBase drive, Joystick stick){
-        m_drive = drive;
-        m_stick = stick;
-        addRequirements(m_drive);
+  public DriveWithJoystick(DriveBase drive, Joystick stick){
+      m_drive = drive;
+      m_stick = stick;
+      addRequirements(m_drive);
   }
   @Override
   public void initialize(){}
@@ -34,8 +35,20 @@ public class DriveWithJoystick extends Command{
     double ySpeed = -m_stick.getRawAxis(JoystickAxes.LEFT_Y.ordinal());
     double zRot = m_stick.getRawAxis(JoystickAxes.RIGHT_X.ordinal());
 
-    m_drive.drive(xSpeed, ySpeed, zRot);
-    System.out.printf("%f,%f,%f\n",xSpeed,ySpeed,zRot);    
+    if(xSpeed * xSpeed + ySpeed * ySpeed > DEADZONE * DEADZONE) { // deadzone
+      if(xSpeed * xSpeed + ySpeed * ySpeed > 1) {
+        double length = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
+        xSpeed /= length;
+        ySpeed /= length;
+      }
+
+      xSpeed = MAX_SPEED * xSpeed;
+      ySpeed = MAX_SPEED * ySpeed;
+
+      m_drive.drive(xSpeed, ySpeed, zRot);
+    }
+
+    System.out.printf("%f,%f,%f, len: %f\n",xSpeed, ySpeed, zRot, Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed));
   }
   @Override
   public void end(boolean interrupted){
