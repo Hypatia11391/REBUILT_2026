@@ -16,10 +16,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class DriveWithJoystick extends Command{
-  private static final double MAX_SPEED = 0.2;
+  private static final double MAX_SPEED = 0.1;
   private static final double DEADZONE = 0.1;
   private final DriveBase m_drive;
   private final Joystick m_stick; // joystick object
+
+  private double currX = 0;
+  private double currY = 0;
 
   public DriveWithJoystick(DriveBase drive, Joystick stick){
       m_drive = drive;
@@ -45,7 +48,14 @@ public class DriveWithJoystick extends Command{
       xSpeed = MAX_SPEED * xSpeed;
       ySpeed = MAX_SPEED * ySpeed;
 
-      m_drive.drive(xSpeed, ySpeed, zRot);
+      currX = currX * 0.95 + xSpeed * 0.05;
+      currY = currY * 0.95 + ySpeed * 0.05;
+
+      m_drive.drive(currX,currY,zRot);
+    } else {
+      currX = currX * 0.95;
+      currY = currY * 0.95;
+      m_drive.drive(currX,currY,0);
     }
 
     System.out.printf("%f,%f,%f, len: %f\n",xSpeed, ySpeed, zRot, Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed));

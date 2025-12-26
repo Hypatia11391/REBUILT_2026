@@ -8,6 +8,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+repositories {
+    maven {
+        url = "https://maven.revrobotics.com/"
+    }
+}
+
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -73,6 +79,8 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation("com.revrobotics.frc:REVLib-java:2026.0.0-beta-1")
 }
 
 test {
