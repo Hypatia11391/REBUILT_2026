@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
-
 public class DriveWithJoystick extends Command{
 
     private final DriveBase m_drive;
@@ -31,14 +30,16 @@ public class DriveWithJoystick extends Command{
 
   @Override
   public void execute(){
-    double ySpeed = -m_stick.getY();
-    double xSpeed = -m_stick.getX();
-    double zRot = -m_stick.getZ();
-    m_drive.drive(xSpeed, ySpeed, zRot);
+    double xSpeed = m_stick.getRawAxis(JoystickAxes.LEFT_X.ordinal());
+    double ySpeed = -m_stick.getRawAxis(JoystickAxes.LEFT_Y.ordinal());
+    double zRot = m_stick.getRawAxis(JoystickAxes.RIGHT_X.ordinal());
+
+    m_drive.driveCartesian(xSpeed, ySpeed, zRot);
+    System.out.printf("%f,%f,%f\n",xSpeed,ySpeed,zRot);    
   }
   @Override
   public void end(boolean interrupted){
-    m_drive.drive(0,0,0);
+    m_drive.driveCartesian(0,0,0);
   }
   @Override
   public boolean isFinished(){
