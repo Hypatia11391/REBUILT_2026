@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class DriveWithJoystick extends Command{
-  private static final double MAX_SPEED = 0.1;
   private static final double DEADZONE = 0.1;
+  private static final double ROT_DEADZONE = 0.1;
   private final DriveBase m_drive;
   private final Joystick m_stick; // joystick object
 
@@ -34,32 +34,31 @@ public class DriveWithJoystick extends Command{
 
   @Override
   public void execute(){
-    double xSpeed = m_stick.getRawAxis(JoystickAxes.LEFT_X.ordinal());
-    double ySpeed = -m_stick.getRawAxis(JoystickAxes.LEFT_Y.ordinal());
+    double wishX = m_stick.getRawAxis(JoystickAxes.LEFT_X.ordinal());
+    double wishY = -m_stick.getRawAxis(JoystickAxes.LEFT_Y.ordinal());
     double zRot = m_stick.getRawAxis(JoystickAxes.RIGHT_X.ordinal());
-
-    if(xSpeed * xSpeed + ySpeed * ySpeed > DEADZONE * DEADZONE) { // deadzone
-      if(xSpeed * xSpeed + ySpeed * ySpeed > 1) {
-        double length = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
-        xSpeed /= length;
-        ySpeed /= length;
-      }
-
-      xSpeed = MAX_SPEED * xSpeed;
-      ySpeed = MAX_SPEED * ySpeed;
-
-      currX = currX * 0.95 + xSpeed * 0.05;
-      currY = currY * 0.95 + ySpeed * 0.05;
-
-      m_drive.drive(currX,currY,zRot);
-    } else {
-      currX = currX * 0.95;
-      currY = currY * 0.95;
-      m_drive.drive(currX,currY,0);
+    if(wishX * wishX + wishY * wishY < DEADZONE * DEADZONE) {
+      wishX = 0;
+      wishY = 0;
     }
 
-    System.out.printf("%f,%f,%f, len: %f\n",xSpeed, ySpeed, zRot, Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed));
+    if(zRot * zRot < ROT_DEADZONE * ROT_DEADZONE) {
+      zRot = 0;
+    }
+
+    if(wishX * wishX + wishY * wishY > 1) {
+      double length = Math.sqrt(wishX * wishX + wishY * wishY);
+      wishX /= length;
+      wishY /= length;
+    }
+
+    currX = currX * 0.95 + wishX * 0.05;
+    currY = currY * 0.95 + wishY * 0.05;
+
+    m_drive.drive(currX,currY,-zRot);
+
   }
+
   @Override
   public void end(boolean interrupted){
     m_drive.drive(0,0,0);

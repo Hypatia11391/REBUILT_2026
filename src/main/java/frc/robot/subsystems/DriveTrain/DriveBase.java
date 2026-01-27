@@ -12,8 +12,14 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import java.util.function.DoubleConsumer;
+
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
 
 //import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
@@ -22,15 +28,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
+
+  private static final double MAX_SPEED = 0.1;
   
-  private static final int kFrontLeftChannel = 2; // front left port
+  private static final int kFrontLeftChannel = 4; // front left port
   private static final int kFrontRightChannel = 1; // front right port
   private static final int kRearLeftChannel = 3; // rear left port
-  private static final int kRearRightChannel = 4; // rear right port
+  private static final int kRearRightChannel = 2; // rear right port
 
   // rear right and joystick port are on different devices, so the ports can be the same
-
-
 
   /**it  Called once at the beginning of the robot program. */
   public DriveBase() { // constructor
@@ -43,14 +49,38 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SparkMax frontLeft = new SparkMax(kFrontLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
     SparkMax rearRight = new SparkMax(kRearRightChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
     SparkMax rearLeft = new SparkMax(kRearLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
+    
+    frontLeft.configureAsync(
+      new SparkMaxConfig().inverted(true),
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters
+    );
 
-    // Invert the right side motors.
-    // You may need to change or remove this to match your robot.
-    // frontRight.setInverted(true);
-    // rearRight.setInverted(true);
+    frontRight.configureAsync(
+      new SparkMaxConfig().inverted(false),
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters
+    );
+
+    rearLeft.configureAsync(
+      new SparkMaxConfig().inverted(true),
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters
+    );
+
+    rearRight.configureAsync(
+      new SparkMaxConfig().inverted(false),
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters
+    );
 
     // TODO: look if method reference can be removed
-    m_Drive = new MecanumDrive(frontLeft::set, value -> rearLeft.set(-value), frontRight::set, value -> rearRight.set(-value));
+    m_Drive = new MecanumDrive(
+      createCappedSpeedSetter(frontLeft, MAX_SPEED),
+      createCappedSpeedSetter(rearLeft, MAX_SPEED),
+      createCappedSpeedSetter(frontRight, MAX_SPEED),
+      createCappedSpeedSetter(rearRight, MAX_SPEED)
+    );
         // for debugging
         SendableRegistry.addChild(m_Drive, frontLeft); // front left motor shows up on the shuffleboard
         SendableRegistry.addChild(m_Drive, rearLeft); // rear left motor shows up on the shuffleboard
@@ -60,6 +90,12 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
     public void drive(double xSpeed, double ySpeed, double zRot){
       m_Drive.driveCartesian(xSpeed, ySpeed, zRot);
+    }
+
+    public DoubleConsumer createCappedSpeedSetter(SparkMax controller, double maxSpeed) {
+      return (speed) -> {
+        controller.set(maxSpeed * speed);
+      };
     }
 
     public void stop() {
