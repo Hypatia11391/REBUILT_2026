@@ -38,8 +38,9 @@ public class RobotContainer {
   private final DriveBase m_driveBase = new DriveBase();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    m_driveBase.setDefaultCommand(new DriveWithJoystick(m_driveBase, m_driverController));
-    configureBindings();
+    m_driveBase.setDefaultCommand(
+      new DriveWithJoystick(m_driveBase, m_driverController));
+      configureBindings();
   }
 
   /**

@@ -61,7 +61,7 @@ public class DriveWithJoystick extends Command{
 
   @Override
   public void end(boolean interrupted){
-    m_drive.drive(0,0,0);
+    m_drive.driveCartesian(0,0,0);
   }
   @Override
   public boolean isFinished(){

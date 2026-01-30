@@ -21,10 +21,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
 //import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
 import edu.wpi.first.wpilibj.drive.MecanumDrive; // mecanum drive math
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.DriveWithJoystick;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -88,8 +90,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         SendableRegistry.addChild(m_Drive, rearRight); // rear right motor shows up on the shuffleboard
     }
 
-    public void drive(double xSpeed, double ySpeed, double zRot){
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot);
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot){
+      SmartDashboard.putNumber("xSpeed", xSpeed);
+      SmartDashboard.putNumber("ySpeed", ySpeed);
+      SmartDashboard.putNumber("zRot", zRot);
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot); 
     }
 
     public DoubleConsumer createCappedSpeedSetter(SparkMax controller, double maxSpeed) {
