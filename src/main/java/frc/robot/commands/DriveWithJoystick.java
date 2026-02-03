@@ -52,10 +52,18 @@ public class DriveWithJoystick extends Command{
       wishY /= length;
     }
 
+    // for (int i = 1; i <=12; i++){
+    //   if (m_stick.getRawButton(i)){
+    //     System.out.println("Button " + i + "pressed");
+    //   }
+    // }
+// m_stick.getTrigger() ? 0.35 :
+    double scale = 0.35;
+
     currX = currX * 0.95 + wishX * 0.05;
     currY = currY * 0.95 + wishY * 0.05;
 
-    m_drive.driveCartesian(currX,currY,-zRot);
+    m_drive.driveCartesian(currX * scale,currY * scale,-zRot * scale); //times the scale
 
   }
 

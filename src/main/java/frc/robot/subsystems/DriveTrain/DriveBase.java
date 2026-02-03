@@ -31,7 +31,7 @@ import frc.robot.commands.DriveWithJoystick;
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
 
-  private static final double MAX_SPEED = 0.1;
+  private static final double MAX_SPEED = 1.0;
   
   private static final int kFrontLeftChannel = 4; // front left port
   private static final int kFrontRightChannel = 1; // front right port
