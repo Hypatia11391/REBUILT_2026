@@ -55,7 +55,7 @@ public class DriveWithJoystick extends Command{
     currX = currX * 0.95 + wishX * 0.05;
     currY = currY * 0.95 + wishY * 0.05;
 
-    m_drive.drive(currX,currY,-zRot);
+    m_drive.driveCartesian(currX,currY,-zRot);
 
   }
 
