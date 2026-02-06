@@ -9,8 +9,6 @@ public class NavX extends SubsystemBase{
     private final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public NavX(){
-        // Optional: give the sensor a moment to start calibrating on boot.
-        // Don't block here; just be aware calibration happens.
     }
 
 
