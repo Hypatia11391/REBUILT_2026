@@ -3,11 +3,10 @@ package frc.utils.gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import edu.wpi.first.wpilibj.SPI;
 import com.studica.frc.AHRS;
 
 public class NavX extends SubsystemBase{
-    private final AHRS navx = new AHRS(SPI.Port.kMXP);
+    private final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public NavX(){
         // Optional: give the sensor a moment to start calibrating on boot.
