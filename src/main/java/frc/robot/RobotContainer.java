@@ -16,9 +16,12 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveWithJoystick;
+import frc.utils.gyro.NavX;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,6 +37,9 @@ public class RobotContainer {
   private final Joystick m_driverController =
       new Joystick(OperatorConstants.kDriverControllerPort);
 
+  private final NavX navx = 
+      new NavX();
+  
   private final DriveBase m_driveBase = new DriveBase();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -41,6 +47,8 @@ public class RobotContainer {
       new DriveWithJoystick(m_driveBase, m_driverController));
       configureBindings();
   }
+
+  
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -52,6 +60,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    new JoystickButton(m_driverController, 1).onTrue(new InstantCommand(navx::zeroYaw, navx));
   }
 
   /**
