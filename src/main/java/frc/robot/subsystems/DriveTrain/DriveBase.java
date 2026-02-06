@@ -26,12 +26,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch 
 //import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
 import edu.wpi.first.wpilibj.drive.MecanumDrive; // mecanum drive math
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.DriveWithJoystick;
+// import frc.robot.commands.DriveWithJoystick;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
 
-  private static final double MAX_SPEED = 0.1;
+  private static final double MAX_SPEED = 1.0;
   
   private static final int kFrontLeftChannel = 4; // front left port
   private static final int kFrontRightChannel = 1; // front right port
