@@ -55,7 +55,7 @@ public class NavX extends SubsystemBase{
     }
 
     // If you use getAngle(), reset it to 0.
-    public void resetAngle(){
+    public void resetNavX(){
         navx.reset();
     }
 
