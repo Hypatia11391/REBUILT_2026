@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
@@ -90,11 +91,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         SendableRegistry.addChild(m_Drive, rearRight); // rear right motor shows up on the shuffleboard
     }
 
-    public void driveCartesian(double xSpeed, double ySpeed, double zRot){
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
       SmartDashboard.putNumber("zRot", zRot);
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot); 
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
     }
 
     public DoubleConsumer createCappedSpeedSetter(SparkMax controller, double maxSpeed) {
