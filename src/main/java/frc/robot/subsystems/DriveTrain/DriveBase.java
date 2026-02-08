@@ -21,90 +21,84 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
+import edu.wpi.first.util.sendable.SendableRegistry; 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; 
 
-//import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
-import edu.wpi.first.wpilibj.drive.MecanumDrive; // mecanum drive math
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import frc.robot.commands.DriveWithJoystick;
 
-public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
-  private final MecanumDrive m_Drive; // mecanum drive object
+public class DriveBase extends SubsystemBase { 
 
+  // tune this to cap max output for testing
   private static final double MAX_SPEED = 1.0;
   
-  private static final int kFrontLeftChannel = 4; // front left port
-  private static final int kFrontRightChannel = 1; // front right port
-  private static final int kRearLeftChannel = 3; // rear left port
-  private static final int kRearRightChannel = 2; // rear right port
+  // CAN IDs (spark max)
+  private static final int FRONT_LEFT_ID = 4;
+  private static final int FRONT_RIGHT_ID  = 1;
+  private static final int REAR_LEFT_ID = 3;
+  private static final int REAR_RIGHT_ID = 2;
 
-  // rear right and joystick port are on different devices, so the ports can be the same
+  private final SparkMax frontRight;
+  private final SparkMax frontLeft;
+  private final SparkMax rearRight;
+  private final SparkMax rearLeft;
 
-  /**it  Called once at the beginning of the robot program. */
-  public DriveBase() { // constructor
-    // PWMSparkMax frontLeft = new PWMSparkMax(kFrontLeftChannel); // front left motor controller
-    // PWMSparkMax rearLeft = new PWMSparkMax(kRearLeftChannel); // rear left motor controller
-    // PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel); // front right motor controller
-    // PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel); // rear right motor controller
+  private final MecanumDrive m_Drive; 
 
-    SparkMax frontRight = new SparkMax(kFrontRightChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax frontLeft = new SparkMax(kFrontLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax rearRight = new SparkMax(kRearRightChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax rearLeft = new SparkMax(kRearLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    
-    frontLeft.configureAsync(
-      new SparkMaxConfig().inverted(true),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
+  public DriveBase() { 
 
-    frontRight.configureAsync(
-      new SparkMaxConfig().inverted(false),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
+    // motors
+    frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    rearRight = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
 
-    rearLeft.configureAsync(
-      new SparkMaxConfig().inverted(true),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
+    configureMotor(frontLeft, true);
+    configureMotor(frontRight, false);
+    configureMotor(rearLeft, true);
+    configureMotor(rearRight, false);
 
-    rearRight.configureAsync(
-      new SparkMaxConfig().inverted(false),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
-
-    // TODO: look if method reference can be removed
     m_Drive = new MecanumDrive(
-      createCappedSpeedSetter(frontLeft, MAX_SPEED),
-      createCappedSpeedSetter(rearLeft, MAX_SPEED),
-      createCappedSpeedSetter(frontRight, MAX_SPEED),
-      createCappedSpeedSetter(rearRight, MAX_SPEED)
+      cappedSetter(frontLeft, MAX_SPEED),
+      cappedSetter(rearLeft, MAX_SPEED),
+      cappedSetter(frontRight, MAX_SPEED),
+      cappedSetter(rearRight, MAX_SPEED)
     );
-        // for debugging
-        SendableRegistry.addChild(m_Drive, frontLeft); // front left motor shows up on the shuffleboard
-        SendableRegistry.addChild(m_Drive, rearLeft); // rear left motor shows up on the shuffleboard
-        SendableRegistry.addChild(m_Drive, frontRight); // front right motor shows up on the shuffleboard
-        SendableRegistry.addChild(m_Drive, rearRight); // rear right motor shows up on the shuffleboard
-    }
 
+    // motors visible in shuffleboard
+    SendableRegistry.addChild(m_Drive, frontLeft); 
+    SendableRegistry.addChild(m_Drive, rearLeft); 
+    SendableRegistry.addChild(m_Drive, frontRight);
+    SendableRegistry.addChild(m_Drive, rearRight);
+    }
+    
+    /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
       SmartDashboard.putNumber("zRot", zRot);
       m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
     }
-
-    public DoubleConsumer createCappedSpeedSetter(SparkMax controller, double maxSpeed) {
-      return (speed) -> {
-        controller.set(maxSpeed * speed);
-      };
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot){
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
     }
 
     public void stop() {
       m_Drive.stopMotor();
     }
+
+    public void configureMotor(SparkMax motor, boolean isInverted){
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.inverted(isInverted);
+      motor.configureAsync(
+        config, 
+        ResetMode.kNoResetSafeParameters, 
+        PersistMode.kPersistParameters);
+    }
+
+    private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
+        return speed -> controller.set(maxSpeed * speed);
+    }
+
+    
 }
