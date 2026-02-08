@@ -11,9 +11,16 @@
  **/
 
 package frc.robot.commands;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 import frc.robot.subsystems.DriveTrain.DriveBase;
+import frc.utils.gyro.NavX;
+
+import com.studica.frc.AHRS;
+
 
 public class DriveWithJoystick extends Command{
   private static final double DEADZONE = 0.1;
@@ -24,14 +31,16 @@ public class DriveWithJoystick extends Command{
 
   private final DriveBase m_drive;
   private final Joystick m_stick; // joystick object
+  private final NavX navX; // navx object
 
   private double currX = 0;
   private double currY = 0;
   private double currZ = 0;
 
-  public DriveWithJoystick(DriveBase drive, Joystick stick){
+  public DriveWithJoystick(DriveBase drive, Joystick stick, NavX navx){
       m_drive = drive;
       m_stick = stick;
+      navX = navx;
       addRequirements(m_drive);
   }
   @Override
@@ -66,7 +75,14 @@ public class DriveWithJoystick extends Command{
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
     currZ = currZ * (1.0 - ALPHA_Z) + wishZ * ALPHA_Z;
     
-    m_drive.driveCartesian(currX * scale,currY * scale,-currZ * scale); // scales
+    double outX = currX * scale;
+    double outY = currY * scale;
+    double outZ = -currZ * scale;
+
+    //Field-oriented, navx yaw as heading
+    Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg());
+
+    m_drive.driveCartesian(outX, outY, outZ, heading); // scales
 
   }
 
@@ -75,7 +91,7 @@ public class DriveWithJoystick extends Command{
     currX = 0;
     currY = 0;
     currZ = 0;
-    m_drive.driveCartesian(0,0,0);
+    m_drive.stop();
   }
   @Override
   public boolean isFinished(){
