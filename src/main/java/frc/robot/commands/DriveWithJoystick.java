@@ -19,8 +19,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.utils.gyro.NavX;
 
-import com.studica.frc.AHRS;
-
 
 public class DriveWithJoystick extends Command{
   private static final double DEADZONE = 0.1;
