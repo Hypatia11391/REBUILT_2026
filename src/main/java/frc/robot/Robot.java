@@ -3,15 +3,21 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.PoseReceiver;
+
+import java.net.ServerSocket;
 
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
+  private final PoseReceiver poseReceiver;
 
   public Robot() {
     // RobotContainer wires subsystems + default commands + button bindings.
     m_robotContainer = new RobotContainer();
+
+    this.poseReceiver = new PoseReceiver();
   }
 
   @Override
@@ -38,7 +44,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  // This function is called periodically during autonomous. 
+  // This function is called periodically during autonomous.
   @Override
   public void autonomousPeriodic() {}
 
