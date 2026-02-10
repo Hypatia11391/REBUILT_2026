@@ -28,8 +28,8 @@ public class DriveWithJoystick extends Command{
   private static final double ALPHA_Z = 0.08;
 
   private final DriveBase m_drive;
-  private final Joystick m_stick; // joystick object
-  private final NavX navX; // navx object
+  private final Joystick m_stick;
+  private final NavX navX;
 
   private double currX = 0;
   private double currY = 0;
@@ -66,8 +66,8 @@ public class DriveWithJoystick extends Command{
       wishY /= mag;
     }
   
-  // speed scaling TODO: hook to button for slow-fast
-    double scale = 0.40; // % speed
+    // speed scaling TODO: hook to button for slow-fast
+    double scale = 0.40;
 
     currX = currX * (1.0 - ALPHA_XY) + wishX * ALPHA_XY;
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
@@ -80,7 +80,7 @@ public class DriveWithJoystick extends Command{
     //Field-oriented, navx yaw as heading
     Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg());
 
-    m_drive.driveCartesian(outX, outY, outZ, heading); // scales
+    m_drive.driveCartesian(outX, outY, outZ, heading);
 
   }
 
