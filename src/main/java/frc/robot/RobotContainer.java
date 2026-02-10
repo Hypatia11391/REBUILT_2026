@@ -10,7 +10,7 @@
 
 package frc.robot;
 
-import frc.utils.gyro.NavX;
+import frc.utils.gyro.Navx;
 
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.Constants.OperatorConstants;
@@ -38,8 +38,8 @@ public class RobotContainer {
   private final Joystick m_driverController =
       new Joystick(OperatorConstants.kDriverControllerPort);
 
-  private final NavX navx = 
-      new NavX();
+  private final Navx navx = 
+      new Navx();
   
   private final DriveBase m_driveBase =
       new DriveBase();

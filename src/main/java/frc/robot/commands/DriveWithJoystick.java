@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
-import frc.utils.gyro.NavX;
+import frc.utils.gyro.Navx;
 
 
 public class DriveWithJoystick extends Command{
@@ -29,13 +29,13 @@ public class DriveWithJoystick extends Command{
 
   private final DriveBase m_drive;
   private final Joystick m_stick; // joystick object
-  private final NavX navX; // navx object
+  private final Navx navX; // navx object
 
   private double currX = 0;
   private double currY = 0;
   private double currZ = 0;
 
-  public DriveWithJoystick(DriveBase drive, Joystick stick, NavX navx){
+  public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;
       m_stick = stick;
       navX = navx;
