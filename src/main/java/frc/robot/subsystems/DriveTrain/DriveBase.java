@@ -22,7 +22,7 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.SendableRegistry; 
@@ -43,7 +43,6 @@ public class DriveBase extends SubsystemBase {
   private static final int REAR_RIGHT_ID = 2;
 
  
-  private static final int KICKER_CIS_ID = 0;
   private static final int SHOOTER_NEO_LOW_ID = 0;
   private static final int SHOOTER_NEO_TOP_ID = 0;
   /*  
@@ -59,7 +58,6 @@ public class DriveBase extends SubsystemBase {
   private final SparkMax rearRight;
   private final SparkMax rearLeft;
 
-  private final SparkMax feedCis;
   private final SparkMax shooterNeoLow;
   private final SparkMax shooterNeoTop;
 
@@ -77,12 +75,9 @@ public class DriveBase extends SubsystemBase {
     shooterNeoLow = new SparkMax(SHOOTER_NEO_LOW_ID, SparkLowLevel.MotorType.kBrushless);
     shooterNeoTop = new SparkMax(SHOOTER_NEO_TOP_ID, SparkLowLevel.MotorType.kBrushless);
 
-    // intake motors
-    intakeRollCis = new SparkMax(INTAKE_ROLL_CIS_ID, SparkLowLevel.MotorType.kBrushed);
-    intakeLiftNonCis = new SparkMax(INTAKE_LIFT_NON_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+    
 
-    // kicker motor
-    feedCis = new SparkMax(KICKER_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+    
     
 
     configureMotor(frontLeft, true);
@@ -92,9 +87,8 @@ public class DriveBase extends SubsystemBase {
 
     configureShooterMotor(shooterNeoLow, false); 
     configureShooterMotor(shooterNeoTop, false);
-    configureIntakeAndFeedMotor(feedCis, false); 
-    configureIntakeAndFeedMotor(intakeRollCis, false);
-    configureIntakeLiftMotor(intakeLiftNonCis, false);
+    
+    
 
     m_Drive = new MecanumDrive(
       cappedSetter(frontLeft, MAX_SPEED),
@@ -153,46 +147,8 @@ public class DriveBase extends SubsystemBase {
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
     }
+    
 
-    public void configureIntakeAndFeedMotor(SparkMax motor, boolean isInverted){
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(isInverted)
-            .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(50)
-            .voltageCompensation(12)
-            .openLoopRampRate(0.1);
-      motor.configureAsync(
-        config, 
-        ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);
-    }
-
-    public void configureKickerMotor(SparkMax motor, boolean isInverted){
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(isInverted)
-            .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(30)
-            .voltageCompensation(12)
-            .openLoopRampRate(0.1);
-
-      motor.configureAsync(
-        config, 
-        ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);
-    }
-    public void configureIntakeLiftMotor(SparkMax motor, boolean isInverted){
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(isInverted)
-            .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(25)
-            .voltageCompensation(12)
-            .openLoopRampRate(0.2);
-
-      motor.configureAsync(
-        config, 
-        ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);
-    }
 
     private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
         return speed -> controller.set(maxSpeed * speed);

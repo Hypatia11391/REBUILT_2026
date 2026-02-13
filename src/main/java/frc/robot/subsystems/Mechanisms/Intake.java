@@ -31,6 +31,40 @@ public class Intake extends SubsystemBase {
 
 
     public Intake(){
-        
+
+      // intake motors
+      intakeRollCis = new SparkMax(INTAKE_ROLL_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+      intakeLiftNonCis = new SparkMax(INTAKE_LIFT_NON_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+
+      configureIntakeMotor(intakeRollCis, false);
+      configureIntakeLiftMotor(intakeLiftNonCis, false);
+
+    }
+
+    public void configureIntakeLiftMotor(SparkMax motor, boolean isInverted){
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.inverted(isInverted)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(25)
+            .voltageCompensation(12)
+            .openLoopRampRate(0.2);
+
+      motor.configureAsync(
+        config, 
+        ResetMode.kNoResetSafeParameters, 
+        PersistMode.kPersistParameters);
+    }
+
+    public void configureIntakeMotor(SparkMax motor, boolean isInverted){
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.inverted(isInverted)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(50)
+            .voltageCompensation(12)
+            .openLoopRampRate(0.1);
+      motor.configureAsync(
+        config, 
+        ResetMode.kNoResetSafeParameters, 
+        PersistMode.kPersistParameters);
     }
 }
