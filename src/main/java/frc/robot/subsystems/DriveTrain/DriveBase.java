@@ -25,6 +25,7 @@ import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -94,7 +95,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final SparkMax shooterNeoLow;
   private final SparkMax shooterNeoTop;
 
-  private final MecanumDrive m_Drive; 
 
   private Pose2d currentPose = STARTING_POSE;
 
