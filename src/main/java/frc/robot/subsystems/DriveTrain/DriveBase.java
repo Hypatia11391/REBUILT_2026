@@ -20,10 +20,12 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,12 +56,22 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final int REAR_LEFT_ID = 3;
   private static final int REAR_RIGHT_ID = 2;
 
+ 
+  private static final int SHOOTER_NEO_LOW_ID = 0;
+  private static final int SHOOTER_NEO_TOP_ID = 0;
+  /*  
+  *   brushed - CIS for the rollers
+  *   brushed - non CIS lifting
+  *   brushed - CIS for the kicker
+  *   brushless - NEO x2
+  */  
+  
+
   private final SparkMax frontRight;
   private final SparkMax frontLeft;
   private final SparkMax rearRight;
   private final SparkMax rearLeft;
-
-  
+   
   //     -/  \
   // ^+x
   // |   -\  /
@@ -79,6 +91,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
   private static final Pose2d STARTING_POSE = Pose2d.kZero; // TODO: Correct to be the actual starting position!
+  private final SparkMax shooterNeoLow;
+  private final SparkMax shooterNeoTop;
+
+  private final MecanumDrive m_Drive; 
 
   private Pose2d currentPose = STARTING_POSE;
 
@@ -91,7 +107,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public DriveBase(Navx navx) { // constructor
     this.navx = navx;
 
-    // motors
+    // wheel motors
     frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
@@ -100,6 +116,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
+
+    // shooter motors
+    shooterNeoLow = new SparkMax(SHOOTER_NEO_LOW_ID, SparkLowLevel.MotorType.kBrushless);
+    shooterNeoTop = new SparkMax(SHOOTER_NEO_TOP_ID, SparkLowLevel.MotorType.kBrushless);
+
 
     configureMotor(frontLeft, true);
     configureMotor(frontRight, false);
@@ -110,6 +131,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     flEncoder = frontLeft.getAbsoluteEncoder();
     rrEncoder = rearRight.getAbsoluteEncoder();
     rlEncoder = rearLeft.getAbsoluteEncoder();
+
+    configureShooterMotor(shooterNeoLow, false); 
+    configureShooterMotor(shooterNeoTop, false);
+    
+    
 
     m_Drive = new MecanumDrive(
       cappedSetter(frontLeft, MAX_SPEED),
@@ -233,6 +259,28 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
     }
+
+    public void configureShooterMotor(SparkMax motor, boolean isInverted){
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.inverted(isInverted)
+            .idleMode(IdleMode.kCoast)
+            .smartCurrentLimit(50)
+            .voltageCompensation(12)
+            .openLoopRampRate(0.25);
+
+      // TODO: figure out the PID stuff
+      // config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      //   .p(0.0001, ClosedLoopSlot.kSlot0)
+      //   .i(0, ClosedLoopSlot.kSlot0)
+      //   .d(0, ClosedLoopSlot.kSlot0)
+      //   .outputRange(0, 1, ClosedLoopSlot.kSlot0);
+      motor.configureAsync(
+        config, 
+        ResetMode.kNoResetSafeParameters, 
+        PersistMode.kPersistParameters);
+    }
+    
+
 
     private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
         return speed -> controller.set(maxSpeed * speed);
