@@ -1,6 +1,6 @@
 /**
  * RobotContainer
- *
+ * <p>
  * Defines the overall structure of the robot.
  * - Creates subsystems (e.g. DriveBase)
  * - Creates controllers and joysticks
@@ -15,8 +15,6 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveTrain.DriveBase;
-
-
 import edu.wpi.first.wpilibj.Joystick;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,7 +39,7 @@ public class RobotContainer {
       new Navx();
   
   private final DriveBase m_driveBase =
-      new DriveBase();
+      new DriveBase(navx);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -65,6 +63,6 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return Autos.getAutonomousCommand();
+    return Autos.autonomousFull("pathplanner/paths.txt");
   }
 }
