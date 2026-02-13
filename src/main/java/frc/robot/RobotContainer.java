@@ -1,6 +1,6 @@
 /**
  * RobotContainer
- *
+ * <p>
  * Defines the overall structure of the robot.
  * - Creates subsystems (e.g. DriveBase)
  * - Creates controllers and joysticks
@@ -37,11 +37,11 @@ public class RobotContainer {
   private final Joystick m_driverController =
       new Joystick(OperatorConstants.kDriverControllerPort);
 
-  private final NavX navx = 
-      new NavX();
+  private final Navx navx = 
+      new Navx();
   
   private final DriveBase m_driveBase =
-      new DriveBase();
+      new DriveBase(navx);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

@@ -5,10 +5,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.studica.frc.AHRS;
 
-public class NavX extends SubsystemBase{
+public class Navx extends SubsystemBase{
     private final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-    public NavX(){
+    public Navx(){
     }
 
 
