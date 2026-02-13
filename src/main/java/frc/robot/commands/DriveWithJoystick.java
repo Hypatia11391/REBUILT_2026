@@ -29,7 +29,7 @@ public class DriveWithJoystick extends Command{
 
   private final DriveBase m_drive;
   private final Joystick m_stick;
-  private final NavX navX;
+  private final Navx navX;
 
   private double currX = 0;
   private double currY = 0;
