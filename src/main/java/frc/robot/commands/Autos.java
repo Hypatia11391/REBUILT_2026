@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.lang.reflect.Array;
 
@@ -24,7 +23,6 @@ import java.util.List;
 
 
 public final class Autos {
-  /** Example static factory for an autonomous command. */
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -81,8 +79,6 @@ public static String[] getPaths(String filePath) {
             e.printStackTrace();
         }
     }
-
-
 
     return Commands.sequence(commandList.toArray(new Command[0])).withTimeout(20.0);
     }

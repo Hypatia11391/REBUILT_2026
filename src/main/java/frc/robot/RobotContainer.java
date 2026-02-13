@@ -10,8 +10,8 @@
 
 package frc.robot;
 
-import frc.utils.gyro.Navx;
-
+import frc.utils.gyro.NavX;
+import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveTrain.DriveBase;
@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
   private final Joystick m_driverController =
       new Joystick(OperatorConstants.kDriverControllerPort);
 
@@ -66,6 +65,6 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return null;
+    return Autos.getAutonomousCommand();
   }
 }

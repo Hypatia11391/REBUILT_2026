@@ -22,7 +22,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkMaxd;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -36,8 +36,7 @@ import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
-//import edu.wpi.first.wpilibj.TimedRobot; //TODO: check whether or we can use it, cuz it seems to be off
-import edu.wpi.first.wpilibj.drive.MecanumDrive; // mecanum drive math
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.gyro.Navx;
 // import frc.robot.commands.DriveWithJoystick;
@@ -46,13 +45,23 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final MecanumDrive m_Drive; // mecanum drive object
   private final Navx navx;
 
+  // tune this to cap max output for testing
   private static final double MAX_SPEED = 1.0;
   
-  private static final int kFrontLeftChannel = 4; // front left port
-  private static final int kFrontRightChannel = 1; // front right port
-  private static final int kRearLeftChannel = 3; // rear left port
-  private static final int kRearRightChannel = 2; // rear right port
+  // CAN IDs (spark max)
+  private static final int FRONT_LEFT_ID = 4;
+  private static final int FRONT_RIGHT_ID  = 1;
+  private static final int REAR_LEFT_ID = 3;
+  private static final int REAR_RIGHT_ID = 2;
 
+  private final SparkMax frontRight;
+  private final SparkMax frontLeft;
+  private final SparkMax rearRight;
+  private final SparkMax rearLeft;
+
+  private final MecanumDrive m_Drive; 
+
+  
   //     -/  \
   // ^+x
   // |   -\  /
@@ -84,61 +93,43 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public DriveBase(Navx navx) { // constructor
     this.navx = navx;
 
-    SparkMax frontRight = new SparkMax(kFrontRightChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax frontLeft = new SparkMax(kFrontLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax rearRight = new SparkMax(kRearRightChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-    SparkMax rearLeft = new SparkMax(kRearLeftChannel, SparkLowLevel.MotorType.kBrushless); // front right motor controller
-
+    // motors
+    frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    rearRight = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
 
-    frontLeft.configureAsync(
-      new SparkMaxConfig().inverted(true).apply(conf),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
-
-    frontRight.configureAsync(
-      new SparkMaxConfig().inverted(false).apply(conf),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
-
-    rearLeft.configureAsync(
-      new SparkMaxConfig().inverted(true).apply(conf),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
-
-    rearRight.configureAsync(
-      new SparkMaxConfig().inverted(false).apply(conf),
-      ResetMode.kNoResetSafeParameters,
-      PersistMode.kPersistParameters
-    );
-
+    configureMotor(frontLeft, true);
+    configureMotor(frontRight, false);
+    configureMotor(rearLeft, true);
+    configureMotor(rearRight, false);
+    
     frEncoder = frontRight.getAbsoluteEncoder();
     flEncoder = frontLeft.getAbsoluteEncoder();
     rrEncoder = rearRight.getAbsoluteEncoder();
     rlEncoder = rearLeft.getAbsoluteEncoder();
 
     m_Drive = new MecanumDrive(
-      createCappedSpeedSetter(frontLeft, MAX_SPEED),
-      createCappedSpeedSetter(rearLeft, MAX_SPEED),
-      createCappedSpeedSetter(frontRight, MAX_SPEED),
-      createCappedSpeedSetter(rearRight, MAX_SPEED)
+      cappedSetter(frontLeft, MAX_SPEED),
+      cappedSetter(rearLeft, MAX_SPEED),
+      cappedSetter(frontRight, MAX_SPEED),
+      cappedSetter(rearRight, MAX_SPEED)
     );
 
-    // for debugging
-    SendableRegistry.addChild(m_Drive, frontLeft); // front left motor shows up on the shuffleboard
-    SendableRegistry.addChild(m_Drive, rearLeft); // rear left motor shows up on the shuffleboard
-    SendableRegistry.addChild(m_Drive, frontRight); // front right motor shows up on the shuffleboard
-    SendableRegistry.addChild(m_Drive, rearRight); // rear right motor shows up on the shuffleboard
-
+    // motors visible in shuffleboard
+    SendableRegistry.addChild(m_Drive, frontLeft); 
+    SendableRegistry.addChild(m_Drive, rearLeft); 
+    SendableRegistry.addChild(m_Drive, frontRight);
+    SendableRegistry.addChild(m_Drive, rearRight);
+  
     initPathPlanner();
-  }
-
-  private void initPathPlanner() {
+    }
+    
+    private void initPathPlanner() {
     RobotConfig config;
     try{
       config = RobotConfig.fromGUISettings();
@@ -221,20 +212,33 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     return currentPose;
   }
 
-  public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
-    SmartDashboard.putNumber("xSpeed", xSpeed);
-    SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("zRot", zRot);
-    m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle);
-  }
+    /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
+      SmartDashboard.putNumber("xSpeed", xSpeed);
+      SmartDashboard.putNumber("ySpeed", ySpeed);
+      SmartDashboard.putNumber("zRot", zRot);
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
+    }
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot){
+      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
+    }
 
-  public DoubleConsumer createCappedSpeedSetter(SparkMax controller, double maxSpeed) {
-    return (speed) -> {
-      controller.set(maxSpeed * speed);
-    };
-  }
+    public void stop() {
+      m_Drive.stopMotor();
+    }
 
-  public void stop() {
-    m_Drive.stopMotor();
-  }
+    public void configureMotor(SparkMax motor, boolean isInverted){
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.inverted(isInverted);
+      motor.configureAsync(
+        config, 
+        ResetMode.kNoResetSafeParameters, 
+        PersistMode.kPersistParameters);
+    }
+
+    private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
+        return speed -> controller.set(maxSpeed * speed);
+    }
+
+    
 }
