@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
-import frc.utils.gyro.NavX;
+import frc.utils.gyro.Navx;
 
 
 public class DriveWithJoystick extends Command{
@@ -29,15 +29,15 @@ public class DriveWithJoystick extends Command{
 
   private final DriveBase m_drive;
   private final Joystick m_stick;
-  private final NavX navX;
+  private final Navx navX;
 
   private double currX = 0;
   private double currY = 0;
   private double currZ = 0;
 
-  private static final double NAVX_OFFSET_DEG = 90;
+  // private static final double NAVX_OFFSET_DEG = 90; // if needed to setup the right angle
 
-  public DriveWithJoystick(DriveBase drive, Joystick stick, NavX navx){
+  public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;
       m_stick = stick;
       navX = navx;
@@ -80,7 +80,7 @@ public class DriveWithJoystick extends Command{
     double outZ = -currZ * scale;
 
     //Field-oriented, navx yaw as heading
-    Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg() + NAVX_OFFSET_DEG);
+    Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg()); //+ NAVX_OFFSET_DEG
 
     m_drive.driveCartesian(outX, outY, outZ, heading);
 

@@ -42,9 +42,7 @@ public class DriveBase extends SubsystemBase {
   private static final int REAR_LEFT_ID = 3;
   private static final int REAR_RIGHT_ID = 2;
 
-  // TODO: edit all the CAN IDs to proper ones
-  private static final int INTAKE_ROLL_CIS_ID = 0; 
-  private static final int INTAKE_LIFT_NON_CIS_ID = 0;
+ 
   private static final int KICKER_CIS_ID = 0;
   private static final int SHOOTER_NEO_LOW_ID = 0;
   private static final int SHOOTER_NEO_TOP_ID = 0;
@@ -61,8 +59,6 @@ public class DriveBase extends SubsystemBase {
   private final SparkMax rearRight;
   private final SparkMax rearLeft;
 
-  private final SparkMax intakeRollCis;
-  private final SparkMax intakeLiftNonCis;
   private final SparkMax feedCis;
   private final SparkMax shooterNeoLow;
   private final SparkMax shooterNeoTop;
@@ -86,7 +82,7 @@ public class DriveBase extends SubsystemBase {
     intakeLiftNonCis = new SparkMax(INTAKE_LIFT_NON_CIS_ID, SparkLowLevel.MotorType.kBrushed);
 
     // kicker motor
-    kickerCis = new SparkMax(KICKER_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+    feedCis = new SparkMax(KICKER_CIS_ID, SparkLowLevel.MotorType.kBrushed);
     
 
     configureMotor(frontLeft, true);
