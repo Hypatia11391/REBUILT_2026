@@ -3,12 +3,11 @@ package frc.robot.subsystems.Mechanisms;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 
   /*  
   *   brushed - CIS for the rollers
@@ -20,18 +19,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Intake extends SubsystemBase {
 
-    private static final double MAX_SPEED = 1.0;
-
     // TODO: edit all the CAN IDs to proper ones
     private static final int INTAKE_ROLL_CIS_ID = 0; 
     private static final int INTAKE_LIFT_NON_CIS_ID = 0;
 
     private final SparkMax intakeRollCis;
-    private final SparkMax intakeLiftNonCis;
-
+    private final SparkMax intakeLiftNonCis;    
 
     public Intake(){
-
       // intake motors
       intakeRollCis = new SparkMax(INTAKE_ROLL_CIS_ID, SparkLowLevel.MotorType.kBrushed);
       intakeLiftNonCis = new SparkMax(INTAKE_LIFT_NON_CIS_ID, SparkLowLevel.MotorType.kBrushed);
@@ -66,5 +61,10 @@ public class Intake extends SubsystemBase {
         config, 
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
+    }
+
+    public void stop() {
+        intakeLiftNonCis.stopMotor();
+        intakeRollCis.stopMotor();
     }
 }

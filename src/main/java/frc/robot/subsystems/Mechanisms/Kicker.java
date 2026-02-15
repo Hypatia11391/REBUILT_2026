@@ -4,28 +4,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-public class Feed extends SubsystemBase {
+public class Kicker extends SubsystemBase {
 
-    private static final double MAX_SPEED = 1.0;
+    private static final int KICKER_CIS_ID = 0;
 
-    private static final int FEED_CIS_ID = 0;
+    private final SparkMax kickerCis;
 
-    private final SparkMax feedCis;
-
-    public Feed(){
+    public Kicker(){
         // kicker motor
-        feedCis = new SparkMax(FEED_CIS_ID, SparkLowLevel.MotorType.kBrushed);
+        kickerCis = new SparkMax(KICKER_CIS_ID, SparkLowLevel.MotorType.kBrushed);
 
-        configureFeedMotor(feedCis, false);
+        configureKickerMotor(kickerCis, false);
     }
     
-    public void configureFeedMotor(SparkMax motor, boolean isInverted){
+    public void configureKickerMotor(SparkMax motor, boolean isInverted){
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
@@ -37,6 +34,10 @@ public class Feed extends SubsystemBase {
         config, 
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
+    }
+
+    public void stop() {
+        kickerCis.stopMotor();
     }
     
 }
