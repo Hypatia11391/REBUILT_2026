@@ -39,7 +39,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch 
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.gyro.Navx;
-// import frc.robot.commands.DriveWithJoystick;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -58,8 +57,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final SparkMax frontLeft;
   private final SparkMax rearRight;
   private final SparkMax rearLeft;
-
-  
+   
   //     -/  \
   // ^+x
   // |   -\  /
@@ -91,7 +89,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public DriveBase(Navx navx) { // constructor
     this.navx = navx;
 
-    // motors
+    // wheel motors
     frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
@@ -233,10 +231,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
     }
-
+    
     private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
         return speed -> controller.set(maxSpeed * speed);
     }
-
-    
 }
