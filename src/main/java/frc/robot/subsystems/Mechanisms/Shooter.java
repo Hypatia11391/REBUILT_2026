@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -13,30 +12,30 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/* 
+ * SHOOTER
+ *      brushless NEO x2
+ * 
+*/
 
 public class Shooter extends SubsystemBase {
     
-    private static final int SHOOTER_NEO_LOW_ID = 0; // TODO: type an actual ID
-    private static final int SHOOTER_NEO_TOP_ID = 0; // TODO: type an actual ID
-    /*  
-    *   brushed - CIS for the rollers
-    *   brushed - non CIS lifting
-    *   brushed - CIS for the kicker
-    *   brushless - NEO x2
-    */  
+    private static final int SHOOTER_NEO_LEFT_ID = 0; // TODO: type an actual ID
+    private static final int SHOOTER_NEO_RIGHT_ID = 0; // TODO: type an actual ID 
 
     private final SparkMax shooterNeoLeft;
     private final SparkMax shooterNeoRight;
 
-    private final RelativeEncoder topEncoder;
-    private final RelativeEncoder botttomEncoder;
+    private final RelativeEncoder leftEncoder;
+    private final RelativeEncoder rightEncoder;
 
-    private final SparkClosedLoopController topLoop;
-    private final SparkClosedLoopController bottomLoop;
+    private final SparkClosedLoopController leftLoop;
+    private final SparkClosedLoopController rightLoop;
 
-    private double targetTopRPM = 0.0;
-    private double targetBottomRPM = 0.0;
+    private double targetLeftRPM = 0.0;
+    private double targetRightRPM = 0.0;
 
     // PID constants
     private static final double kP = 0.0001;
@@ -51,14 +50,14 @@ public class Shooter extends SubsystemBase {
     public Shooter(){
 
     // shooter motors
-    shooterNeoRight = new SparkMax(SHOOTER_NEO_TOP_ID, SparkLowLevel.MotorType.kBrushless);
-    shooterNeoLeft = new SparkMax(SHOOTER_NEO_LOW_ID, SparkLowLevel.MotorType.kBrushless);
+    shooterNeoRight = new SparkMax(SHOOTER_NEO_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    shooterNeoLeft = new SparkMax(SHOOTER_NEO_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     
-    topEncoder = shooterNeoRight.getEncoder();
-    botttomEncoder = shooterNeoLeft.getEncoder();
+    rightEncoder = shooterNeoRight.getEncoder();
+    leftEncoder = shooterNeoLeft.getEncoder();
 
-    topLoop = shooterNeoRight.getClosedLoopController();
-    bottomLoop = shooterNeoLeft.getClosedLoopController();
+    rightLoop = shooterNeoRight.getClosedLoopController();
+    leftLoop = shooterNeoLeft.getClosedLoopController();
     
         
     configureShooterMotor(shooterNeoLeft, false); 
@@ -68,26 +67,26 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setTargetRPM(double topRPM, double bottomRPM){
-        targetTopRPM = topRPM;
-        targetBottomRPM = bottomRPM;
+        targetRightRPM = topRPM;
+        targetLeftRPM = bottomRPM;
 
-        topLoop.setSetpoint(targetTopRPM, ControlType.kVelocity);
-        bottomLoop.setSetpoint(targetBottomRPM, ControlType.kVelocity);
+        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
     }
 
-    public double getTopRPM(){return topEncoder.getVelocity();}
-    public double getBottomRPM(){return botttomEncoder.getVelocity();}
+    public double getTopRPM(){return rightEncoder.getVelocity();}
+    public double getBottomRPM(){return leftEncoder.getVelocity();}
 
     public boolean atSpeed(){
-        return Math.abs(getTopRPM() - targetTopRPM) < RPM_TOL && Math.abs(getBottomRPM() - targetBottomRPM) < RPM_TOL;
+        return Math.abs(getTopRPM() - targetRightRPM) < RPM_TOL && Math.abs(getBottomRPM() - targetLeftRPM) < RPM_TOL;
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Shooter/TopRPM", getTopRPM());
         SmartDashboard.putNumber("Shooter/BottomRPM", getBottomRPM());
-        SmartDashboard.putNumber("Shooter/TopTarget", targetTopRPM);
-        SmartDashboard.putNumber("Shooter/BottomTarget", targetBottomRPM);
+        SmartDashboard.putNumber("Shooter/TopTarget", targetRightRPM);
+        SmartDashboard.putNumber("Shooter/BottomTarget", targetLeftRPM);
         SmartDashboard.putBoolean("Shooter/AtSpeed", atSpeed());
     }
 
@@ -113,8 +112,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public void stop() {
-        targetTopRPM = 0.0;
-        targetBottomRPM = 0.0;
+        targetRightRPM = 0.0;
+        targetLeftRPM = 0.0;
         shooterNeoRight.stopMotor();
         shooterNeoLeft.stopMotor();
     }

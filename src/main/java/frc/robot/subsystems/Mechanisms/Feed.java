@@ -10,31 +10,30 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 /* 
- * KICKER
- *      brushed CIM x1
+ * FEED
+ *      brushless NEO x1
 */
 
-public class Kicker extends SubsystemBase {
+public class Feed extends SubsystemBase {
+    private static final int FEED_NEO_ID = 0;
 
-    private static final int KICKER_CIM_ID = 0;
+    private final SparkMax feedNeo;
 
-    private final SparkMax kickerCim;
+    public Feed(){
+        // feed motor
+        feedNeo = new SparkMax(FEED_NEO_ID, SparkLowLevel.MotorType.kBrushless);
 
-    public Kicker(){
-        // kicker motor
-        kickerCim = new SparkMax(KICKER_CIM_ID, SparkLowLevel.MotorType.kBrushed);
-
-        configureKickerMotor(kickerCim, true);
+        configureFeedMotor(feedNeo, false);
     }
     
-    public void setKickerSpeed(double speed){
-        kickerCim.set(speed);
+    public void setFeedSpeed(double speed){
+        feedNeo.set(speed);
     }
 
-    public void configureKickerMotor(SparkMax motor, boolean isInverted){
+    public void configureFeedMotor(SparkMax motor, boolean isInverted){
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
-            .idleMode(IdleMode.kBrake)
+            .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(30)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
@@ -46,7 +45,7 @@ public class Kicker extends SubsystemBase {
     }
 
     public void stop() {
-        kickerCim.stopMotor();
+        feedNeo.stopMotor();
     }
     
 }
