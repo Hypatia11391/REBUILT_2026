@@ -18,7 +18,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class Intake extends SubsystemBase {
 
     // TODO: edit all the CAN IDs to proper ones
-    private static final int INTAKE_FEED_ID = 0; 
+    private static final int INTAKE_FEED_ID = 0;
     private static final int INTAKE_LIFT_ID = 0;
 
     private static final int TOP_LIMIT_SWITCH_ID = 0;
@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(25)
+            .smartCurrentLimit(20)
             .voltageCompensation(12)
             .openLoopRampRate(0.2);
 
@@ -79,7 +79,7 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(50)
+            .smartCurrentLimit(20)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
       motor.configureAsync(

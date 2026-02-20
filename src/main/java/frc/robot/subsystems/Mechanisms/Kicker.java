@@ -35,7 +35,7 @@ public class Kicker extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(30)
+            .smartCurrentLimit(20)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
 
