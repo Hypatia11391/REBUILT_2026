@@ -61,7 +61,7 @@ public class RobotContainer {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
     shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
+      new OperateWithJoystick(shooter, m_driverController, intake, kicker, feed));
     configureBindings();
   }
 
