@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private double targetRightRPM = 0.0;
 
     // PID constants
-    private static final double kP = 0.02; // max_value (1) / max error (42 CPR for the hall sensor)
+    private static final double kP = 0.02;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
 
@@ -59,21 +59,19 @@ public class Shooter extends SubsystemBase {
     rightLoop = shooterNeoRight.getClosedLoopController();
     leftLoop = shooterNeoLeft.getClosedLoopController();
     
-        
     configureShooterMotor(shooterNeoLeft, false); 
-    configureShooterMotor(shooterNeoRight, true);
+    configureShooterMotor(shooterNeoRight, false);
     
     stop();
     }
 
-    public void setTargetRPM(double topRPM, double bottomRPM){
-        targetRightRPM = topRPM;
-        targetLeftRPM = bottomRPM;
-        shooterNeoRight.set(targetRightRPM);
-        shooterNeoLeft.set(targetLeftRPM);
-        // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
-        // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-    }
+    public void setTargetRPM(double targetRightRPM, double targetLeftRPM){
+        this.targetRightRPM = targetRightRPM;
+        this.targetLeftRPM = targetLeftRPM;
+
+        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
+}
 
     public double getTopRPM(){return rightEncoder.getVelocity();}
     public double getBottomRPM(){return leftEncoder.getVelocity();}
