@@ -63,8 +63,8 @@ public class OperateWithJoystick extends Command{
     public void execute(){
 
         // intake lift motor
-        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal()); 
-        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal());
+        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal()+1); 
+        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal()+1);
         
         if (yUP){
             if (intakeLiftState == IntakeLiftState.UP){
@@ -94,8 +94,8 @@ public class OperateWithJoystick extends Command{
         }
 
         // intake feed
-        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal()); // intake in
-        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal()); // intake out
+        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal()+1); // intake in
+        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal()+1); // intake out
 
         if (rb){
             if (intakeFeedState == IntakeFeedState.FWD){
@@ -126,7 +126,7 @@ public class OperateWithJoystick extends Command{
         }
         
         // shooter + delayed feed & kicker
-        double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
+        double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()+1), 0.08);
         
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
