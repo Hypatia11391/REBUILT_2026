@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.poseEstimation;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-public class PoseManager {
+public class VisionPoseManager {
     private final ServerSocketChannel channel;
     private final LinkedList<BufferedFixedLengthChannel> channels = new LinkedList<>();
     private static final int PORT = 11211;
@@ -26,7 +26,10 @@ public class PoseManager {
 
     private static final double DATA_DECAY = Math.log(2)/DATA_HALF_LIFE;
 
-    public PoseManager() {
+    private final OdometryManager odometryManager;
+
+    public VisionPoseManager(OdometryManager odometryManager) {
+        this.odometryManager = odometryManager;
         try {
             this.channel = ServerSocketChannel.open();
             this.channel.configureBlocking(false);
@@ -70,7 +73,7 @@ public class PoseManager {
     }
 
     public Vector<N3> getPos() {
-        return weighted.vec();
+        return weighted.vec().div(weighted.weight);
     }
 
     public void update() {
@@ -94,6 +97,7 @@ public class PoseManager {
                 lastUpdate = packet.time();
             })
         ;
+        odometryManager.updateFromVision(this.getPos());
     }
 
     public record WeightedVec3(Vector<N3> vec, double weight) {}

@@ -48,6 +48,10 @@ public class RobotContainer {
       configureBindings();
   }
 
+  public DriveBase getDriveBase() {
+    return m_driveBase;
+  }
+
   /**
    * Maps driver inputs (buttons/triggers) to commands.
    * This is where controller buttons are bound to robot actions.
