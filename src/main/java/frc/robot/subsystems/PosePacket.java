@@ -8,6 +8,7 @@ import edu.wpi.first.math.numbers.N3;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.Comparator;
 
 public record PosePacket(Rotation3d rotation, Vector<N3> position, Instant time) {
     //                         Timestamp  | Position Vector  | Rotation Matrix
@@ -31,4 +32,10 @@ public record PosePacket(Rotation3d rotation, Vector<N3> position, Instant time)
 
         return new PosePacket(new Rotation3d(rotation),position,time);
     }
+
+    public Vector<N3> getPos() {
+        return position;
+    }
+
+    public static Comparator<PosePacket> BY_TIME = Comparator.comparing(pose -> pose.time);
 }

@@ -3,27 +3,26 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.PoseReceiver;
-
-import java.net.ServerSocket;
+import frc.robot.subsystems.PoseManager;
 
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
-  private final PoseReceiver poseReceiver;
+  private final PoseManager poseManager;
 
   public Robot() {
     // RobotContainer wires subsystems + default commands + button bindings.
     m_robotContainer = new RobotContainer();
 
-    this.poseReceiver = new PoseReceiver();
+    this.poseManager = new PoseManager();
   }
 
   @Override
   public void robotPeriodic() {
     // Required for command-based: runs commands + polls buttons each loop.
     CommandScheduler.getInstance().run();
+    this.poseManager.update();
   }
 
   @Override
