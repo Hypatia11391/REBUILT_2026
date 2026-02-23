@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
     
-    private static final int SHOOTER_NEO_LEFT_ID = 0; // TODO: type an actual ID
-    private static final int SHOOTER_NEO_RIGHT_ID = 0; // TODO: type an actual ID 
+    private static final int SHOOTER_NEO_LEFT_ID = 3; // TODO: type an actual ID
+    private static final int SHOOTER_NEO_RIGHT_ID = 5; // TODO: type an actual ID 
 
     private final SparkMax shooterNeoLeft;
     private final SparkMax shooterNeoRight;
@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private double targetRightRPM = 0.0;
 
     // PID constants
-    private static final double kP = 0.0001;
+    private static final double kP = 0.02; // max_value (1) / max error (42 CPR for the hall sensor)
     private static final double kI = 0.0;
     private static final double kD = 0.0;
 
@@ -61,7 +61,7 @@ public class Shooter extends SubsystemBase {
     
         
     configureShooterMotor(shooterNeoLeft, false); 
-    configureShooterMotor(shooterNeoRight, false);
+    configureShooterMotor(shooterNeoRight, true);
     
     stop();
     }
@@ -69,9 +69,10 @@ public class Shooter extends SubsystemBase {
     public void setTargetRPM(double topRPM, double bottomRPM){
         targetRightRPM = topRPM;
         targetLeftRPM = bottomRPM;
-
-        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
-        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
+        shooterNeoRight.set(targetRightRPM);
+        shooterNeoLeft.set(targetLeftRPM);
+        // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
     }
 
     public double getTopRPM(){return rightEncoder.getVelocity();}
@@ -94,7 +95,7 @@ public class Shooter extends SubsystemBase {
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(isInverted)
             .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(50)
+            .smartCurrentLimit(40)
             .voltageCompensation(12)
             .openLoopRampRate(0.25);
 

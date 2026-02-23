@@ -12,9 +12,15 @@ package frc.robot;
 
 import frc.utils.gyro.Navx;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
+import frc.robot.commands.OperateWithJoystick;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveTrain.DriveBase;
+import frc.robot.subsystems.Mechanisms.Feed;
+import frc.robot.subsystems.Mechanisms.Intake;
+import frc.robot.subsystems.Mechanisms.Kicker;
+import frc.robot.subsystems.Mechanisms.Shooter;
 import edu.wpi.first.wpilibj.Joystick;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,9 +40,18 @@ public class RobotContainer {
 
   private final Joystick m_driverController =
       new Joystick(OperatorConstants.kDriverControllerPort);
-
+  private final Joystick m_operatorController = 
+      new Joystick(OperatorConstants.kOperateControllerPort);
   private final Navx navx = 
       new Navx();
+  private final Shooter shooter = 
+      new Shooter();
+  private final Intake intake =
+      new Intake();
+  private final Kicker kicker = 
+      new Kicker();
+  private final Feed feed = 
+      new Feed();
   
   private final DriveBase m_driveBase =
       new DriveBase(navx);
@@ -45,7 +60,9 @@ public class RobotContainer {
   public RobotContainer() {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
-      configureBindings();
+    shooter.setDefaultCommand(
+      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
+    configureBindings();
   }
 
   /**
@@ -55,7 +72,7 @@ public class RobotContainer {
    */
 
   private void configureBindings() {
-    new JoystickButton(m_driverController, 1).onTrue(new InstantCommand(navx::zeroYaw, navx));
+    new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
   }
 
   /**

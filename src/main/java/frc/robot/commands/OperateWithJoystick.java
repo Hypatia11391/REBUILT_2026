@@ -127,11 +127,12 @@ public class OperateWithJoystick extends Command{
         
         // shooter + delayed feed & kicker
         double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
-
+        
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
         if (rtSHOOT != 0.0){
+            System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
             shooter.setTargetRPM(rightTarget, leftTarget);
 
             boolean ready = shooter.atSpeed();

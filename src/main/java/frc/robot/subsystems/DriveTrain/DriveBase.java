@@ -48,9 +48,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final double MAX_SPEED = 1.0;
   
   // CAN IDs (spark max)
-  private static final int FRONT_LEFT_ID = 4;
-  private static final int FRONT_RIGHT_ID  = 1;
-  private static final int REAR_LEFT_ID = 3;
+  private static final int FRONT_LEFT_ID = 9;
+  private static final int FRONT_RIGHT_ID = 1;
+  private static final int REAR_LEFT_ID = 10;
   private static final int REAR_RIGHT_ID = 2;
 
   private final SparkMax frontRight;

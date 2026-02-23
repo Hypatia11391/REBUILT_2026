@@ -15,7 +15,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 */
 
 public class Feed extends SubsystemBase {
-    private static final int FEED_NEO_ID = 0;
+    private static final int FEED_NEO_ID = 7;
 
     private final SparkMax feedNeo;
 
@@ -34,7 +34,7 @@ public class Feed extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(30)
+            .smartCurrentLimit(40)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
 

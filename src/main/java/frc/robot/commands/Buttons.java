@@ -1,14 +1,14 @@
 package frc.robot.commands;
 
 public enum Buttons {
-    X,
     A,
     B,
+    X,
     Y,
     LB,
     RB,
-    LT,
-    RT,
     BACK,
-    START
+    START,
+    LS,
+    RS
 }
