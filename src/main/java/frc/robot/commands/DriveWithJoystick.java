@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
-import frc.utils.gyro.NavX;
+import frc.utils.gyro.Navx;
 
 
 public class DriveWithJoystick extends Command{
@@ -28,14 +28,16 @@ public class DriveWithJoystick extends Command{
   private static final double ALPHA_Z = 0.08;
 
   private final DriveBase m_drive;
-  private final Joystick m_stick; // joystick object
-  private final NavX navX; // navx object
+  private final Joystick m_stick;
+  private final Navx navX;
 
   private double currX = 0;
   private double currY = 0;
   private double currZ = 0;
 
-  public DriveWithJoystick(DriveBase drive, Joystick stick, NavX navx){
+  // private static final double NAVX_OFFSET_DEG = 90; // if needed to setup the right angle
+
+  public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;
       m_stick = stick;
       navX = navx;
@@ -66,8 +68,8 @@ public class DriveWithJoystick extends Command{
       wishY /= mag;
     }
   
-  // speed scaling TODO: hook to button for slow-fast
-    double scale = 0.40; // % speed
+    // speed scaling TODO: hook to button for slow-fast
+    double scale = 0.40;
 
     currX = currX * (1.0 - ALPHA_XY) + wishX * ALPHA_XY;
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
@@ -78,9 +80,9 @@ public class DriveWithJoystick extends Command{
     double outZ = -currZ * scale;
 
     //Field-oriented, navx yaw as heading
-    Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg());
+    Rotation2d heading = Rotation2d.fromDegrees(-navX.getYawDeg()); //+ NAVX_OFFSET_DEG
 
-    m_drive.driveCartesian(outX, outY, outZ, heading); // scales
+    m_drive.driveCartesian(outX, outY, outZ, heading);
 
   }
 

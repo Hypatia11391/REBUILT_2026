@@ -12,7 +12,7 @@ public class Robot extends TimedRobot {
   private final PoseManager poseManager;
 
   public Robot() {
-    // RobotContainer wires subsystems + default commands + button bindings.
+    // robotContainer wires subsystems + default commands + button bindings
     m_robotContainer = new RobotContainer();
 
     this.poseManager = new PoseManager();
@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // Required for command-based: runs commands + polls buttons each loop.
+    // required for command-based: runs commands + polls buttons each loop
     CommandScheduler.getInstance().run();
     this.poseManager.update();
   }
