@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     private double targetRightRPM = 0.0;
 
     // PID constants
-    private static final double kP = 0.02;
+    private static final double kP = 0.00036;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
 
@@ -53,25 +53,34 @@ public class Shooter extends SubsystemBase {
     shooterNeoRight = new SparkMax(SHOOTER_NEO_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     shooterNeoLeft = new SparkMax(SHOOTER_NEO_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     
+    // must be the opposites
+    configureShooterMotor(shooterNeoLeft, true); 
+    configureShooterMotor(shooterNeoRight, false);
+
     rightEncoder = shooterNeoRight.getEncoder();
     leftEncoder = shooterNeoLeft.getEncoder();
 
     rightLoop = shooterNeoRight.getClosedLoopController();
     leftLoop = shooterNeoLeft.getClosedLoopController();
     
-    configureShooterMotor(shooterNeoLeft, false); 
-    configureShooterMotor(shooterNeoRight, false);
-    
     stop();
     }
 
     public void setTargetRPM(double targetRightRPM, double targetLeftRPM){
+
         this.targetRightRPM = targetRightRPM;
         this.targetLeftRPM = targetLeftRPM;
 
-        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
-        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-}
+        shooterNeoRight.set(-kP * (getTopRPM() - targetRightRPM));
+        shooterNeoLeft.set(-kP * (getBottomRPM() - targetLeftRPM));
+
+        // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
+
+
+    
+        
+    }
 
     public double getTopRPM(){return rightEncoder.getVelocity();}
     public double getBottomRPM(){return leftEncoder.getVelocity();}
@@ -87,6 +96,10 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter/TopTarget", targetRightRPM);
         SmartDashboard.putNumber("Shooter/BottomTarget", targetLeftRPM);
         SmartDashboard.putBoolean("Shooter/AtSpeed", atSpeed());
+        double actualVelRight = shooterNeoRight.get();
+        double actualVelLeft = shooterNeoLeft.get();
+        SmartDashboard.putNumber("NeoRight/actualvelocity", actualVelRight);
+        SmartDashboard.putNumber("NeoLeft/actualvelocity", actualVelLeft);
     }
 
     public void configureShooterMotor(SparkMax motor, boolean isInverted){
@@ -96,13 +109,16 @@ public class Shooter extends SubsystemBase {
             .smartCurrentLimit(40)
             .voltageCompensation(12)
             .openLoopRampRate(0.25);
+        config.absoluteEncoder
+            .velocityConversionFactor(1);
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(kP, kI, kD)
             .outputRange(-1.0, 1.0);
-        config.closedLoop.feedForward
-            .sv(0.0, kV);
+
+        // config.closedLoop.feedForward
+        //     .sv(0.0, kV);
     
         motor.configureAsync(
             config, 

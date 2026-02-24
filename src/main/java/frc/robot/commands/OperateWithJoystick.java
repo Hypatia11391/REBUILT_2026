@@ -8,6 +8,7 @@ import frc.robot.subsystems.Mechanisms.Feed;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class OperateWithJoystick extends Command{
@@ -16,9 +17,8 @@ public class OperateWithJoystick extends Command{
     private final Intake intake;
     private final Kicker kicker;
     private final Feed feed;
-
-    private static final double HIGH_LEFT_RPM = 1500; // A is one motor
-    private static final double HIGH_RIGHT_RPM = 1500; // B is another motor
+    private static final double HIGH_LEFT_RPM = 1500; // A is one motor TODO: make 1500
+    private static final double HIGH_RIGHT_RPM = 1500; // B is another motor TODO: make 1500
 
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
@@ -126,13 +126,15 @@ public class OperateWithJoystick extends Command{
         }
         
         // shooter + delayed feed & kicker
-        double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()+1), 0.08);
+        double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
+
+        SmartDashboard.putNumber("Joystick/RT", stick.getRawAxis(JoystickAxes.RT.ordinal()));
         
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
         if (rtSHOOT != 0.0){
-            System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+            // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
             shooter.setTargetRPM(rightTarget, leftTarget);
 
             boolean ready = shooter.atSpeed();
