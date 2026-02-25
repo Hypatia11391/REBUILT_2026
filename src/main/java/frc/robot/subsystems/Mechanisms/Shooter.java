@@ -41,7 +41,7 @@ public class Shooter extends SubsystemBase {
     // PID constants
     private static final double kP = 0.00036;
     private static final double kI = 0.0;
-    private static final double kD = 0.0;
+    private static final double kD = 0.00001; //0.00000001
 
     // for the pid things
     private double prevRightError = 0.0;
@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
     private double prevTime = 0.0;
 
     // NEOs free speed = 5676 rpm
-    private static final double kV = 12.0 / 5676.0; // feed-forward constant
+    private static final double kV = 1.0 / 5676.0; // feed-forward constant or 12.0 / 5676.0
 
     private static final double RPM_TOL = 50.0;
 
@@ -95,8 +95,11 @@ public class Shooter extends SubsystemBase {
             leftDerivative = (leftError - prevLeftError) / dt;
         }
 
-        double rightOutput = kP * rightError + kD * rightDerivative;
-        double leftOutput = kP * leftError + kD * leftDerivative;
+        double ffRight = kV * targetRightRPM;
+        double ffLeft = kV * targetLeftRPM;
+
+        double rightOutput = ffRight + kP * rightError + kD * rightDerivative;
+        double leftOutput = ffLeft +  kP * leftError + kD * leftDerivative;
 
         shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
         shooterNeoLeft.set(leftOutput);

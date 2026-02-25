@@ -17,8 +17,8 @@ public class OperateWithJoystick extends Command{
     private final Intake intake;
     private final Kicker kicker;
     private final Feed feed;
-    private static final double HIGH_LEFT_RPM = 1500; // A is one motor TODO: make 1500
-    private static final double HIGH_RIGHT_RPM = 1500; // B is another motor TODO: make 1500
+    private static final double HIGH_LEFT_RPM = 3000; // A is one motor TODO: make 1500
+    private static final double HIGH_RIGHT_RPM = 3000; // B is another motor TODO: make 1500
 
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
