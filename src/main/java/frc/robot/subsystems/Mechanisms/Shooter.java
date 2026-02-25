@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.PersistMode;
@@ -22,8 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
     
-    private static final int SHOOTER_NEO_LEFT_ID = 3; // TODO: type an actual ID
-    private static final int SHOOTER_NEO_RIGHT_ID = 5; // TODO: type an actual ID 
+    private static final int SHOOTER_NEO_LEFT_ID = 3;
+    private static final int SHOOTER_NEO_RIGHT_ID = 5;
 
     private final SparkMax shooterNeoLeft;
     private final SparkMax shooterNeoRight;
@@ -42,8 +43,13 @@ public class Shooter extends SubsystemBase {
     private static final double kI = 0.0;
     private static final double kD = 0.0;
 
+    // for the pid things
+    private double prevRightError = 0.0;
+    private double prevLeftError = 0.0;
+    private double prevTime = 0.0;
+
     // NEOs free speed = 5676 rpm
-    private static final double kV = 12.0 / 5676.0;
+    private static final double kV = 12.0 / 5676.0; // feed-forward constant
 
     private static final double RPM_TOL = 50.0;
 
@@ -70,29 +76,47 @@ public class Shooter extends SubsystemBase {
 
         this.targetRightRPM = targetRightRPM;
         this.targetLeftRPM = targetLeftRPM;
+        
+        double currentTime = Timer.getFPGATimestamp();
+        double dt = currentTime - prevTime;
+        prevTime = currentTime;
 
-        shooterNeoRight.set(-kP * (getTopRPM() - targetRightRPM));
-        shooterNeoLeft.set(-kP * (getBottomRPM() - targetLeftRPM));
+        double rightError = targetRightRPM - getRightRPM();
+        double leftError = targetLeftRPM - getLeftRPM();
+
+        double rightDerivative = 0.0;
+        double leftDerivative = 0.0;
+
+        prevRightError = rightError;
+        prevLeftError = leftError;
+
+        if (dt > 0){
+            rightDerivative = (rightError - prevRightError) / dt;
+            leftDerivative = (leftError - prevLeftError) / dt;
+        }
+
+        double rightOutput = kP * rightError + kD * rightDerivative;
+        double leftOutput = kP * leftError + kD * leftDerivative;
+
+        shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
+        shooterNeoLeft.set(leftOutput);
 
         // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
         // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-
-
     
-        
     }
 
-    public double getTopRPM(){return rightEncoder.getVelocity();}
-    public double getBottomRPM(){return leftEncoder.getVelocity();}
+    public double getRightRPM(){return rightEncoder.getVelocity();}
+    public double getLeftRPM(){return leftEncoder.getVelocity();}
 
     public boolean atSpeed(){
-        return Math.abs(getTopRPM() - targetRightRPM) < RPM_TOL && Math.abs(getBottomRPM() - targetLeftRPM) < RPM_TOL;
+        return Math.abs(getRightRPM() - targetRightRPM) < RPM_TOL && Math.abs(getLeftRPM() - targetLeftRPM) < RPM_TOL;
     }
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Shooter/TopRPM", getTopRPM());
-        SmartDashboard.putNumber("Shooter/BottomRPM", getBottomRPM());
+        SmartDashboard.putNumber("Shooter/TopRPM", getRightRPM());
+        SmartDashboard.putNumber("Shooter/BottomRPM", getLeftRPM());
         SmartDashboard.putNumber("Shooter/TopTarget", targetRightRPM);
         SmartDashboard.putNumber("Shooter/BottomTarget", targetLeftRPM);
         SmartDashboard.putBoolean("Shooter/AtSpeed", atSpeed());
