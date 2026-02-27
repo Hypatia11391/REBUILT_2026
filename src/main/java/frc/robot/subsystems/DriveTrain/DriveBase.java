@@ -48,9 +48,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final double MAX_SPEED = 1.0;
   
   // CAN IDs (spark max)
-  private static final int FRONT_LEFT_ID = 4;
-  private static final int FRONT_RIGHT_ID  = 1;
-  private static final int REAR_LEFT_ID = 3;
+  private static final int FRONT_LEFT_ID = 9;
+  private static final int FRONT_RIGHT_ID = 1;
+  private static final int REAR_LEFT_ID = 10;
   private static final int REAR_RIGHT_ID = 2;
 
   private final SparkMax frontRight;
@@ -213,10 +213,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
       SmartDashboard.putNumber("zRot", zRot);
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, new Rotation2d()); 
     }
 
     public void stop() {
