@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     // required for command-based: runs commands + polls buttons each loop
     CommandScheduler.getInstance().run();
+      
   }
 
   @Override
