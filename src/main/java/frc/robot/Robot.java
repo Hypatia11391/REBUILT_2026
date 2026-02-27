@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+//Logging
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
@@ -12,6 +16,11 @@ public class Robot extends TimedRobot {
   public Robot() {
     // robotContainer wires subsystems + default commands + button bindings
     m_robotContainer = new RobotContainer();
+
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
+    
+
   }
 
   @Override

@@ -61,6 +61,7 @@ public static String[] getPaths(String filePath) {
 
   public static Command autonomousFull(String filePath){
 
+
     String[] paths = getPaths(filePath);
     List<Command> commandList = new ArrayList<>();
     

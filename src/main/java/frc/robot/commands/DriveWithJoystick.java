@@ -18,13 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.utils.gyro.Navx;
-
-//Logging
 import edu.wpi.first.wpilibj.DataLogManager;
-
-DataLogManager.start()
-DriverStation.startDataLog(DataLogManager.getLog());
-
 
 
 public class DriveWithJoystick extends Command{
