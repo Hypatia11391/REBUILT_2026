@@ -135,7 +135,9 @@ public class OperateWithJoystick extends Command{
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+            kicker.setKickerSpeed(KICKER_PWR);
             shooter.setTargetRPM(rightTarget, leftTarget);
+            // feed.setFeedSpeed(FEED_PWR);
 
             boolean ready = shooter.atSpeed();
         
@@ -149,7 +151,6 @@ public class OperateWithJoystick extends Command{
 
         if (feedAllowed){
             feed.setFeedSpeed(FEED_PWR);
-            kicker.setKickerSpeed(KICKER_PWR);
         }else{
             kicker.stop();
             feed.stop();

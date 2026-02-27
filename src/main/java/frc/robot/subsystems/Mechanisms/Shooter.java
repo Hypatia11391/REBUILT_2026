@@ -39,9 +39,9 @@ public class Shooter extends SubsystemBase {
     private double targetRightRPM = 0.0;
 
     // PID constants
-    private static final double kP = 0.00036;
+    private static final double kP = 0.00006;
     private static final double kI = 0.0;
-    private static final double kD = 0.00001; //0.00000001
+    private static final double kD = 0.1; //0.00000001
 
     // for the pid things
     private double prevRightError = 0.0;
@@ -49,11 +49,11 @@ public class Shooter extends SubsystemBase {
     private double prevTime = 0.0;
 
     // NEOs free speed = 5676 rpm
-    private static final double kV = 1.0 / 5676.0; // feed-forward constant or 12.0 / 5676.0
+    private static final double kV = 1.0 / 5676.0; // 0.00005; // feed-forward constant or 12.0 / 5676.0
 
-    private static final double RPM_TOL = 50.0;
+    private static final double RPM_TOL = 400.0;
 
-    public Shooter(){
+    public Shooter(){ 
 
     // shooter motors
     shooterNeoRight = new SparkMax(SHOOTER_NEO_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);

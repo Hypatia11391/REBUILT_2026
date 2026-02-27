@@ -34,7 +34,7 @@ public class Feed extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(40)
+            .smartCurrentLimit(40) // TODO: change to 40
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
 

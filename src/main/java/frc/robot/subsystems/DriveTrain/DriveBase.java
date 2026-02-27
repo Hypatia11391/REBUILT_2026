@@ -213,10 +213,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
       SmartDashboard.putNumber("zRot", zRot);
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, new Rotation2d()); 
     }
 
     public void stop() {
