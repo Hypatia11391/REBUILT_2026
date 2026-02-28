@@ -88,7 +88,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
 
-    configureMotor(flSparkMax, true,conf);
+    configureMotor(flSparkMax, true, conf);
     configureMotor(frSparkMax, false, conf);
     configureMotor(rlSparkMax, true, conf);
     configureMotor(rrSparkMax, false, conf);
@@ -201,6 +201,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public void configureMotor(SparkMax motor, boolean isInverted, AbsoluteEncoderConfig absEncoderConf){
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(isInverted);
+    config.absoluteEncoder.apply(absEncoderConf);
     motor.configureAsync(
       config,
       ResetMode.kNoResetSafeParameters,
