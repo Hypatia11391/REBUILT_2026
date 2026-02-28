@@ -12,6 +12,8 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import java.util.function.DoubleConsumer;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -47,9 +49,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final double MAX_SPEED = 1.0;
   
   // CAN IDs (spark max)
-  private static final int FRONT_LEFT_ID = 4;
-  private static final int FRONT_RIGHT_ID  = 1;
-  private static final int REAR_LEFT_ID = 3;
+  private static final int FRONT_LEFT_ID = 9;
+  private static final int FRONT_RIGHT_ID = 1;
+  private static final int REAR_LEFT_ID = 10;
   private static final int REAR_RIGHT_ID = 2;
 
   private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
@@ -183,17 +185,16 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
   }
 
-  /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
-  public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
-    SmartDashboard.putNumber("xSpeed", xSpeed);
-    SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("zRot", zRot);
-    m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle);
-  }
-
-  public void driveCartesian(double xSpeed, double ySpeed, double zRot){
-    m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d());
-  }
+    /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
+      SmartDashboard.putNumber("xSpeed", xSpeed);
+      SmartDashboard.putNumber("ySpeed", ySpeed);
+      SmartDashboard.putNumber("zRot", zRot);
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle);
+    }
+    public void driveCartesian(double xSpeed, double ySpeed, double zRot){
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, new Rotation2d());
+    }
 
   public void stop() {
     m_Drive.stopMotor();

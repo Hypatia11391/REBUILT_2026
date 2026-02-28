@@ -8,6 +8,7 @@ import frc.robot.subsystems.Mechanisms.Feed;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class OperateWithJoystick extends Command{
@@ -16,9 +17,8 @@ public class OperateWithJoystick extends Command{
     private final Intake intake;
     private final Kicker kicker;
     private final Feed feed;
-
-    private static final double HIGH_LEFT_RPM = 1500; // A is one motor
-    private static final double HIGH_RIGHT_RPM = 1500; // B is another motor
+    private static final double HIGH_LEFT_RPM = 3000; // A is one motor TODO: make 1500
+    private static final double HIGH_RIGHT_RPM = 3000; // B is another motor TODO: make 1500
 
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
@@ -63,8 +63,8 @@ public class OperateWithJoystick extends Command{
     public void execute(){
 
         // intake lift motor
-        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal()); 
-        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal());
+        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal()+1); 
+        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal()+1);
         
         if (yUP){
             if (intakeLiftState == IntakeLiftState.UP){
@@ -94,8 +94,8 @@ public class OperateWithJoystick extends Command{
         }
 
         // intake feed
-        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal()); // intake in
-        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal()); // intake out
+        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal()+1); // intake in
+        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal()+1); // intake out
 
         if (rb){
             if (intakeFeedState == IntakeFeedState.FWD){
@@ -128,11 +128,16 @@ public class OperateWithJoystick extends Command{
         // shooter + delayed feed & kicker
         double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
 
+        SmartDashboard.putNumber("Joystick/RT", stick.getRawAxis(JoystickAxes.RT.ordinal()));
+        
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
         if (rtSHOOT != 0.0){
+            // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+            kicker.setKickerSpeed(KICKER_PWR);
             shooter.setTargetRPM(rightTarget, leftTarget);
+            // feed.setFeedSpeed(FEED_PWR);
 
             boolean ready = shooter.atSpeed();
         
@@ -146,9 +151,8 @@ public class OperateWithJoystick extends Command{
 
         if (feedAllowed){
             feed.setFeedSpeed(FEED_PWR);
-            kicker.setKickerSpeed(KICKER_PWR);
         }else{
-            kicker.stop();
+            // kicker.stop(); // lol it was just this line
             feed.stop();
         }
         }else{
