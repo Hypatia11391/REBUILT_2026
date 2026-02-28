@@ -152,7 +152,7 @@ public class OperateWithJoystick extends Command{
         if (feedAllowed){
             feed.setFeedSpeed(FEED_PWR);
         }else{
-            kicker.stop();
+            // kicker.stop(); // lol it was just this line
             feed.stop();
         }
         }else{
