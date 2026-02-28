@@ -1,15 +1,3 @@
-/**
- * DrivWithJoystick.java
- * 
- * Teleop for driving the robot
- * 
- * - Reads controller inpurt
- * - Applies deadbands and scaling
- * - Calls drive method from DriveBase.java // if someone knows how to do {@link} properly then do it for this line
- * 
- * This file should NOT create/configure hardware
- **/
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -19,7 +7,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.utils.gyro.Navx;
 
-
+/// DriveWithJoystick \
+/// Tele-op for driving the robot
+/// - Reads controller input
+/// - Applies deadbands and scaling
+/// - Calls drive method from {@link frc.robot.subsystems.DriveTrain.DriveBase} \
+/// This file should NOT create/configure hardware
+///
 public class DriveWithJoystick extends Command{
   private static final double DEADZONE = 0.1;
   private static final double ROT_DEADZONE = 0.1;
@@ -35,7 +29,7 @@ public class DriveWithJoystick extends Command{
   private double currY = 0;
   private double currZ = 0;
 
-  private static final double NAVX_OFFSET_DEG = 90; // if needed to setup the right angle
+  private static final double NAVX_OFFSET_DEG = 90; // if needed to set up the right angle
 
   public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;

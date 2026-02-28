@@ -9,12 +9,13 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 
 /// As a buffer,
-/// a pose packet consists of a 4x4 matrix written
-/// in left to right top to bottom order
-/// then the translational error as a double
-/// the rotational error in radians as a double
-/// the current time as a unix timestamp in milliseconds (milliseconds since 1970/01/01)
-/// NOTE: time may not actually be calibrated on the RoboRIO??? I mean idk how it would sync???
+/// a pose packet consists of
+///  - a 4x4 matrix written in left to right top to bottom order
+///  - then the translational error as a double
+///  - the rotational error in radians as a double
+///  - the current time as a unix timestamp in milliseconds (milliseconds since 1970/01/01)
+///
+/// NOTE: time may not actually be calibrated on the RoboRIO??? I mean I don't know how it would sync???
 /// If so, a shared other timestamp could be found and used
 public record PosePacket(Pose3d pose, double translationErr, double rotationErr, Instant time) {
     //                   Rotation Quaternion| Position Vector       | Time of measurement

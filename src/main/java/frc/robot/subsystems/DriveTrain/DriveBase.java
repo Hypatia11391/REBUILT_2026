@@ -5,14 +5,12 @@
  * 
  * - Contains motor controller object, 
  * - Contains WPILib mecanum drive object, 
- * - Runs methods (ie, drive, stop, etc)
+ * - Runs methods (ie, drive, stop, etc.)
  * 
  * This class should NOT read controller input or handle logic
  */
 
 package frc.robot.subsystems.DriveTrain;
-
-import java.util.function.DoubleConsumer;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -130,9 +128,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       () -> poseEstimator.getEstimatedPosition().toPose2d(),
       (pose) -> poseEstimator.resetPose(new Pose3d(pose)),
       this::getChassisSpeeds,
-      (speeds, ff) -> {
-        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds));
-      },
+      (speeds, ff) ->
+        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds))
+      ,
       new PPHolonomicDriveController(
           new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants TODO: THIS IS PROBABLY WRONG
           new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants TODO: THIS IS PROBABLY WRONG
