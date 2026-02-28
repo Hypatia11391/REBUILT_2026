@@ -3,6 +3,7 @@ package frc.robot.poseEstimation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Objects;
 import java.util.stream.*;
 
 public class BufferedFixedLengthChannel {
@@ -16,7 +17,11 @@ public class BufferedFixedLengthChannel {
     }
 
     public Stream<ByteBuffer> pollFullBuffers() {
-        return Stream.iterate(this.pollBuffer(),(lastBuf) -> this.pollBuffer());
+        return Stream.iterate(
+            ByteBuffer.allocate(packetLength),
+            Objects::nonNull,
+            (lastBuf) -> this.pollBuffer()
+        );
     }
 
     public ByteBuffer pollBuffer() {
@@ -35,7 +40,9 @@ public class BufferedFixedLengthChannel {
         }
 
         this.incompleteBuffer.flip();
-        return this.incompleteBuffer;
+        ByteBuffer justGoneBuffer = this.incompleteBuffer;
+        this.incompleteBuffer = null;
+        return justGoneBuffer;
     }
 }
 

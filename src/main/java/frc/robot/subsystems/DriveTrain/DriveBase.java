@@ -23,15 +23,21 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.poseEstimation.OdometryManager;
 import frc.utils.gyro.Navx;
 
+import java.time.Instant;
 import java.util.function.DoubleConsumer;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
@@ -46,55 +52,71 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final int REAR_LEFT_ID = 3;
   private static final int REAR_RIGHT_ID = 2;
 
-  private final OdometryManager odometryManager;
+  private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
 
-  private static final double MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT = 1; // TODO: JUST... FIX THIS
-  private static final double OTHER_MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT = 1; // TODO: FIX THIS TOO
+  // TODO: MEASURE
+  private static final double WHEEL_DIAMETER = 0.25;
+  public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
-  /**it  Called once at the beginning of the robot program. */
-  public DriveBase(Navx navx) { // constructor
+  private final SparkAbsoluteEncoder frEncoder;
+  private final SparkAbsoluteEncoder flEncoder;
+  private final SparkAbsoluteEncoder rrEncoder;
+  private final SparkAbsoluteEncoder rlEncoder;
 
-      // wheel motors
-    SparkMax frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    SparkMax frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-    SparkMax rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    SparkMax rearRight = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+  private final SparkMax frSparkMax;
+  private final SparkMax flSparkMax;
+  private final SparkMax rrSparkMax;
+  private final SparkMax rlSparkMax;
+
+  private final MecanumDrivePoseEstimator3d poseEstimator;
+  private final Navx navx;
+  private final MecanumDriveKinematics driveKinematics;
+
+  /** Called once at the beginning of the robot program. */
+  public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
+    this.poseEstimator = poseEstimator;
+    this.navx = navx;
+    this.driveKinematics = kinematics;
+
+    // wheel motors
+    flSparkMax = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    frSparkMax = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    rlSparkMax = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    rrSparkMax = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
-    conf = conf.positionConversionFactor(OdometryManager.WHEEL_CIRCUMFERENCE);
-    conf = conf.velocityConversionFactor(OdometryManager.WHEEL_CIRCUMFERENCE);
+    conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
+    conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
 
-    configureMotor(frontLeft, true,conf);
-    configureMotor(frontRight, false, conf);
-    configureMotor(rearLeft, true, conf);
-    configureMotor(rearRight, false, conf);
+    configureMotor(flSparkMax, true,conf);
+    configureMotor(frSparkMax, false, conf);
+    configureMotor(rlSparkMax, true, conf);
+    configureMotor(rrSparkMax, false, conf);
     
-    SparkAbsoluteEncoder frEncoder = frontRight.getAbsoluteEncoder();
-    SparkAbsoluteEncoder flEncoder = frontLeft.getAbsoluteEncoder();
-    SparkAbsoluteEncoder rrEncoder = rearRight.getAbsoluteEncoder();
-    SparkAbsoluteEncoder rlEncoder = rearLeft.getAbsoluteEncoder();
-
-    odometryManager = new OdometryManager(frEncoder,flEncoder,rrEncoder,rlEncoder,navx);
+    this.frEncoder = flSparkMax.getAbsoluteEncoder();
+    this.flEncoder = frSparkMax.getAbsoluteEncoder();
+    this.rrEncoder = rlSparkMax.getAbsoluteEncoder();
+    this.rlEncoder = rrSparkMax.getAbsoluteEncoder();
 
     m_Drive = new MecanumDrive(
-      cappedSetter(frontLeft, MAX_SPEED),
-      cappedSetter(rearLeft, MAX_SPEED),
-      cappedSetter(frontRight, MAX_SPEED),
-      cappedSetter(rearRight, MAX_SPEED)
+      cappedSetter(flSparkMax, MAX_SPEED),
+      cappedSetter(frSparkMax, MAX_SPEED),
+      cappedSetter(rlSparkMax, MAX_SPEED),
+      cappedSetter(rrSparkMax, MAX_SPEED)
     );
 
     // motors visible in shuffleboard
-    SendableRegistry.addChild(m_Drive, frontLeft); 
-    SendableRegistry.addChild(m_Drive, rearLeft); 
-    SendableRegistry.addChild(m_Drive, frontRight);
-    SendableRegistry.addChild(m_Drive, rearRight);
+    SendableRegistry.addChild(m_Drive, flSparkMax);
+    SendableRegistry.addChild(m_Drive, frSparkMax);
+    SendableRegistry.addChild(m_Drive, rlSparkMax);
+    SendableRegistry.addChild(m_Drive, rrSparkMax);
   
     initPathPlanner();
-    }
+  }
     
-    private void initPathPlanner() {
+  private void initPathPlanner() {
     RobotConfig config;
-    try{
+    try {
       config = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       // Handle exception as needed
@@ -103,15 +125,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     }
 
     AutoBuilder.configure(
-      odometryManager::getPose,
-      odometryManager::resetPose,
-      odometryManager::getRelativeSpeeds,
+      () -> poseEstimator.getEstimatedPosition().toPose2d(),
+      (pose) -> poseEstimator.resetPose(new Pose3d(pose)),
+      this::getChassisSpeeds,
       (speeds, ff) -> {
-        m_Drive.driveCartesian(
-            speeds.vyMetersPerSecond * MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT,
-            speeds.vxMetersPerSecond * MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT,
-            speeds.omegaRadiansPerSecond * OTHER_MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT
-        );
+        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds));
       },
       new PPHolonomicDriveController(
           new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants TODO: THIS IS PROBABLY WRONG
@@ -126,15 +144,43 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     );
   }
 
-  public OdometryManager getOdometryManager() {
-    return odometryManager;
+  public MecanumDriveWheelSpeeds getWheelSpeeds() {
+    return new MecanumDriveWheelSpeeds(
+        flEncoder.getVelocity(),
+        frEncoder.getVelocity(),
+        rlEncoder.getVelocity(),
+        rrEncoder.getVelocity()
+    );
+  }
+
+  public MecanumDriveWheelPositions getWheelPositions() {
+    return new MecanumDriveWheelPositions(
+        flEncoder.getPosition(),
+        frEncoder.getPosition(),
+        rlEncoder.getPosition(),
+        rrEncoder.getPosition()
+    );
+  }
+
+  public ChassisSpeeds getChassisSpeeds() {
+    return driveKinematics.toChassisSpeeds(getWheelSpeeds());
   }
 
   @Override
   public void periodic() {
-    odometryManager.update();
-
+    this.poseEstimator.updateWithTime(
+        Instant.now().toEpochMilli() / 1000.0,
+        navx.getFullRotation(),
+        this.getWheelPositions()
+    );
     super.periodic();
+  }
+
+  public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+    flSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
+    frSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
+    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
+    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
   }
 
   /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
@@ -144,6 +190,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SmartDashboard.putNumber("zRot", zRot);
     m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle);
   }
+
   public void driveCartesian(double xSpeed, double ySpeed, double zRot){
     m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d());
   }

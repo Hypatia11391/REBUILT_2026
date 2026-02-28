@@ -2,40 +2,40 @@ package frc.robot.poseEstimation;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.numbers.N4;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Comparator;
 
-public record PosePacket(Rotation3d rotation, Vector<N3> position, Instant time) {
-    //                         Timestamp  | Position Vector  | Rotation Matrix
+/// As a buffer,
+/// a pose packet consists of a 4x4 matrix written
+/// in left to right top to bottom order
+/// then the translational error as a double
+/// the rotational error in radians as a double
+/// the current time as a unix timestamp in milliseconds (milliseconds since 1970/01/01)
+/// NOTE: time may not actually be calibrated on the RoboRIO??? I mean idk how it would sync???
+/// If so, a shared other timestamp could be found and used
+public record PosePacket(Pose3d pose, double translationErr, double rotationErr, Instant time) {
+    //                   Rotation Quaternion| Position Vector       | Time of measurement
     public static int BYTES = Long.BYTES + 3 * Double.BYTES + 3 * 3 * Double.BYTES;
 
     public static PosePacket fromBuf(ByteBuffer buf) {
+        double[] matrixValues = new double[4 * 4];
+        // reading order (left to right then top to bottom)
+        for(int i=0;i<4;i++) {
+            for(int j=0;j<4;j++) {
+                matrixValues[i * 4 + j] = buf.getDouble();
+            }
+        }
+        Matrix<N4,N4> matrix = new Matrix<>(Nat.N4(), Nat.N4(), matrixValues);
+
         long milliTimestamp = buf.getLong();
         Instant time = Instant.ofEpochMilli(milliTimestamp);
 
-        Vector<N3> position = new Vector<>(Nat.N3());
-        for(int i=0;i<position.getNumRows();i++) {
-            position.set(i,0,buf.getDouble());
-        }
+        double translationErr = buf.getDouble();
+        double rotationErr = buf.getDouble();
 
-        Matrix<N3,N3> rotation = new Matrix<>(Nat.N3(),Nat.N3());
-        for(int i=0;i<rotation.getNumRows();i++) {
-            for(int j=0;j<rotation.getNumCols();j++) {
-                rotation.set(i,j,buf.getDouble());
-            }
-        }
-
-        return new PosePacket(new Rotation3d(rotation),position,time);
+        return new PosePacket(new Pose3d(matrix),translationErr,rotationErr,time);
     }
-
-    public Vector<N3> getPos() {
-        return position;
-    }
-
-    public static Comparator<PosePacket> BY_TIME = Comparator.comparing(pose -> pose.time);
 }
