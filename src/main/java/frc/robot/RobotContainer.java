@@ -61,7 +61,7 @@ public class RobotContainer {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
     shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_driverController, intake, kicker, feed));
+      new OperateWithJoystick(shooter, m_driverController, intake, kicker, feed)); // TODO: change to operator
     configureBindings();
   }
 
@@ -72,7 +72,8 @@ public class RobotContainer {
    */
 
   private void configureBindings() {
-    new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
+    new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::zeroYaw, navx));
+    new JoystickButton(m_driverController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
   }
 
   /**

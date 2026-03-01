@@ -1,8 +1,10 @@
 package frc.robot.subsystems.Mechanisms;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -28,12 +30,24 @@ public class Intake extends SubsystemBase {
     // private final DigitalInput bottomLimitSwitch = new DigitalInput(BOTTOM_LIMIT_SWITCH_ID);
 
     private final SparkMax intakeFeed;
-    private final SparkMax intakeLift;    
+    private final SparkMax intakeLift;
+
+    SparkMaxConfig config = new SparkMaxConfig();
+
+    private final RelativeEncoder liftEncoder;
+
+    private static final double MIN_POS = 0.0;
+    private static final double MAX_POS = 150.0;
+
+    private static final double SLOWZONE_THRESH_M = 0.05;
+    
 
     public Intake(){
       // intake motors
       intakeFeed = new SparkMax(INTAKE_FEED_ID, SparkLowLevel.MotorType.kBrushless);
       intakeLift = new SparkMax(INTAKE_LIFT_ID, SparkLowLevel.MotorType.kBrushless);
+
+      liftEncoder = intakeLift.getEncoder();
 
       configureIntakeMotor(intakeFeed, false);
       configureIntakeLiftMotor(intakeLift, true);
@@ -41,23 +55,25 @@ public class Intake extends SubsystemBase {
     }
 
 
-    public void setLiftMotorSpeed(double speed){
-      // if (speed > 0){
-      //   if (topLimitSwitch.get()){
-      //     intakeLift.set(0);
-      //   }else{
-      //     intakeLift.set(speed);
-      //   }
-      // }else{
-      //   if (bottomLimitSwitch.get()){
-      //     intakeLift.set(0);
-      //   }else{
-      //     intakeLift.set(speed);
-      //   }
-      // }
-      intakeLift.set(speed);
+    public void setLiftMotorSpeed(double power){
+
+      double pos = liftEncoder.getPosition();
+
+      if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
+      if (power < 0 && pos <= MIN_POS){intakeLift.set(0); return;}
+      if (power > 0 && pos >= MAX_POS - SLOWZONE_THRESH_M) {power*=.1;}
+      if (power < 0 && pos <= MIN_POS + SLOWZONE_THRESH_M) {power*=.1;}
+      if (pos == MIN_POS) {zeroLift();}
+      
+      intakeLift.set(power*0.3);
+      
+      SmartDashboard.putNumber("LiftPos", pos);
     }
 
+    public void zeroLift(){
+      liftEncoder.setPosition(0.0);
+    }
+  
     public void setFeedMotorSpeed(double speed){
       intakeFeed.set(speed);
     }
@@ -67,7 +83,9 @@ public class Intake extends SubsystemBase {
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(40)
-            .voltageCompensation(12);
+            .voltageCompensation(12)
+            .encoder.velocityConversionFactor(1.0)
+                    .positionConversionFactor(1.0);
             // .openLoopRampRate(0.2);
 
       motor.configureAsync(

@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
-import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.PersistMode;
@@ -44,9 +44,9 @@ public class Shooter extends SubsystemBase {
     private static final double kD = 0.1; //0.00000001
 
     // for the pid things
-    private double prevRightError = 0.0;
-    private double prevLeftError = 0.0;
-    private double prevTime = 0.0;
+    // private double prevRightError = 0.0;
+    // private double prevLeftError = 0.0;
+    // private double prevTime = 0.0;
 
     // NEOs free speed = 5676 rpm
     private static final double kV = 1.0 / 5676.0; // 0.00005; // feed-forward constant or 12.0 / 5676.0
@@ -87,13 +87,13 @@ public class Shooter extends SubsystemBase {
         // double rightDerivative = 0.0;
         // double leftDerivative = 0.0;
 
-        // prevRightError = rightError;
-        // prevLeftError = leftError;
-
         // if (dt > 0){
         //     rightDerivative = (rightError - prevRightError) / dt;
         //     leftDerivative = (leftError - prevLeftError) / dt;
         // }
+
+        // prevRightError = rightError;
+        // prevLeftError = leftError;
 
         // double ffRight = kV * targetRightRPM;
         // double ffLeft = kV * targetLeftRPM;
@@ -106,7 +106,7 @@ public class Shooter extends SubsystemBase {
 
         rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
         leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-    
+
     }
 
     public double getRightRPM(){return rightEncoder.getVelocity();}
@@ -135,9 +135,9 @@ public class Shooter extends SubsystemBase {
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40)
             .voltageCompensation(12)
-            // .openLoopRampRate(0.25)
+            // .openLoopRampRate(0.25);
             .closedLoopRampRate(0.25);
-        config.absoluteEncoder
+        config.encoder
             .velocityConversionFactor(1);
 
         config.closedLoop
