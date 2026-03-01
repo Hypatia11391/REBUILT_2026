@@ -35,7 +35,7 @@ public class DriveWithJoystick extends Command{
   private double currY = 0;
   private double currZ = 0;
 
-  private static final double NAVX_OFFSET_DEG = 90; // if needed to setup the right angle
+  // private static final double NAVX_OFFSET_DEG = 90; // if needed to setup the right angle
 
   public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;
@@ -69,13 +69,13 @@ public class DriveWithJoystick extends Command{
     }
   
     // speed scaling TODO: hook to button for slow-fast
-    double scale = 0.40;
+    double scale = 0.50;
 
     currX = currX * (1.0 - ALPHA_XY) + wishX * ALPHA_XY;
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
     currZ = currZ * (1.0 - ALPHA_Z) + wishZ * ALPHA_Z;
     
-    double outX = currX * scale;
+    double outX = -currX * scale;
     double outY = currY * scale;
     double outZ = -currZ * scale;
 

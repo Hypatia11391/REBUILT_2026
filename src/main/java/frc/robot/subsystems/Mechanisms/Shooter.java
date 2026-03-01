@@ -77,35 +77,35 @@ public class Shooter extends SubsystemBase {
         this.targetRightRPM = targetRightRPM;
         this.targetLeftRPM = targetLeftRPM;
         
-        double currentTime = Timer.getFPGATimestamp();
-        double dt = currentTime - prevTime;
-        prevTime = currentTime;
+        // double currentTime = Timer.getFPGATimestamp();
+        // double dt = currentTime - prevTime;
+        // prevTime = currentTime;
 
-        double rightError = targetRightRPM - getRightRPM();
-        double leftError = targetLeftRPM - getLeftRPM();
+        // double rightError = targetRightRPM - getRightRPM();
+        // double leftError = targetLeftRPM - getLeftRPM();
 
-        double rightDerivative = 0.0;
-        double leftDerivative = 0.0;
+        // double rightDerivative = 0.0;
+        // double leftDerivative = 0.0;
 
-        prevRightError = rightError;
-        prevLeftError = leftError;
+        // prevRightError = rightError;
+        // prevLeftError = leftError;
 
-        if (dt > 0){
-            rightDerivative = (rightError - prevRightError) / dt;
-            leftDerivative = (leftError - prevLeftError) / dt;
-        }
+        // if (dt > 0){
+        //     rightDerivative = (rightError - prevRightError) / dt;
+        //     leftDerivative = (leftError - prevLeftError) / dt;
+        // }
 
-        double ffRight = kV * targetRightRPM;
-        double ffLeft = kV * targetLeftRPM;
+        // double ffRight = kV * targetRightRPM;
+        // double ffLeft = kV * targetLeftRPM;
 
-        double rightOutput = ffRight + kP * rightError + kD * rightDerivative;
-        double leftOutput = ffLeft +  kP * leftError + kD * leftDerivative;
+        // double rightOutput = ffRight + kP * rightError + kD * rightDerivative;
+        // double leftOutput = ffLeft +  kP * leftError + kD * leftDerivative;
 
-        shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
-        shooterNeoLeft.set(leftOutput);
+        // shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
+        // shooterNeoLeft.set(leftOutput);
 
-        // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
-        // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
+        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
     
     }
 
@@ -135,7 +135,8 @@ public class Shooter extends SubsystemBase {
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40)
             .voltageCompensation(12)
-            .openLoopRampRate(0.25);
+            // .openLoopRampRate(0.25)
+            .closedLoopRampRate(0.25);
         config.absoluteEncoder
             .velocityConversionFactor(1);
 
@@ -144,8 +145,8 @@ public class Shooter extends SubsystemBase {
             .pid(kP, kI, kD)
             .outputRange(-1.0, 1.0);
 
-        // config.closedLoop.feedForward
-        //     .sv(0.0, kV);
+        config.closedLoop.feedForward
+            .sv(0.0, kV);
     
         motor.configureAsync(
             config, 

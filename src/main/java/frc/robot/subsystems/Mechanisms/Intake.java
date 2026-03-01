@@ -32,11 +32,11 @@ public class Intake extends SubsystemBase {
 
     public Intake(){
       // intake motors
-      intakeFeed = new SparkMax(INTAKE_FEED_ID, SparkLowLevel.MotorType.kBrushed);
-      intakeLift = new SparkMax(INTAKE_LIFT_ID, SparkLowLevel.MotorType.kBrushed);
+      intakeFeed = new SparkMax(INTAKE_FEED_ID, SparkLowLevel.MotorType.kBrushless);
+      intakeLift = new SparkMax(INTAKE_LIFT_ID, SparkLowLevel.MotorType.kBrushless);
 
       configureIntakeMotor(intakeFeed, false);
-      configureIntakeLiftMotor(intakeLift, false);
+      configureIntakeLiftMotor(intakeLift, true);
 
     }
 
@@ -66,9 +66,9 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(20)
-            .voltageCompensation(12)
-            .openLoopRampRate(0.2);
+            .smartCurrentLimit(40)
+            .voltageCompensation(12);
+            // .openLoopRampRate(0.2);
 
       motor.configureAsync(
         config, 
@@ -80,9 +80,9 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(20)
-            .voltageCompensation(12)
-            .openLoopRampRate(0.1);
+            .smartCurrentLimit(40)
+            .voltageCompensation(12);
+            // .openLoopRampRate(0.1);
       motor.configureAsync(
         config, 
         ResetMode.kNoResetSafeParameters, 

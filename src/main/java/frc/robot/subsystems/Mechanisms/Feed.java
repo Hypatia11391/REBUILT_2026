@@ -27,14 +27,14 @@ public class Feed extends SubsystemBase {
     }
     
     public void setFeedSpeed(double speed){
-        feedNeo.set(speed);
+        feedNeo.set(speed*0.5);
     }
 
     public void configureFeedMotor(SparkMax motor, boolean isInverted){
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(40) // TODO: change to 40
+            .smartCurrentLimit(40)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
 
