@@ -1,3 +1,5 @@
+package frc.robot.commands;
+
 public final class Aim {
     double elevation = Math.PI/3;
     double g = 9.80665;
@@ -23,7 +25,7 @@ public final class Aim {
         for(int i = 0; i < newtonsMethod; i++) {
             double dist_eff_x = r_h_x - AimObj.vel_r_x * t;
             double dist_eff_y = r_h_y - AimObj.vel_r_y * t;
-            double dist_eff_mag = Math.sqrt(dist_eff_x**2 + dist_eff_y**2);
+            double dist_eff_mag = Math.sqrt(Math.pow(dist_eff_x,2 ) + Math.pow(dist_eff_y, 2));
             double dist_eff_x_hat = dist_eff_x/dist_eff_mag;
             double dist_eff_y_hat = dist_eff_y/dist_eff_mag;
 
