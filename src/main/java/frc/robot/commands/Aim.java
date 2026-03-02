@@ -60,7 +60,7 @@ public final class Aim {
 
         this.shooterPosition[0] = robotPose.getX();
         this.shooterPosition[1] = robotPose.getY();
-        this.shooterPosition[2] = 0.5;
+        this.shooterPosition[2] = 0.5;  //Measure and set
 
         this.targetPosition[0] = goalLocation.getX();
         this.targetPosition[1] = goalLocation.getY();
