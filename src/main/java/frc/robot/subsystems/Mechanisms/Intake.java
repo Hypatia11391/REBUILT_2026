@@ -22,12 +22,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Intake extends SubsystemBase {
 
-    // TODO: edit all the CAN IDs to proper ones
     private static final int INTAKE_FEED_ID = 4; 
     private static final int INTAKE_LIFT_ID = 6;
 
     // PID constants
-    private static final double kP = 0;
+    private static final double kP = 0.05;
     private static final double kI = 0;
     private static final double kD = 0;
 
@@ -47,7 +46,7 @@ public class Intake extends SubsystemBase {
     private static final double MIN_POS = -100.0;
     private static final double MAX_POS = 50.0;
 
-    private static final double SLOWZONE_THRESH_M = 0.05;
+    double targetPos = 0.0;
     
     private final SparkClosedLoopController liftLoop;
 
@@ -59,22 +58,29 @@ public class Intake extends SubsystemBase {
       liftLoop = intakeLift.getClosedLoopController();
       liftEncoder = intakeLift.getEncoder();
 
+      targetPos = liftEncoder.getPosition();
+
       configureIntakeMotor(intakeFeed, true);
       configureIntakeLiftMotor(intakeLift, true);
     }
 
     public void setLiftMotorSpeed(double power){
 
-      double pos = liftEncoder.getPosition();
+      if (Math.abs(power) < 0.05) power = 0;
 
-      double pos_set = pos; // Establishes setpoint to current position to avoid moving
+      // scale kinda
+      targetPos += power * 0.5; // Establishes setpoint to current position to avoid moving
 
-      if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
-      if (power < 0 && pos <= MIN_POS){intakeLift.set(0); return;}
-      if (power > 0 && pos >= MAX_POS - SLOWZONE_THRESH_M) {pos_set = 0 ;} // constant for top
-      if (power < 0 && pos <= MIN_POS + SLOWZONE_THRESH_M) {pos_set = 0;} // constant for bottom
-      if (pos >= MAX_POS ) {zeroLift();}
-      liftLoop.setSetpoint(pos_set, ControlType.kPosition);
+      if (targetPos > MAX_POS)targetPos = MAX_POS;
+      if (targetPos < MIN_POS)targetPos = MIN_POS;
+
+      liftLoop.setSetpoint(targetPos, ControlType.kPosition);
+      // if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
+      // if (power < 0 && pos <= MIN_POS){intakeLift.set(0); return;}
+      // if (power > 0 && pos >= MAX_POS - SLOWZONE_THRESH_M) {pos_set = 0.3 ;} // constant for top
+      // if (power < 0 && pos <= MIN_POS + SLOWZONE_THRESH_M) {pos_set = 0.3;} // constant for bottom
+      // if (pos >= MAX_POS ) {zeroLift();}
+      // liftLoop.setSetpoint(pos_set, ControlType.kPosition);
       // intakeLift.set(power*0.50);
     }
 
@@ -101,7 +107,7 @@ public class Intake extends SubsystemBase {
       config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(kP, kI, kD)
-        .outputRange(-1, 1);
+        .outputRange(-0.5, 0.5);
             // .openLoopRampRate(0.2);
 
       motor.configureAsync(
