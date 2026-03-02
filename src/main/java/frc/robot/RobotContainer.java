@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Aim;
 import frc.robot.commands.Autos;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
@@ -113,10 +114,17 @@ public class RobotContainer {
    * Called once during robot initialization.
    */
 
+
   private void configureBindings() {
+    
+    new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
+
+    new JoystickButton(m_driverController, Buttons.LB.ordinal()).onTrue(new InstantCommand());
+    
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     new JoystickButton(m_driverController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
-  }
+
+}
 
   /**
    * Returns the command that will run during autonomous mode.
@@ -125,4 +133,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return Autos.autonomousFull("pathplanner/paths.txt");
   }
+
 }
