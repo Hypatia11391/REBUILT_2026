@@ -113,9 +113,12 @@ public class RobotContainer {
    * Called once during robot initialization.
    */
 
+
   private void configureBindings() {
+    
     new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
-  }
+
+}
 
   /**
    * Returns the command that will run during autonomous mode.
@@ -124,4 +127,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return Autos.autonomousFull("pathplanner/paths.txt");
   }
+
 }

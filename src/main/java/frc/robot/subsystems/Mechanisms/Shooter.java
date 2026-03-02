@@ -158,4 +158,8 @@ public class Shooter extends SubsystemBase {
         shooterNeoRight.stopMotor();
         shooterNeoLeft.stopMotor();
     }
+
+    public void aimThing() {
+        
+    }
 }
