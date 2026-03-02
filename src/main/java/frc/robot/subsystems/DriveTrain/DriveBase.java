@@ -79,6 +79,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final Navx navx;
   private final MecanumDriveKinematics driveKinematics;
 
+  private static Pose2d currentPose;
+
   /** Called once at the beginning of the robot program. */
   public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
     this.poseEstimator = poseEstimator;
@@ -154,17 +156,20 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
 
   public MecanumDriveWheelSpeeds getWheelSpeeds() {
+
+    Pose3d temp = poseEstimator.getEstimatedPosition();
+    currentPose = temp.toPose2d();
+    m_field.setRobotPose(currentPose);
+
+    super.periodic();
+
+
     return new MecanumDriveWheelSpeeds(
         flEncoder.getVelocity(),
         frEncoder.getVelocity(),
         rlEncoder.getVelocity(),
         rrEncoder.getVelocity()
     );
-
-    m_field.setRobotPose(this.currentPose);
-
-
-    super.periodic();
   }
 
   public MecanumDriveWheelPositions getWheelPositions() {
@@ -177,7 +182,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
 
   public void resetPose(Pose2d pose) {
-    this.currentPose = pose;
+    currentPose = pose;
+  }
   public ChassisSpeeds getChassisSpeeds() {
     return driveKinematics.toChassisSpeeds(getWheelSpeeds());
   }
@@ -232,7 +238,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public static void doAim(MecanumDrivePoseEstimator3d MDPE3D) {
     Pose3d temp = MDPE3D.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
-    Aim.updateAim(null, position, null, null, 4);
+    Aim.updateAim(position, null, null, 4);
   }
 
 }
