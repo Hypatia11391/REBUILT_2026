@@ -9,6 +9,9 @@ import com.studica.frc.AHRS;
 public class Navx extends SubsystemBase{
     public final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
+    private double yawOffsetDeg = 0.0;
+    private boolean fieldCalibrated = false;
+
     public Navx(){
     }
 
@@ -18,11 +21,39 @@ public class Navx extends SubsystemBase{
     //     navx.setAngleAdjustment(navxOffset-currentHeading);
     // }
 
-    // Yaw heading in degrees [-180, 180]
+
+    public void calibrateFieldOrientationFromCompass(){
+        double compassDeg = navx.getFusedHeading(); // [0, 360]
+        double yawDeg = navx.getYaw(); // [-180, 180]
+
+        double compassSigned = wrapTo180(compassDeg);
+
+        yawOffsetDeg = compassSigned-yawDeg;
+        yawOffsetDeg = wrapTo180(yawOffsetDeg);
+
+        fieldCalibrated = true;
+    }
+
+    public boolean isFieldCalibrated(){
+        return fieldCalibrated;
+    }
+
+    public double getFieldHeadingDeg(){
+        double heading = navx.getYaw() + yawOffsetDeg;
+        return wrapTo180(heading);
+    }
+
+
+    private static double wrapTo180(double deg){
+        deg = deg % 360.0;
+        if (deg >= 180.0) deg -=360.0;
+        if (deg<-180.0) deg+=360.0;
+        return deg;
+    }
+
     public double getYawDeg(){
         return navx.getYaw();
     }
-
     // Continuous angle (total accumulated yaw angle)
     // Can grow beyond 360. Great for odometry turning
     public double getAngleDeg(){
@@ -70,25 +101,24 @@ public class Navx extends SubsystemBase{
     public boolean isConnected(){
         return navx.isConnected();
     }
-
-    public double getCompassDeg(){
-        return navx.getFusedHeading();
-    }
   
     public Rotation3d getFullRotation() {
-        return new Rotation3d(this.getRollDeg(),this.getPitchDeg(),this.getYawDeg());
-
+        return new Rotation3d(
+            Math.toRadians(getRollDeg()),
+            Math.toRadians(getPitchDeg()),
+            Math.toRadians(getFieldHeadingDeg())); // possibly getYawDeg();
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putBoolean("navX/Connected", isConnected());
-        SmartDashboard.putBoolean("navX/Calibrating", isCalibrating());
+        // SmartDashboard.putBoolean("navX/Calibrating", isCalibrating());
+        SmartDashboard.putBoolean("navX/isFieldCalibrated", fieldCalibrated);
         SmartDashboard.putNumber("navX/YawDeg", getYawDeg());
-        SmartDashboard.putNumber("navX/AngleDeg", getAngleDeg());
-        SmartDashboard.putNumber("navX/RateDegPerSec", getRateDegPerSec());
+        // SmartDashboard.putNumber("navX/AngleDeg", getAngleDeg());
+        // SmartDashboard.putNumber("navX/RateDegPerSec", getRateDegPerSec());
         SmartDashboard.putNumber("navX/PitchDeg", getPitchDeg());
         SmartDashboard.putNumber("navX/RollDeg", getRollDeg());
-        SmartDashboard.putNumber("navx/CompassDeg", getCompassDeg());
+        // SmartDashboard.putNumber("navx/CompassDeg", getCompassDeg());
     }
 }

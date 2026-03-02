@@ -74,7 +74,7 @@ public class DriveWithJoystick extends Command{
     double outZ = -currZ * scale;
 
     //Field-oriented, navx yaw as heading
-    Rotation2d heading = Rotation2d.fromDegrees(navX.getYawDeg());
+    Rotation2d heading = Rotation2d.fromDegrees(navX.getFieldHeadingDeg());
     m_drive.driveCartesian(outX, outY, outZ, heading);
   }
 
