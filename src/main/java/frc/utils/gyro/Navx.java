@@ -73,6 +73,7 @@ public class Navx extends SubsystemBase{
 
     public double getCompassDeg(){
         return navx.getFusedHeading();
+    }
   
     public Rotation3d getFullRotation() {
         return new Rotation3d(this.getRollDeg(),this.getPitchDeg(),this.getYawDeg());
