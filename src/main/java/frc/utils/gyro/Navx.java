@@ -6,11 +6,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.studica.frc.AHRS;
 
 public class Navx extends SubsystemBase{
-    private final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    public final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public Navx(){
     }
 
+    // public void calibrateFieldOrientation(){
+    //     double currentHeading = navx.getFusedHeading();
+    //     double navxOffset = 90.0;
+    //     navx.setAngleAdjustment(navxOffset-currentHeading);
+    // }
 
     // Yaw heading in degrees [-180, 180]
     public double getYawDeg(){
@@ -65,6 +70,11 @@ public class Navx extends SubsystemBase{
         return navx.isConnected();
     }
 
+    public double getCompassDeg(){
+        return navx.getFusedHeading();
+
+    }
+
     @Override
     public void periodic(){
         SmartDashboard.putBoolean("navX/Connected", isConnected());
@@ -74,5 +84,6 @@ public class Navx extends SubsystemBase{
         SmartDashboard.putNumber("navX/RateDegPerSec", getRateDegPerSec());
         SmartDashboard.putNumber("navX/PitchDeg", getPitchDeg());
         SmartDashboard.putNumber("navX/RollDeg", getRollDeg());
+        SmartDashboard.putNumber("navx/CompassDeg", getCompassDeg());
     }
 }

@@ -94,7 +94,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     rearRight = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-    
+
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
@@ -199,6 +199,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         navx.getRateDegPerSec() * Math.PI / 180
     );
   }
+
 
   public void resetPose(Pose2d pose) {
     this.currentPose = pose;
