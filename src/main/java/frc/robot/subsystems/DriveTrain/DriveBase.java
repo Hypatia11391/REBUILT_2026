@@ -32,6 +32,9 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
+
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,6 +66,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final SparkAbsoluteEncoder rrEncoder;
   private final SparkAbsoluteEncoder rlEncoder;
 
+  private final Field2d m_field = new Field2d();
   private final SparkMax frSparkMax;
   private final SparkMax flSparkMax;
   private final SparkMax rrSparkMax;
@@ -112,7 +116,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SendableRegistry.addChild(m_Drive, rrSparkMax);
   
     initPathPlanner();
-  }
+
+    SmartDashboard.putData("Field", m_field);
+    }
     
   private void initPathPlanner() {
     RobotConfig config;
@@ -151,6 +157,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         rlEncoder.getVelocity(),
         rrEncoder.getVelocity()
     );
+
+    m_field.setRobotPose(this.currentPose);
+
+
+    super.periodic();
   }
 
   public MecanumDriveWheelPositions getWheelPositions() {
