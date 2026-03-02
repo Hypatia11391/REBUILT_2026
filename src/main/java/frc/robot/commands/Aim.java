@@ -1,47 +1,74 @@
 package frc.robot.commands;
 
 public final class Aim {
-    double elevation = Math.PI/3;
-    double g = 9.80665;
-    double pos_r_x;
-    double pos_r_y;
-    double pos_r_z;
-    double pos_t_x;
-    double pos_t_y;
-    double pos_t_z;
-    double vel_r_x;
-    double vel_r_y;
-    double req_theta;
-    double req_exit_v;
+    double shooterAngle = Math.PI/3;
+    double gravity = 9.80665;
 
-    public static void update_aim(Aim AimObj, int newtonsMethod) {
-        double t = 5.0;
-        double H = AimObj.pos_t_z - AimObj.pos_r_z;
-        double cot_alpha = 1/Math.tan(AimObj.elevation);
-        double r_h_x = AimObj.pos_t_x - AimObj.pos_r_x;
-        double r_h_y = AimObj.pos_t_y - AimObj.pos_r_y;
-        double r_h_z = AimObj.pos_t_z - AimObj.pos_r_z;
+    double[] shooterPosition = new double[3];
+    double[] targetPosition = new double[3];
+    double[] robotVelocities = new double[2];
 
-        for(int i = 0; i < newtonsMethod; i++) {
-            double dist_eff_x = r_h_x - AimObj.vel_r_x * t;
-            double dist_eff_y = r_h_y - AimObj.vel_r_y * t;
-            double dist_eff_mag = Math.sqrt(Math.pow(dist_eff_x,2 ) + Math.pow(dist_eff_y, 2));
-            double dist_eff_x_hat = dist_eff_x/dist_eff_mag;
-            double dist_eff_y_hat = dist_eff_y/dist_eff_mag;
+    double height = targetPosition[2] - shooterPosition[2];
 
-            double f = cot_alpha * (H + AimObj.g/2 * t * t) - dist_eff_mag;
-            double f_prime = cot_alpha * AimObj.g * t + (AimObj.vel_r_x*dist_eff_x_hat + AimObj.vel_r_y*dist_eff_y_hat);
+    double rotateBy;
+    double exitVelocity;
 
-            t = t - f/f_prime;
-        }
+    public static void update_aim(Aim AimObj, double timeGuess) {
+        double[] distanceToTarget = new double[3];
+        double time = timeGuess;
+        double cotAlpha = 1/Math.tan(AimObj.shooterAngle);
+        distanceToTarget[0] = AimObj.targetPosition[0] - AimObj.shooterPosition[0];
+        distanceToTarget[1] = AimObj.targetPosition[1] - AimObj.shooterPosition[1];
+        distanceToTarget[2] = AimObj.targetPosition[2] - AimObj.shooterPosition[2];
 
-        double dist_eff_x = r_h_x - AimObj.vel_r_x * t;
-        double dist_eff_y = r_h_y - AimObj.vel_r_y * t;
-        double dist_eff_mag = Math.sqrt(Math.pow(dist_eff_x, 2) + Math.pow(dist_eff_y, 2));
-        double dist_eff_x_hat = dist_eff_x/dist_eff_mag;
-        double dist_eff_y_hat = dist_eff_y/dist_eff_mag;
+        time = newtonsMethodFunc(distanceToTarget, AimObj.robotVelocities, time, AimObj.height, cotAlpha, 4);
 
-        AimObj.req_theta = Math.atan2(dist_eff_y_hat, dist_eff_x_hat);
-        AimObj.req_exit_v = (r_h_z + AimObj.g/2*t)/(t * Math.sin(AimObj.elevation));
+        double effectiveDistanceX = distanceToTarget[0] - AimObj.robotVelocities[0] * time;
+        double effectiveDistanceY = distanceToTarget[1] - AimObj.robotVelocities[1] * time;
+        double effectiveDistanceMagnitude = Math.sqrt(Math.pow(effectiveDistanceX, 2) + Math.pow(effectiveDistanceY, 2));
+        double HATeffectiveDistanceX = effectiveDistanceX/effectiveDistanceMagnitude;
+        double HATeffectiveDistanceY = effectiveDistanceY/effectiveDistanceMagnitude;
+
+        AimObj.rotateBy = Math.atan2(HATeffectiveDistanceY, HATeffectiveDistanceX);
+        AimObj.exitVelocity = (AimObj.height + 0.5 * AimObj.gravity * Math.pow(time, 2)) / (time * Math.sin(AimObj.shooterAngle));
+        
+        AimObj.updateStuff();
+    }
+
+    public static double newtonsMethodFunc(double[] distanceToTarget, double[] robotVelocities, double time, double height, double cotAlpha, int repetitions) {
+            for (int i = repetitions; i > 0; i--) {
+                final double gravity = 9.80665;
+                double[] effectiveDistance = new double[2];
+                effectiveDistance[0] = distanceToTarget[0] - robotVelocities[0] * time;
+                effectiveDistance[1] = distanceToTarget[1] - robotVelocities[1] * time;
+                double effectiveDistanceMagnitude = Math.sqrt(Math.pow(effectiveDistance[0],2 ) + Math.pow(effectiveDistance[1], 2));
+                double HATeffectiveDistanceX = effectiveDistance[0]/effectiveDistanceMagnitude;
+                double HATeffectiveDistanceY = effectiveDistance[1]/effectiveDistanceMagnitude;
+
+                double func = cotAlpha * (height + gravity/2 * time * time) - effectiveDistanceMagnitude;
+                double funcPrime = cotAlpha * gravity * time + (robotVelocities[0]*HATeffectiveDistanceX + robotVelocities[1]*HATeffectiveDistanceY);
+
+                time = time - func/funcPrime;
+            }
+            return time;
+    };
+
+    public void updateStuff() {
+        /*
+        shooterPosition[0] = Do.Stuff.To.Get.Pos;
+        shooterPosition[1] = Do.Stuff.To.Get.Pos;
+        shooterPosition[2] = Do.Stuff.To.Get.Pos;
+
+        targetPosition[0] = Do.Stuff.To.Get.Pos;
+        targetPosition[1] = Do.Stuff.To.Get.Pos;
+        targetPosition[2] = Do.Stuff.To.Get.Pos;
+
+        robotVelocities[0] = Do.Stuff.To.Get.Vel;
+        robotVelocities[1] = Do.Stuff.To.Get.Vel;
+
+        height = Do.Stuff.To.Get.Height;
+        */
+
+
     }
 }
