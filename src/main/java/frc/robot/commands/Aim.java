@@ -14,13 +14,16 @@ public final class Aim {
     double exitVelocity;
 
     public static void update_aim(Aim AimObj, double timeGuess) {
+
         double[] distanceToTarget = new double[3];
         double time = timeGuess;
         double cotAlpha = 1/Math.tan(AimObj.shooterAngle);
+
+        //Functions that do important stuff. Move the order and it all goes to sh!t.
+        AimObj.updateStuff();
         distanceToTarget[0] = AimObj.targetPosition[0] - AimObj.shooterPosition[0];
         distanceToTarget[1] = AimObj.targetPosition[1] - AimObj.shooterPosition[1];
         distanceToTarget[2] = AimObj.targetPosition[2] - AimObj.shooterPosition[2];
-
         time = newtonsMethodFunc(distanceToTarget, AimObj.robotVelocities, time, AimObj.height, cotAlpha, 4);
 
         double effectiveDistanceX = distanceToTarget[0] - AimObj.robotVelocities[0] * time;
@@ -31,8 +34,6 @@ public final class Aim {
 
         AimObj.rotateBy = Math.atan2(HATeffectiveDistanceY, HATeffectiveDistanceX);
         AimObj.exitVelocity = (AimObj.height + 0.5 * AimObj.gravity * Math.pow(time, 2)) / (time * Math.sin(AimObj.shooterAngle));
-        
-        AimObj.updateStuff();
     }
 
     public static double newtonsMethodFunc(double[] distanceToTarget, double[] robotVelocities, double time, double height, double cotAlpha, int repetitions) {
