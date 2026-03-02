@@ -5,14 +5,12 @@
  * 
  * - Contains motor controller object, 
  * - Contains WPILib mecanum drive object, 
- * - Runs methods (ie, drive, stop, etc)
+ * - Runs methods (ie, drive, stop, etc.)
  * 
  * This class should NOT read controller input or handle logic
  */
 
 package frc.robot.subsystems.DriveTrain;
-
-import java.util.function.DoubleConsumer;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -25,26 +23,30 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.util.sendable.SendableRegistry; // for motors to show up in shuffleboard
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.gyro.Navx;
 
+import java.time.Instant;
+import java.util.function.DoubleConsumer;
+
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
-  private final Navx navx;
 
-  // tune this to cap max output for testing
+    // tune this to cap max output for testing
   private static final double MAX_SPEED = 1.0;
   
   // CAN IDs (spark max)
@@ -53,81 +55,74 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final int REAR_LEFT_ID = 10;
   private static final int REAR_RIGHT_ID = 2;
 
-  private final SparkMax frontRight;
-  private final SparkMax frontLeft;
-  private final SparkMax rearRight;
-  private final SparkMax rearLeft;
-   
-  //     -/  \
-  // ^+x
-  // |   -\  /
-  // '-> +y
-
-  private static final double ROOT_TWO = Math.sqrt(2);
-  private static final double MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT = 1; // TODO: JUST... FIX THIS
-  private static final double OTHER_MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT = 1; // TODO: FIX THIS TOO
-
-  private static final Translation2d FRONT_LEFT_MOVE = new Translation2d(ROOT_TWO,ROOT_TWO);
-  private static final Translation2d FRONT_RIGHT_MOVE = new Translation2d(ROOT_TWO,-ROOT_TWO);
-  private static final Translation2d REAR_LEFT_MOVE = new Translation2d(ROOT_TWO,-ROOT_TWO);
-  private static final Translation2d REAR_RIGHT_MOVE = new Translation2d(ROOT_TWO,ROOT_TWO);
+  private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
 
   // TODO: MEASURE
   private static final double WHEEL_DIAMETER = 0.25;
-  private static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-
-  private static final Pose2d STARTING_POSE = Pose2d.kZero; // TODO: Correct to be the actual starting position!
-
-  private Pose2d currentPose = STARTING_POSE;
+  public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
   private final SparkAbsoluteEncoder frEncoder;
   private final SparkAbsoluteEncoder flEncoder;
   private final SparkAbsoluteEncoder rrEncoder;
   private final SparkAbsoluteEncoder rlEncoder;
 
-  /**it  Called once at the beginning of the robot program. */
-  public DriveBase(Navx navx) { // constructor
+  private final Field2d m_field = new Field2d();
+  private final SparkMax frSparkMax;
+  private final SparkMax flSparkMax;
+  private final SparkMax rrSparkMax;
+  private final SparkMax rlSparkMax;
+
+  private final MecanumDrivePoseEstimator3d poseEstimator;
+  private final Navx navx;
+  private final MecanumDriveKinematics driveKinematics;
+
+  /** Called once at the beginning of the robot program. */
+  public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
+    this.poseEstimator = poseEstimator;
     this.navx = navx;
+    this.driveKinematics = kinematics;
 
     // wheel motors
-    frontLeft = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    frontRight = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-    rearLeft = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    rearRight = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-
+    flSparkMax = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    frSparkMax = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    rlSparkMax = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    rrSparkMax = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
 
-    configureMotor(frontLeft, true);
-    configureMotor(frontRight, false);
-    configureMotor(rearLeft, true);
-    configureMotor(rearRight, false);
+    configureMotor(flSparkMax, true, conf);
+    configureMotor(frSparkMax, false, conf);
+    configureMotor(rlSparkMax, true, conf);
+    configureMotor(rrSparkMax, false, conf);
     
-    frEncoder = frontRight.getAbsoluteEncoder();
-    flEncoder = frontLeft.getAbsoluteEncoder();
-    rrEncoder = rearRight.getAbsoluteEncoder();
-    rlEncoder = rearLeft.getAbsoluteEncoder();
+    this.frEncoder = flSparkMax.getAbsoluteEncoder();
+    this.flEncoder = frSparkMax.getAbsoluteEncoder();
+    this.rrEncoder = rlSparkMax.getAbsoluteEncoder();
+    this.rlEncoder = rrSparkMax.getAbsoluteEncoder();
 
     m_Drive = new MecanumDrive(
-      cappedSetter(frontLeft, MAX_SPEED),
-      cappedSetter(rearLeft, MAX_SPEED),
-      cappedSetter(frontRight, MAX_SPEED),
-      cappedSetter(rearRight, MAX_SPEED)
+      cappedSetter(flSparkMax, MAX_SPEED),
+      cappedSetter(frSparkMax, MAX_SPEED),
+      cappedSetter(rlSparkMax, MAX_SPEED),
+      cappedSetter(rrSparkMax, MAX_SPEED)
     );
 
     // motors visible in shuffleboard
-    SendableRegistry.addChild(m_Drive, frontLeft); 
-    SendableRegistry.addChild(m_Drive, rearLeft); 
-    SendableRegistry.addChild(m_Drive, frontRight);
-    SendableRegistry.addChild(m_Drive, rearRight);
+    SendableRegistry.addChild(m_Drive, flSparkMax);
+    SendableRegistry.addChild(m_Drive, frSparkMax);
+    SendableRegistry.addChild(m_Drive, rlSparkMax);
+    SendableRegistry.addChild(m_Drive, rrSparkMax);
   
     initPathPlanner();
+
+    SmartDashboard.putData("Field", m_field);
     }
     
-    private void initPathPlanner() {
+  private void initPathPlanner() {
     RobotConfig config;
-    try{
+    try {
       config = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       // Handle exception as needed
@@ -136,16 +131,12 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     }
 
     AutoBuilder.configure(
-      this::getPose,
-      this::resetPose,
-      this::getRelativeSpeeds,
-      (speeds, ff) -> {
-        m_Drive.driveCartesian(
-            speeds.vyMetersPerSecond * MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT,
-            speeds.vxMetersPerSecond * MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT,
-            speeds.omegaRadiansPerSecond * OTHER_MAGICAL_CONSTANT_I_DONT_WANT_TO_FIGURE_OUT
-        );
-      },
+      () -> poseEstimator.getEstimatedPosition().toPose2d(),
+      (pose) -> poseEstimator.resetPose(new Pose3d(pose)),
+      this::getChassisSpeeds,
+      (speeds, ff) ->
+        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds))
+      ,
       new PPHolonomicDriveController(
           new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants TODO: THIS IS PROBABLY WRONG
           new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants TODO: THIS IS PROBABLY WRONG
@@ -159,54 +150,50 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     );
   }
 
-  @Override
-  public void periodic() {
-    Translation2d vec = FRONT_RIGHT_MOVE.times(frEncoder.getPosition())
-      .plus(
-        FRONT_LEFT_MOVE.times(flEncoder.getPosition())
-      ).plus(
-        REAR_LEFT_MOVE.times(rlEncoder.getPosition())
-      ).plus(
-        REAR_RIGHT_MOVE.times(rrEncoder.getPosition())
-      );
-
-    Rotation2d newRotation = new Rotation2d(Angle.ofBaseUnits(navx.getYawDeg(), Units.Degrees));
-
-    vec.rotateBy(newRotation);
-
-    this.currentPose = new Pose2d(
-        this.currentPose.getTranslation()
-            .plus(vec),
-        newRotation
+  public MecanumDriveWheelSpeeds getWheelSpeeds() {
+    return new MecanumDriveWheelSpeeds(
+        flEncoder.getVelocity(),
+        frEncoder.getVelocity(),
+        rlEncoder.getVelocity(),
+        rrEncoder.getVelocity()
     );
+
+    m_field.setRobotPose(this.currentPose);
+
 
     super.periodic();
   }
 
-  public ChassisSpeeds getRelativeSpeeds() {
-    Translation2d velocity = FRONT_RIGHT_MOVE.times(frEncoder.getVelocity())
-        .plus(
-            FRONT_LEFT_MOVE.times(flEncoder.getVelocity())
-        ).plus(
-            REAR_LEFT_MOVE.times(rlEncoder.getVelocity())
-        ).plus(
-            REAR_RIGHT_MOVE.times(rrEncoder.getVelocity())
-        );
-
-    return new ChassisSpeeds(
-        velocity.getX(),
-        velocity.getY(),
-        navx.getRateDegPerSec() * Math.PI / 180
+  public MecanumDriveWheelPositions getWheelPositions() {
+    return new MecanumDriveWheelPositions(
+        flEncoder.getPosition(),
+        frEncoder.getPosition(),
+        rlEncoder.getPosition(),
+        rrEncoder.getPosition()
     );
   }
 
-
   public void resetPose(Pose2d pose) {
     this.currentPose = pose;
+  public ChassisSpeeds getChassisSpeeds() {
+    return driveKinematics.toChassisSpeeds(getWheelSpeeds());
   }
 
-  public Pose2d getPose() {
-    return currentPose;
+  @Override
+  public void periodic() {
+    this.poseEstimator.updateWithTime(
+        Instant.now().toEpochMilli() / 1000.0,
+        navx.getFullRotation(),
+        this.getWheelPositions()
+    );
+    super.periodic();
+  }
+
+  public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+    flSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
+    frSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
+    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
+    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
   }
 
     /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
@@ -220,20 +207,21 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
     }
 
-    public void stop() {
-      m_Drive.stopMotor();
-    }
+  public void stop() {
+    m_Drive.stopMotor();
+  }
 
-    public void configureMotor(SparkMax motor, boolean isInverted){
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(isInverted);
-      motor.configureAsync(
-        config, 
-        ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);
-    }
-    
-    private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
-        return speed -> controller.set(maxSpeed * speed);
-    }
+  public void configureMotor(SparkMax motor, boolean isInverted, AbsoluteEncoderConfig absEncoderConf){
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.inverted(isInverted);
+    config.absoluteEncoder.apply(absEncoderConf);
+    motor.configureAsync(
+      config,
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters);
+  }
+
+  private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
+      return speed -> controller.set(maxSpeed * speed);
+  }
 }
