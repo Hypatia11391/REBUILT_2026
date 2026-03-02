@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.utils.gyro.Navx;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 /// DriveWithJoystick \
 /// Tele-op for driving the robot
@@ -29,14 +30,13 @@ public class DriveWithJoystick extends Command{
   private double currY = 0;
   private double currZ = 0;
 
-  private static final double NAVX_OFFSET_DEG = 90; // if needed to set up the right angle
-
   public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx){
       m_drive = drive;
       m_stick = stick;
       navX = navx;
       addRequirements(m_drive);
   }
+
   @Override
   public void initialize(){}
 
@@ -63,7 +63,7 @@ public class DriveWithJoystick extends Command{
     }
   
     // speed scaling TODO: hook to button for slow-fast
-    double scale = 0.40;
+    double scale = 0.50;
 
     currX = currX * (1.0 - ALPHA_XY) + wishX * ALPHA_XY;
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
@@ -74,10 +74,8 @@ public class DriveWithJoystick extends Command{
     double outZ = -currZ * scale;
 
     //Field-oriented, navx yaw as heading
-    Rotation2d heading = Rotation2d.fromDegrees(navX.getYawDeg()); //+ NAVX_OFFSET_DEG
-
+    Rotation2d heading = Rotation2d.fromDegrees(navX.getYawDeg());
     m_drive.driveCartesian(outX, outY, outZ, heading);
-
   }
 
   @Override

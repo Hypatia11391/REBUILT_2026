@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
-import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.PersistMode;
@@ -43,9 +43,9 @@ public class Shooter extends SubsystemBase {
     private static final double kD = 0.1; //0.00000001
 
     // for the pid things
-    private double prevRightError = 0.0;
-    private double prevLeftError = 0.0;
-    private double prevTime = 0.0;
+    // private double prevRightError = 0.0;
+    // private double prevLeftError = 0.0;
+    // private double prevTime = 0.0;
 
     // NEOs free speed = 5676 rpm
     private static final double kV = 1.0 / 5676.0; // 0.00005; // feed-forward constant or 12.0 / 5676.0
@@ -76,36 +76,36 @@ public class Shooter extends SubsystemBase {
         this.targetRightRPM = targetRightRPM;
         this.targetLeftRPM = targetLeftRPM;
         
-        double currentTime = Timer.getFPGATimestamp();
-        double dt = currentTime - prevTime;
-        prevTime = currentTime;
+        // double currentTime = Timer.getFPGATimestamp();
+        // double dt = currentTime - prevTime;
+        // prevTime = currentTime;
 
-        double rightError = targetRightRPM - getRightRPM();
-        double leftError = targetLeftRPM - getLeftRPM();
+        // double rightError = targetRightRPM - getRightRPM();
+        // double leftError = targetLeftRPM - getLeftRPM();
 
-        double rightDerivative = 0.0;
-        double leftDerivative = 0.0;
+        // double rightDerivative = 0.0;
+        // double leftDerivative = 0.0;
 
-        prevRightError = rightError;
-        prevLeftError = leftError;
+        // if (dt > 0){
+        //     rightDerivative = (rightError - prevRightError) / dt;
+        //     leftDerivative = (leftError - prevLeftError) / dt;
+        // }
 
-        if (dt > 0){
-            rightDerivative = (rightError - prevRightError) / dt;
-            leftDerivative = (leftError - prevLeftError) / dt;
-        }
+        // prevRightError = rightError;
+        // prevLeftError = leftError;
 
-        double ffRight = kV * targetRightRPM;
-        double ffLeft = kV * targetLeftRPM;
+        // double ffRight = kV * targetRightRPM;
+        // double ffLeft = kV * targetLeftRPM;
 
-        double rightOutput = ffRight + kP * rightError + kD * rightDerivative;
-        double leftOutput = ffLeft +  kP * leftError + kD * leftDerivative;
+        // double rightOutput = ffRight + kP * rightError + kD * rightDerivative;
+        // double leftOutput = ffLeft +  kP * leftError + kD * leftDerivative;
 
-        shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
-        shooterNeoLeft.set(leftOutput);
+        // shooterNeoRight.set(rightOutput); // - kP(delta(f)) - kD(delta(f'))) () look at previous velocity and current
+        // shooterNeoLeft.set(leftOutput);
 
-        // rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
-        // leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-    
+        rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
+        leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
+
     }
 
     public double getRightRPM(){return rightEncoder.getVelocity();}
@@ -134,8 +134,9 @@ public class Shooter extends SubsystemBase {
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40)
             .voltageCompensation(12)
-            .openLoopRampRate(0.25);
-        config.absoluteEncoder
+            // .openLoopRampRate(0.25);
+            .closedLoopRampRate(0.25);
+        config.encoder
             .velocityConversionFactor(1);
 
         config.closedLoop
@@ -143,8 +144,8 @@ public class Shooter extends SubsystemBase {
             .pid(kP, kI, kD)
             .outputRange(-1.0, 1.0);
 
-        // config.closedLoop.feedForward
-        //     .sv(0.0, kV);
+        config.closedLoop.feedForward
+            .sv(0.0, kV);
     
         motor.configureAsync(
             config, 
