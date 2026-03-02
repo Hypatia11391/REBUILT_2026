@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
-import edu.wpi.first.wpilibj.DigitalInput;
+// import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -18,14 +18,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class Intake extends SubsystemBase {
 
     // TODO: edit all the CAN IDs to proper ones
-    private static final int INTAKE_FEED_ID = 0; 
-    private static final int INTAKE_LIFT_ID = 0;
+    private static final int INTAKE_FEED_ID = 4; 
+    private static final int INTAKE_LIFT_ID = 6;
 
-    private static final int TOP_LIMIT_SWITCH_ID = 0;
-    private static final int BOTTOM_LIMIT_SWITCH_ID = 1;
+    // private static final int TOP_LIMIT_SWITCH_ID = 0;
+    // private static final int BOTTOM_LIMIT_SWITCH_ID = 1;
 
-    private final DigitalInput topLimitSwitch = new DigitalInput(TOP_LIMIT_SWITCH_ID);
-    private final DigitalInput bottomLimitSwitch = new DigitalInput(BOTTOM_LIMIT_SWITCH_ID);
+    // private final DigitalInput topLimitSwitch = new DigitalInput(TOP_LIMIT_SWITCH_ID);
+    // private final DigitalInput bottomLimitSwitch = new DigitalInput(BOTTOM_LIMIT_SWITCH_ID);
 
     private final SparkMax intakeFeed;
     private final SparkMax intakeLift;    
@@ -42,19 +42,20 @@ public class Intake extends SubsystemBase {
 
 
     public void setLiftMotorSpeed(double speed){
-      if (speed > 0){
-        if (topLimitSwitch.get()){
-          intakeLift.set(0);
-        }else{
-          intakeLift.set(speed);
-        }
-      }else{
-        if (bottomLimitSwitch.get()){
-          intakeLift.set(0);
-        }else{
-          intakeLift.set(speed);
-        }
-      }
+      // if (speed > 0){
+      //   if (topLimitSwitch.get()){
+      //     intakeLift.set(0);
+      //   }else{
+      //     intakeLift.set(speed);
+      //   }
+      // }else{
+      //   if (bottomLimitSwitch.get()){
+      //     intakeLift.set(0);
+      //   }else{
+      //     intakeLift.set(speed);
+      //   }
+      // }
+      intakeLift.set(speed);
     }
 
     public void setFeedMotorSpeed(double speed){
@@ -65,7 +66,7 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(25)
+            .smartCurrentLimit(20)
             .voltageCompensation(12)
             .openLoopRampRate(0.2);
 
@@ -79,7 +80,7 @@ public class Intake extends SubsystemBase {
       SparkMaxConfig config = new SparkMaxConfig();
       config.inverted(isInverted)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(50)
+            .smartCurrentLimit(20)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
       motor.configureAsync(

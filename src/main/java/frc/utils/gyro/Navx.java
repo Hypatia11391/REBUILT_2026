@@ -1,5 +1,6 @@
 package frc.utils.gyro;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -63,6 +64,10 @@ public class Navx extends SubsystemBase{
 
     public boolean isConnected(){
         return navx.isConnected();
+    }
+
+    public Rotation3d getFullRotation() {
+        return new Rotation3d(this.getRollDeg(),this.getPitchDeg(),this.getYawDeg());
     }
 
     @Override
