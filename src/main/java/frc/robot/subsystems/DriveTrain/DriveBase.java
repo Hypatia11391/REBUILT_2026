@@ -25,8 +25,10 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -39,6 +41,7 @@ import frc.utils.gyro.Navx;
 
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
+import frc.robot.commands.Aim;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -173,6 +176,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         navx.getFullRotation(),
         this.getWheelPositions()
     );
+
     super.periodic();
   }
 
@@ -211,4 +215,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
   }
+
+  public static void doAim(MecanumDrivePoseEstimator3d MDPE3D) {
+    Pose3d temp = MDPE3D.getEstimatedPosition();
+    Pose2d position = temp.toPose2d();
+    Aim.updateAim(null, position, null, null, 4);
+  }
+
 }
