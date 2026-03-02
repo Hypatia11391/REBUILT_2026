@@ -9,6 +9,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
 
+
   public Robot() {
     // robotContainer wires subsystems + default commands + button bindings
     m_robotContainer = new RobotContainer();
@@ -18,6 +19,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     // required for command-based: runs commands + polls buttons each loop
     CommandScheduler.getInstance().run();
+    this.m_robotContainer.update();
   }
 
   @Override
@@ -26,10 +28,10 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-
+  /// runs the autonomous command selected by your {@link RobotContainer} class.
   @Override
   public void autonomousInit() {
-    /** runs the autonomous command selected by your {@link RobotContainer} class. */
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -38,7 +40,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  // This function is called periodically during autonomous. 
+  // This function is called periodically during autonomous.
   @Override
   public void autonomousPeriodic() {}
 
