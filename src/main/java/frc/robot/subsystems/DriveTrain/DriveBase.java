@@ -12,13 +12,14 @@
 
 package frc.robot.subsystems.DriveTrain;
 
+import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
@@ -64,10 +65,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final double WHEEL_DIAMETER = 0.25;
   public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
-  private final SparkAbsoluteEncoder frEncoder;
-  private final SparkAbsoluteEncoder flEncoder;
-  private final SparkAbsoluteEncoder rrEncoder;
-  private final SparkAbsoluteEncoder rlEncoder;
+  private final RelativeEncoder frEncoder;
+  private final RelativeEncoder flEncoder;
+  private final RelativeEncoder rrEncoder;
+  private final RelativeEncoder rlEncoder;
 
   private final Field2d m_field = new Field2d();
   private final SparkMax frSparkMax;
@@ -102,15 +103,15 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     configureMotor(rlSparkMax, true, conf);
     configureMotor(rrSparkMax, false, conf);
     
-    this.frEncoder = flSparkMax.getAbsoluteEncoder();
-    this.flEncoder = frSparkMax.getAbsoluteEncoder();
-    this.rrEncoder = rlSparkMax.getAbsoluteEncoder();
-    this.rlEncoder = rrSparkMax.getAbsoluteEncoder();
+    this.frEncoder = flSparkMax.getEncoder();
+    this.flEncoder = frSparkMax.getEncoder();
+    this.rrEncoder = rlSparkMax.getEncoder();
+    this.rlEncoder = rrSparkMax.getEncoder();
 
     m_Drive = new MecanumDrive(
       cappedSetter(flSparkMax, MAX_SPEED),
-      cappedSetter(frSparkMax, MAX_SPEED),
       cappedSetter(rlSparkMax, MAX_SPEED),
+      cappedSetter(frSparkMax, MAX_SPEED),
       cappedSetter(rrSparkMax, MAX_SPEED)
     );
 
@@ -196,6 +197,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         this.getWheelPositions()
     );
 
+    SmartDashboard.putNumber("frontLeftVel",flEncoder.getVelocity());
+    SmartDashboard.putNumber("frontRightVel",frEncoder.getVelocity());
+    SmartDashboard.putNumber("rearLeftVel",rlEncoder.getVelocity());
+    SmartDashboard.putNumber("rearRightVel",rrEncoder.getVelocity());
+
     super.periodic();
   }
 
@@ -211,10 +217,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
       SmartDashboard.putNumber("zRot", zRot);
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, gyroAngle); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
-      m_Drive.driveCartesian(xSpeed, ySpeed, zRot, new Rotation2d()); 
+      m_Drive.driveCartesian(ySpeed, xSpeed, zRot, new Rotation2d()); 
     }
 
   public void stop() {
