@@ -118,7 +118,7 @@ public class RobotContainer {
     
     new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-    new JoystickButton(m_driverController, Buttons.LB.ordinal()).onTrue(new InstantCommand());
+    new JoystickButton(m_driverController, Buttons.LB.ordinal()).onTrue(new InstantCommand(m_driveBase::doAim, m_driveBase));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     new JoystickButton(m_driverController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator

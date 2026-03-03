@@ -232,10 +232,13 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
   }
-
-  public static void doAim(MecanumDrivePoseEstimator3d MDPE3D, ChassisSpeeds robotVelocities) {
-    Pose3d temp = MDPE3D.getEstimatedPosition();
+  
+  //TODO make sure this goes somewhere where it'll work
+  public void doAim() {
+    Pose3d temp = this.poseEstimator.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
+    ChassisSpeeds robotVelocities = this.getChassisSpeeds();
+    
     Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
   }
 
