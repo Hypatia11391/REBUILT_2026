@@ -236,7 +236,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public static void doAim(MecanumDrivePoseEstimator3d MDPE3D, ChassisSpeeds robotVelocities) {
     Pose3d temp = MDPE3D.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
-    Aim.updateAim(position, robotVelocities, 4);
+    Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
   }
 
 }

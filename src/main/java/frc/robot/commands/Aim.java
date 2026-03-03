@@ -9,7 +9,9 @@ public final class Aim {
 
     private static double[] shooterPosition = new double[3];
     private static double[] targetPosition = new double[3];
-    private static double[] thingPosition = {}; //TODO Replace targetPosition with this and measure gameday
+    private static double[] targetPositionRed = {4.611624, 4.034536,1.8288}; //TODO Replace targetPosition with this and measure gameday
+    private static double[] targetPositionBlue = {11.901424, 4.034536,1.8288}; //TODO Replace targetPosition with this and measure gameday
+
     private static double[] robotVelocities = new double[2];
 
 
@@ -18,7 +20,10 @@ public final class Aim {
     public static double rotateBy;
     public static double exitVelocity;
 
-    public static void updateAim(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, double timeGuess) {
+    public static void updateAim(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, double timeGuess, boolean redTeam) {
+        targetPosition = targetPositionBlue;
+        if (redTeam)
+            targetPosition = targetPositionRed;
 
         double[] distanceToTarget = new double[3];
         double time = timeGuess;
@@ -61,7 +66,7 @@ public final class Aim {
 
         shooterPosition[0] = robotPose.getX();
         shooterPosition[1] = robotPose.getY();
-        shooterPosition[2] = 0.5;  //TODO Measure and set
+        shooterPosition[2] = 0.381;  //TODO Should be right prob double check
 
         robotVelocities[0] = fieldRelativeSpeeds.vxMetersPerSecond;
         robotVelocities[1] = fieldRelativeSpeeds.vyMetersPerSecond;
