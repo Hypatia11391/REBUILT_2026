@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public final class Aim {
@@ -10,21 +9,23 @@ public final class Aim {
 
     private static double[] shooterPosition = new double[3];
     private static double[] targetPosition = new double[3];
+    private static double[] thingPosition = {}; //TODO Replace targetPosition with this and measure gameday
     private static double[] robotVelocities = new double[2];
+
 
     private static double height;
 
     public static double rotateBy;
     public static double exitVelocity;
 
-    public static void updateAim(Pose2d robotPose, Translation3d goalLocation, ChassisSpeeds fieldRelativeSpeeds, double timeGuess) {
+    public static void updateAim(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, double timeGuess) {
 
         double[] distanceToTarget = new double[3];
         double time = timeGuess;
         double cotAlpha = 1/Math.tan(shooterAngle);
 
         //Functions that do important stuff. Move the order and it all goes to sh!t.
-        updateStuff(robotPose, goalLocation, fieldRelativeSpeeds);
+        updateStuff(robotPose, fieldRelativeSpeeds);
         distanceToTarget[0] = targetPosition[0] - shooterPosition[0];
         distanceToTarget[1] = targetPosition[1] - shooterPosition[1];
         distanceToTarget[2] = targetPosition[2] - shooterPosition[2];
@@ -56,15 +57,11 @@ public final class Aim {
             return time;
     }
 
-    private static void updateStuff(Pose2d robotPose, Translation3d goalLocation, ChassisSpeeds fieldRelativeSpeeds) {
+    private static void updateStuff(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
 
         shooterPosition[0] = robotPose.getX();
         shooterPosition[1] = robotPose.getY();
-        shooterPosition[2] = 0.5;  //Measure and set
-
-        targetPosition[0] = goalLocation.getX();
-        targetPosition[1] = goalLocation.getY();
-        targetPosition[2] = goalLocation.getZ();
+        shooterPosition[2] = 0.5;  //TODO Measure and set
 
         robotVelocities[0] = fieldRelativeSpeeds.vxMetersPerSecond;
         robotVelocities[1] = fieldRelativeSpeeds.vyMetersPerSecond;

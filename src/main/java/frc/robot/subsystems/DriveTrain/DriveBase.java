@@ -233,10 +233,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       return speed -> controller.set(maxSpeed * speed);
   }
 
-  public static void doAim(MecanumDrivePoseEstimator3d MDPE3D) {
+  public static void doAim(MecanumDrivePoseEstimator3d MDPE3D, ChassisSpeeds robotVelocities) {
     Pose3d temp = MDPE3D.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
-    Aim.updateAim(position, null, null, 4);
+    Aim.updateAim(position, robotVelocities, 4);
   }
 
 }
