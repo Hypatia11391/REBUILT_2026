@@ -22,21 +22,23 @@ public class Navx extends SubsystemBase{
     // }
 
 
-    public void calibrateFieldOrientationFromCompass(){
-        double compassDeg = navx.getFusedHeading(); // [0, 360]
-        double yawDeg = navx.getYaw(); // [-180, 180]
 
-        double compassSigned = wrapTo180(compassDeg);
 
-        yawOffsetDeg = compassSigned-yawDeg;
-        yawOffsetDeg = wrapTo180(yawOffsetDeg);
+    // public void calibrateFieldOrientationFromCompass(){
+    //     double compassDeg = navx.getFusedHeading(); // [0, 360]
+    //     double yawDeg = navx.getYaw(); // [-180, 180]
 
-        fieldCalibrated = true;
-    }
+    //     double compassSigned = wrapTo180(compassDeg);
 
-    public boolean isFieldCalibrated(){
-        return fieldCalibrated;
-    }
+    //     yawOffsetDeg = compassSigned-yawDeg;
+    //     yawOffsetDeg = wrapTo180(yawOffsetDeg);
+
+    //     fieldCalibrated = true;
+    // }
+
+    // public boolean isFieldCalibrated(){
+    //     return fieldCalibrated;
+    // }
 
     public double getFieldHeadingDeg(){
         double heading = navx.getYaw() + yawOffsetDeg;

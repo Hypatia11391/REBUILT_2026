@@ -64,9 +64,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    if (!navx.isCalibrating() && !navx.isFieldCalibrated()){
-      navx.calibrateFieldOrientationFromCompass();
-    }
+    // if (!navx.isCalibrating() && !navx.isFieldCalibrated()){
+    //   navx.calibrateFieldOrientationFromCompass();
+    // }
   }
 
   /** This function is called periodically during teleop. */
