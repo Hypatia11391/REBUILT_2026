@@ -15,34 +15,26 @@ public class Navx extends SubsystemBase{
     public Navx(){
     }
 
-    // public void calibrateFieldOrientation(){
-    //     double currentHeading = navx.getFusedHeading();
-    //     double navxOffset = 90.0;
-    //     navx.setAngleAdjustment(navxOffset-currentHeading);
-    // }
+    public void calibrateFieldOrientationFromCompass(){
+        double compassDeg = navx.getFusedHeading(); // [0, 360]
+        double yawDeg = navx.getYaw(); // [-180, 180]
 
+        double compassSigned = wrapTo180(compassDeg);
 
+        yawOffsetDeg = compassSigned-yawDeg;
+        yawOffsetDeg = wrapTo180(yawOffsetDeg);
 
+        fieldCalibrated = true;
+    }
 
-    // public void calibrateFieldOrientationFromCompass(){
-    //     double compassDeg = navx.getFusedHeading(); // [0, 360]
-    //     double yawDeg = navx.getYaw(); // [-180, 180]
-
-    //     double compassSigned = wrapTo180(compassDeg);
-
-    //     yawOffsetDeg = compassSigned-yawDeg;
-    //     yawOffsetDeg = wrapTo180(yawOffsetDeg);
-
-    //     fieldCalibrated = true;
-    // }
-
-    // public boolean isFieldCalibrated(){
-    //     return fieldCalibrated;
-    // }
+    public boolean isFieldCalibrated(){
+        return fieldCalibrated;
+    }
 
     public double getFieldHeadingDeg(){
-        double heading = navx.getYaw() + yawOffsetDeg;
-        return wrapTo180(heading);
+    
+        SmartDashboard.putBoolean("magnometerCalibrated", navx.isMagnetometerCalibrated());
+        return navx.getFusedHeading();
     }
 
 
