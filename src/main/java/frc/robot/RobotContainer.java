@@ -110,6 +110,9 @@ public class RobotContainer {
   public DriveBase getDriveBase() {
     return m_driveBase;
   }
+  public Navx getNavx(){
+    return navx;
+  }
 
   public void update() {
     visionManager.update();
@@ -124,9 +127,9 @@ public class RobotContainer {
 
   private void configureBindings() {
     
-    new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
+    // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-    new JoystickButton(m_driverController, Buttons.LB.ordinal()).onTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase));
+    new JoystickButton(m_driverController, Buttons.X.ordinal()).onTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     new JoystickButton(m_driverController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
