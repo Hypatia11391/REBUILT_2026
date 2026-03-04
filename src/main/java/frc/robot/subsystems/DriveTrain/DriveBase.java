@@ -103,10 +103,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     configureMotor(rlSparkMax, true, conf);
     configureMotor(rrSparkMax, false, conf);
     
-    this.frEncoder = flSparkMax.getEncoder();
-    this.flEncoder = frSparkMax.getEncoder();
-    this.rrEncoder = rlSparkMax.getEncoder();
-    this.rlEncoder = rrSparkMax.getEncoder();
+    this.flEncoder = flSparkMax.getEncoder();
+    this.frEncoder = frSparkMax.getEncoder();
+    this.rlEncoder = rlSparkMax.getEncoder();
+    this.rrEncoder = rrSparkMax.getEncoder();
 
     m_Drive = new MecanumDrive(
       cappedSetter(flSparkMax, MAX_SPEED),
@@ -208,8 +208,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     flSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
     frSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
-    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
-    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
+    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearLeftMetersPerSecond);
+    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearRightMetersPerSecond);
   }
 
     /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */

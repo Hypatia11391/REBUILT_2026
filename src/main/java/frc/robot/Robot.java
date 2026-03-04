@@ -8,19 +8,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DataLogManager;
 
-import frc.utils.gyro.Navx;
 
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
-  private final Navx navx;
 
 
   public Robot() {
     // robotContainer wires subsystems + default commands + button bindings
     m_robotContainer = new RobotContainer();
-    navx = new Navx();
 
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
@@ -63,6 +60,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.getNavx().zeroYaw();
 
     // if (!navx.isCalibrating() && !navx.isFieldCalibrated()){
     //   navx.calibrateFieldOrientationFromCompass();

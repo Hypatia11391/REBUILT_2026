@@ -1,5 +1,6 @@
 package frc.utils.gyro;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,32 +10,33 @@ import com.studica.frc.AHRS;
 public class Navx extends SubsystemBase{
     public final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-    private double yawOffsetDeg = 0.0;
-    private boolean fieldCalibrated = false;
+    // private double yawOffsetDeg = 0.0;
+    // private boolean fieldCalibrated = false;
 
     public Navx(){
     }
 
-    public void calibrateFieldOrientationFromCompass(){
-        double compassDeg = navx.getFusedHeading(); // [0, 360]
-        double yawDeg = navx.getYaw(); // [-180, 180]
+    // public void calibrateFieldOrientationFromCompass(){
+    //     double compassDeg = navx.getFusedHeading(); // [0, 360]
+    //     double yawDeg = navx.getYaw(); // [-180, 180]
 
-        double compassSigned = wrapTo180(compassDeg);
+    //     double compassSigned = wrapTo180(compassDeg);
 
-        yawOffsetDeg = compassSigned-yawDeg;
-        yawOffsetDeg = wrapTo180(yawOffsetDeg);
+    //     yawOffsetDeg = compassSigned-yawDeg;
+    //     yawOffsetDeg = wrapTo180(yawOffsetDeg);
 
-        fieldCalibrated = true;
-    }
+    //     fieldCalibrated = true;
+    // }
 
-    public boolean isFieldCalibrated(){
-        return fieldCalibrated;
-    }
+    // public boolean isFieldCalibrated(){
+    //     return fieldCalibrated;
+    // }
 
     public double getFieldHeadingDeg(){
     
         SmartDashboard.putBoolean("magnometerCalibrated", navx.isMagnetometerCalibrated());
-        return navx.getFusedHeading();
+        SmartDashboard.putNumber("navX/fusedHead", wrapTo180(navx.getFusedHeading()));
+        return wrapTo180(navx.getFusedHeading());
     }
 
 
@@ -45,8 +47,8 @@ public class Navx extends SubsystemBase{
         return deg;
     }
 
-    public double getYawDeg(){
-        return navx.getYaw();
+    public double getHeadingDeg(){
+        return -navx.getYaw();
     }
     // Continuous angle (total accumulated yaw angle)
     // Can grow beyond 360. Great for odometry turning
@@ -95,24 +97,29 @@ public class Navx extends SubsystemBase{
     public boolean isConnected(){
         return navx.isConnected();
     }
+
+    public Rotation2d getHeading(){
+        return Rotation2d.fromDegrees(navx.getYaw());
+    }
   
     public Rotation3d getFullRotation() {
         return new Rotation3d(
             Math.toRadians(getRollDeg()),
             Math.toRadians(getPitchDeg()),
-            Math.toRadians(getFieldHeadingDeg())); // possibly getYawDeg();
+            getHeading().getRadians()); // possibly getYawDeg();
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putBoolean("navX/Connected", isConnected());
         // SmartDashboard.putBoolean("navX/Calibrating", isCalibrating());
-        SmartDashboard.putBoolean("navX/isFieldCalibrated", fieldCalibrated);
-        SmartDashboard.putNumber("navX/YawDeg", getYawDeg());
+        // SmartDashboard.putBoolean("navX/isFieldCalibrated", fieldCalibrated);
+        SmartDashboard.putNumber("navX/YawDeg", getHeadingDeg());
         // SmartDashboard.putNumber("navX/AngleDeg", getAngleDeg());
         // SmartDashboard.putNumber("navX/RateDegPerSec", getRateDegPerSec());
         SmartDashboard.putNumber("navX/PitchDeg", getPitchDeg());
         SmartDashboard.putNumber("navX/RollDeg", getRollDeg());
+        SmartDashboard.putNumber("navX/AngleVal", getAngleDeg());
         // SmartDashboard.putNumber("navx/CompassDeg", getCompassDeg());
     }
 }

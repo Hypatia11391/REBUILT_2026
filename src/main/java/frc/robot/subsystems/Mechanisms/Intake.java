@@ -26,9 +26,9 @@ public class Intake extends SubsystemBase {
     private static final int INTAKE_LIFT_ID = 6;
 
     // PID constants
-    private static final double kP = 0.1;
+    private static final double kP = 50;
     private static final double kI = 0;
-    private static final double kD = 0;
+    private static final double kD = 5;
 
     // private static final int TOP_LIMIT_SWITCH_ID = 0;
     // private static final int BOTTOM_LIMIT_SWITCH_ID = 1;
@@ -42,9 +42,8 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
 
     private final RelativeEncoder liftEncoder;
-
-    private static final double MIN_POS = -45.0;
-    private static final double MAX_POS = -20.0;
+    private static final double MIN_POS = -51.0;
+    private static final double MAX_POS = -10.0;
     private static final double START_POS = 0.0;
 
     double targetPos = 0.0;
@@ -91,7 +90,7 @@ public class Intake extends SubsystemBase {
     }
   
     public void setFeedMotorSpeed(double speed){
-      intakeFeed.set(speed*0.5);
+      intakeFeed.set(speed);
     }
     @Override
     public void periodic(){
@@ -108,8 +107,8 @@ public class Intake extends SubsystemBase {
                     .positionConversionFactor(1.0);
       config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(kP, kI, kD)
-        .outputRange(-0.5, 0.5);
+        .pid(kP, kI, kD);
+        // .outputRange(-0.5, 0.5);
             // .openLoopRampRate(0.2);
 
       motor.configureAsync(
