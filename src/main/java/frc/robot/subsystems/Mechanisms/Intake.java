@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
     private static final int INTAKE_LIFT_ID = 6;
 
     // PID constants
-    private static final double kP = 0.05;
+    private static final double kP = 0.1;
     private static final double kI = 0;
     private static final double kD = 0;
 
@@ -43,8 +43,9 @@ public class Intake extends SubsystemBase {
 
     private final RelativeEncoder liftEncoder;
 
-    private static final double MIN_POS = -100.0;
-    private static final double MAX_POS = 50.0;
+    private static final double MIN_POS = -45.0;
+    private static final double MAX_POS = -20.0;
+    private static final double START_POS = 0.0;
 
     double targetPos = 0.0;
     
@@ -69,10 +70,11 @@ public class Intake extends SubsystemBase {
       if (Math.abs(power) < 0.05) power = 0;
 
       // scale kinda
-      targetPos += power * 0.5; // Establishes setpoint to current position to avoid moving
+      targetPos += power; // Establishes setpoint to current position to avoid moving
 
-      if (targetPos > MAX_POS)targetPos = MAX_POS;
+      if (targetPos > START_POS)targetPos = START_POS;
       if (targetPos < MIN_POS)targetPos = MIN_POS;
+      if (targetPos > MAX_POS)targetPos = MAX_POS;
 
       liftLoop.setSetpoint(targetPos, ControlType.kPosition);
       // if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
