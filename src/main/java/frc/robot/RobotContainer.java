@@ -13,6 +13,7 @@ package frc.robot;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -83,6 +84,13 @@ public class RobotContainer {
         VISION_STD_DEVS,
         STATE_STD_DEVS
     );
+
+    
+  /* ???????????????
+    public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
+      return poseEstimator;
+    };
+    */
 
     private final VisionManager visionManager = new VisionManager(poseEstimator);
 
