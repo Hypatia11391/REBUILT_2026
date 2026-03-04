@@ -26,7 +26,7 @@ public record PosePacket(Pose3d pose, double translationErr, double rotationErr,
         // reading order (left to right then top to bottom)
         for(int i=0;i<4;i++) {
             for(int j=0;j<4;j++) {
-                matrixValues[i * 4 + j] = buf.getDouble();
+                matrixValues[j * 4 + i] = buf.getDouble();
             }
         }
         Matrix<N4,N4> matrix = new Matrix<>(Nat.N4(), Nat.N4(), matrixValues);
