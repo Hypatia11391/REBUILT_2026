@@ -29,7 +29,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -39,7 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.gyro.Navx;
 
@@ -240,11 +238,14 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
   }
-
-  public static void doAim(MecanumDrivePoseEstimator3d MDPE3D) {
-    Pose3d temp = MDPE3D.getEstimatedPosition();
+  
+  //TODO make sure this goes somewhere where it'll work
+  public void aimingFunction() {
+    Pose3d temp = this.poseEstimator.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
-    Aim.updateAim(position, null, null, 4);
+    ChassisSpeeds robotVelocities = this.getChassisSpeeds();
+    
+    Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
   }
 
 }

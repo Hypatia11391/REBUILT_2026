@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.subsystems.DriveTrain.DriveBase;
 import frc.utils.gyro.Navx;
-import edu.wpi.first.wpilibj.DataLogManager;
 
 /// DriveWithJoystick \
 /// Tele-op for driving the robot
