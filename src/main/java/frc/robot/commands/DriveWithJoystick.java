@@ -22,6 +22,8 @@ public class DriveWithJoystick extends Command{
   private static final double ALPHA_XY = 0.05;
   private static final double ALPHA_Z = 0.08;
 
+  private static final double NAVX_OFFSET_ANGLE = 180;
+
   private final DriveBase m_drive;
   private final Joystick m_stick;
   private final Navx navX;
@@ -69,12 +71,13 @@ public class DriveWithJoystick extends Command{
     currY = currY * (1.0 - ALPHA_XY) + wishY * ALPHA_XY;
     currZ = currZ * (1.0 - ALPHA_Z) + wishZ * ALPHA_Z;
     
-    double outX = currX * scale;
-    double outY = currY * scale;
+    double outX = -currX * scale;
+    double outY = -currY * scale;
     double outZ = -currZ * scale;
 
     //Field-oriented, navx yaw as heading
-    Rotation2d heading = Rotation2d.fromDegrees(navX.getYawDeg());
+    // Rotation2d heading = Rotation2d.fromDegrees(navX.getFieldHeadingDeg() - NAVX_OFFSET_ANGLE); // navX.getFieldHeadingDeg()
+    Rotation2d heading = navX.getHeading();
     m_drive.driveCartesian(outX, outY, outZ, heading);
   }
 
