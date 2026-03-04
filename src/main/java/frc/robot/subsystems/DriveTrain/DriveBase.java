@@ -234,7 +234,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
   
   //TODO make sure this goes somewhere where it'll work
-  public void doAim() {
+  public void aimingFunction() {
     Pose3d temp = this.poseEstimator.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
