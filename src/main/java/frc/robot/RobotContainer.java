@@ -56,7 +56,7 @@ public class RobotContainer {
       new Navx();
   private final Shooter shooter =
       new Shooter();
-  private final Intake intake =
+  public final Intake intake =
       new Intake();
   private final Kicker kicker =
       new Kicker();
@@ -72,9 +72,9 @@ public class RobotContainer {
     );
 
     private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
-    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.45, 0.45, 0.45, 0.45);
+    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.05, 0.05);
 
-    private static final Pose3d STARTING_POSE = Pose3d.kZero; // TODO: Correct to be the actual starting position!
+    private static final Pose3d STARTING_POSE = Pose3d.kZero; // TODO: Correct to be the actual starting pose!
 
     private final MecanumDrivePoseEstimator3d poseEstimator = new MecanumDrivePoseEstimator3d(
         DRIVE_KINEMATICS,
@@ -103,7 +103,7 @@ public class RobotContainer {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
     shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_driverController, intake, kicker, feed)); // TODO: change to operator
+      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
     configureBindings();
   }
 
@@ -132,7 +132,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::automaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
-    new JoystickButton(m_driverController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
+    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
 
 }
 
@@ -141,7 +141,7 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull("pathplanner/paths.txt");
+    return Autos.autonomousFull("pathplanner/paths.txt",this);
   }
 
 }
