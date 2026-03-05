@@ -14,7 +14,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
@@ -72,9 +74,9 @@ public class RobotContainer {
     );
 
     private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
-    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.05, 0.05);
+    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.45, 0.45, 0.45, 0.45);
 
-    private static final Pose3d STARTING_POSE = Pose3d.kZero; // TODO: Correct to be the actual starting pose!
+    private static final Pose3d STARTING_POSE = new Pose3d(new Translation3d(0, 0, 0),new Rotation3d()); // TODO: Correct to be the actual starting position!
 
     private final MecanumDrivePoseEstimator3d poseEstimator = new MecanumDrivePoseEstimator3d(
         DRIVE_KINEMATICS,
@@ -103,7 +105,7 @@ public class RobotContainer {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
     shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
+      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed)); // TODO: change to operator
     configureBindings();
   }
 
@@ -132,7 +134,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::automaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
-    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
+    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
 
 }
 
