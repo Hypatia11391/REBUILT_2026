@@ -22,12 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public final class Autos {
-
-  private Autos() {
-    throw new UnsupportedOperationException("This is a utility class!");
-  }
-
+public abstract class Autos {
   public static Command followPath(String pathName) {
     try {
       PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
@@ -43,7 +38,7 @@ public final class Autos {
     return AutoBuilder.buildAuto(autoName);
   }
 
-public static String[] getPaths(String filePath) {
+  public static String[] getPaths(String filePath) {
     try {
 
         File file = new File(Filesystem.getDeployDirectory(), filePath);
@@ -63,6 +58,13 @@ public static String[] getPaths(String filePath) {
     String[] paths = getPaths(filePath);
     List<Command> commandList = new ArrayList<>();
     
+    commandList.add(new InstantCommand(
+      () -> {
+        container.intake.setLiftMotorSpeed(OperateWithJoystick.INTAKE_LIFT_PWR_DOWN);
+      },
+      container.intake
+    ));
+
     int pathsLength = paths.length;
     
     for (int i = 0; i < (pathsLength-1); i++){
