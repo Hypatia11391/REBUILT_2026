@@ -260,9 +260,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     Pose2d position = temp.toPose2d();
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
-    Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
-
-
+    Aim.updateAim(position, robotVelocities, 4, false); //TODO change team based on what we get
   }
 
 }

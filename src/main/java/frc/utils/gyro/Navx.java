@@ -32,20 +32,20 @@ public class Navx extends SubsystemBase{
     //     return fieldCalibrated;
     // }
 
-    public double getFieldHeadingDeg(){
+    // public double getFieldHeadingDeg(){
     
-        SmartDashboard.putBoolean("magnometerCalibrated", navx.isMagnetometerCalibrated());
-        SmartDashboard.putNumber("navX/fusedHead", wrapTo180(navx.getFusedHeading()));
-        return wrapTo180(navx.getFusedHeading());
-    }
+    //     // SmartDashboard.putBoolean("magnometerCalibrated", navx.isMagnetometerCalibrated());
+    //     SmartDashboard.putNumber("navX/fusedHead", wrapTo180(navx.getFusedHeading()));
+    //     return wrapTo180(navx.getFusedHeading());
+    // }
 
 
-    private static double wrapTo180(double deg){
-        deg = deg % 360.0;
-        if (deg >= 180.0) deg -=360.0;
-        if (deg<-180.0) deg+=360.0;
-        return deg;
-    }
+    // private static double wrapTo180(double deg){
+    //     deg = deg % 360.0;
+    //     if (deg >= 180.0) deg -=360.0;
+    //     if (deg<-180.0) deg+=360.0;
+    //     return deg;
+    // }
 
     public double getHeadingDeg(){
         return -navx.getYaw();
@@ -117,8 +117,8 @@ public class Navx extends SubsystemBase{
         SmartDashboard.putNumber("navX/YawDeg", getHeadingDeg());
         // SmartDashboard.putNumber("navX/AngleDeg", getAngleDeg());
         // SmartDashboard.putNumber("navX/RateDegPerSec", getRateDegPerSec());
-        SmartDashboard.putNumber("navX/PitchDeg", getPitchDeg());
-        SmartDashboard.putNumber("navX/RollDeg", getRollDeg());
+        // SmartDashboard.putNumber("navX/PitchDeg", getPitchDeg());
+        // SmartDashboard.putNumber("navX/RollDeg", getRollDeg());
         SmartDashboard.putNumber("navX/AngleVal", getAngleDeg());
         // SmartDashboard.putNumber("navx/CompassDeg", getCompassDeg());
     }
