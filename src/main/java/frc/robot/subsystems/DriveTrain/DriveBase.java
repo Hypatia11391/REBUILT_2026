@@ -22,6 +22,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -92,7 +93,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     rlSparkMax = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
     rrSparkMax = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     
-    AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
+    EncoderConfig conf = new EncoderConfig();
     conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
     conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
 
@@ -240,10 +241,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     m_Drive.stopMotor();
   }
 
-  public void configureMotor(SparkMax motor, boolean isInverted, AbsoluteEncoderConfig absEncoderConf){
+  public void configureMotor(SparkMax motor, boolean isInverted, EncoderConfig encoderConfig){
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(isInverted);
-    config.absoluteEncoder.apply(absEncoderConf);
+    config.encoder.apply(encoderConfig);
     motor.configureAsync(
       config,
       ResetMode.kNoResetSafeParameters,
