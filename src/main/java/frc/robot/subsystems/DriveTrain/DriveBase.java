@@ -214,7 +214,22 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
       SmartDashboard.putNumber("ySpeed", ySpeed);
-      SmartDashboard.putNumber("zRot", zRot);
+
+      if (Aim.automaticAimControl){
+        double temp = Aim.rotateBy - gyroAngle.getRadians();
+        float magicValue = 0.5F;
+
+        double rotationPower = temp*magicValue;
+        rotationPower = Math.max(rotationPower, -MAX_SPEED);
+        rotationPower = Math.min(rotationPower, MAX_SPEED);
+
+        zRot = rotationPower;
+      }
+      else
+        SmartDashboard.putNumber("zRot", zRot);
+
+
+      
       m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
@@ -246,6 +261,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
     Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
+
+
   }
 
 }
