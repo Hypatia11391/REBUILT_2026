@@ -34,6 +34,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 
@@ -59,9 +60,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
 
-  // TODO: MEASURE
-  private static final double WHEEL_DIAMETER = 0.25;
-  public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
+  // 24 + 11.5 back, 28.2 left, 15 down
+  private static final double WHEEL_DIAMETER = 0.1588; // In meters
+  public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // In meters
 
   private final RelativeEncoder frEncoder;
   private final RelativeEncoder flEncoder;
@@ -142,8 +143,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds))
       ,
       new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants TODO: THIS IS PROBABLY WRONG
-          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants TODO: THIS IS PROBABLY WRONG
+          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
       ),
       config,
       () -> {
@@ -254,15 +255,18 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       return speed -> controller.set(maxSpeed * speed);
   }
   
-  //TODO make sure this goes somewhere where it'll work
   public void aimingFunction() {
     Pose3d temp = this.poseEstimator.getEstimatedPosition();
     Pose2d position = temp.toPose2d();
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
-    Aim.updateAim(position, robotVelocities, 4, true); //TODO change team based on what we get
-
-
+    Aim.updateAim(
+      position,
+      robotVelocities,
+      4,
+      DriverStation.getAlliance()
+      .orElse(Alliance.Red) == Alliance.Red
+    );
   }
 
 }

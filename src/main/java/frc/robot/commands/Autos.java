@@ -7,6 +7,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.RobotContainer;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -55,7 +57,7 @@ public static String[] getPaths(String filePath) {
     }
   }
 
-  public static Command autonomousFull(String filePath){
+  public static Command autonomousFull(String filePath, RobotContainer container){
 
 
     String[] paths = getPaths(filePath);
@@ -65,6 +67,23 @@ public static String[] getPaths(String filePath) {
     
     for (int i = 0; i < (pathsLength-1); i++){
       String pathToRun = paths[i].trim();
+      if (i==2) {
+        commandList.add(
+          new InstantCommand(
+            () -> {
+              container.intake.setFeedMotorSpeed(OperateWithJoystick.INTAKE_FEED_PWR);
+            }, container.intake
+          )
+        );
+      } else if(i==3) {
+        commandList.add(
+          new InstantCommand(
+            () -> {
+              container.intake.setFeedMotorSpeed(0);
+            }, container.intake
+          )
+        );
+      }
       
       
       if (pathToRun.isEmpty())
