@@ -58,16 +58,19 @@ public class VisionManager {
         return packetStream;
     }
 
+    private static final double TRANSLATION_ERR_CONSTANT = 1;
+    private static final double ROTATION_ERR_CONSTANT = 1;
+
     public void update() {
         poll().forEach((posePacket) ->
             poseEstimator3d.addVisionMeasurement(
                 posePacket.pose(),
                 posePacket.time().toEpochMilli() / 1000.0,
                 VecBuilder.fill(
-                    posePacket.translationErr(),
-                    posePacket.translationErr(),
-                    posePacket.translationErr(),
-                    posePacket.rotationErr()
+                    TRANSLATION_ERR_CONSTANT,
+                    TRANSLATION_ERR_CONSTANT,
+                    TRANSLATION_ERR_CONSTANT,
+                    ROTATION_ERR_CONSTANT
                 )
             )
         );

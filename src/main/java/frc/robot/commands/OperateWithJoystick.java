@@ -135,9 +135,21 @@ public class OperateWithJoystick extends Command{
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+            if (Aim.automaticAimControl) {
+                float shooterRadius = 0.05F;
+                double thing = Aim.exitVelocity;
+                double radiansPerSecond = thing/shooterRadius;
+                double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
+                RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);
+                shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
+                kicker.setKickerSpeed(KICKER_PWR);
+
+            }
+            else {
             kicker.setKickerSpeed(KICKER_PWR);
             shooter.setTargetRPM(rightTarget, leftTarget);
             // feed.setFeedSpeed(FEED_PWR);
+            }
 
             boolean ready = shooter.atSpeed();
         
