@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     
-
+    m_robotContainer.getNavx().zeroYaw();
   }
 
   @Override
@@ -60,7 +60,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.getNavx().zeroYaw();
 
     // if (!navx.isCalibrating() && !navx.isFieldCalibrated()){
     //   navx.calibrateFieldOrientationFromCompass();

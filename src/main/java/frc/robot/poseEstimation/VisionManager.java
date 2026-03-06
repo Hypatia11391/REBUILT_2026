@@ -2,6 +2,7 @@ package frc.robot.poseEstimation;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
 public class VisionManager {
     private final ServerSocketChannel channel;
     private final LinkedList<BufferedFixedLengthChannel> channels = new LinkedList<>();
-    private static final int PORT = 11211;
+    private static final int PORT = 8080;
     private final MecanumDrivePoseEstimator3d poseEstimator3d;
 
     public VisionManager(MecanumDrivePoseEstimator3d poseEstimator3d) {
@@ -61,8 +62,10 @@ public class VisionManager {
     private static final double TRANSLATION_ERR_CONSTANT = 1;
     private static final double ROTATION_ERR_CONSTANT = 1;
 
+    private long lastVisionPoseUpdate = 0;
+
     public void update() {
-        poll().forEach((posePacket) ->
+        poll().forEach((posePacket) -> {
             poseEstimator3d.addVisionMeasurement(
                 posePacket.pose(),
                 posePacket.time().toEpochMilli() / 1000.0,
@@ -72,7 +75,11 @@ public class VisionManager {
                     TRANSLATION_ERR_CONSTANT,
                     ROTATION_ERR_CONSTANT
                 )
-            )
+            );
+            this.lastVisionPoseUpdate = posePacket.time().toEpochMilli();
+        }
         );
+
+        SmartDashboard.putNumber("LastVisionUpdateTimeStamp", lastVisionPoseUpdate);
     }
 }

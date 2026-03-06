@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -46,8 +47,8 @@ public abstract class Autos {
         return Files.readAllLines(file.toPath()).toArray(new String[0]);
         
     } catch (IOException e) {
-        System.out.println("Could not read file: " + filePath);
-        e.printStackTrace();
+        // System.out.println("Could not read file: " + filePath);
+        SmartDashboard.putString("Could not read path file for Auto", filePath);
         return new String[0];
     }
   }

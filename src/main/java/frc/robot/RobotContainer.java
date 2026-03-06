@@ -76,7 +76,7 @@ public class RobotContainer {
     private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
     private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.45, 0.45, 0.45, 0.45);
 
-    private static final Pose3d STARTING_POSE = new Pose3d(new Translation3d(0, 0, 0),new Rotation3d()); // TODO: Correct to be the actual starting position!
+    private static final Pose3d STARTING_POSE = new Pose3d(new Translation3d(0, 0, 0),new Rotation3d(0,0,0)); // TODO: Correct to be the actual starting position!
 
     private final MecanumDrivePoseEstimator3d poseEstimator = new MecanumDrivePoseEstimator3d(
         DRIVE_KINEMATICS,
@@ -143,7 +143,7 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull("pathplanner/paths.txt",this);
+    return Autos.autonomousFull("src/main/deploy/pathplanner/test.txt",this);
   }
 
 }

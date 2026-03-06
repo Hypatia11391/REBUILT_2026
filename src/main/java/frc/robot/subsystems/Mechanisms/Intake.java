@@ -30,6 +30,8 @@ public class Intake extends SubsystemBase {
     private static final double kI = 0;
     private static final double kD = 5;
 
+    //private static final double kV = 0.0002; // 1.0 / 5676.0;
+
     // private static final int TOP_LIMIT_SWITCH_ID = 0;
     // private static final int BOTTOM_LIMIT_SWITCH_ID = 1;
 
@@ -42,7 +44,7 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
 
     private final RelativeEncoder liftEncoder;
-    private static final double MIN_POS = -51.0;
+    private static final double MIN_POS = -52.0;
     private static final double MAX_POS = -10.0;
     private static final double START_POS = 0.0;
 
@@ -74,7 +76,7 @@ public class Intake extends SubsystemBase {
       if (targetPos > START_POS)targetPos = START_POS;
       if (targetPos < MIN_POS)targetPos = MIN_POS;
       if (targetPos > MAX_POS)targetPos = MAX_POS;
-
+      
       liftLoop.setSetpoint(targetPos, ControlType.kPosition);
       // if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
       // if (power < 0 && pos <= MIN_POS){intakeLift.set(0); return;}
@@ -107,8 +109,10 @@ public class Intake extends SubsystemBase {
                     .positionConversionFactor(1.0);
       config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(kP, kI, kD);
-        // .outputRange(-0.5, 0.5);
+        .pid(kP, kI, kD)
+        .outputRange(-1, 1);
+      // config.closedLoop.feedForward
+      //       .sv(0.0, kV);
             // .openLoopRampRate(0.2);
 
       motor.configureAsync(
