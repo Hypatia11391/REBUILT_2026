@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.DriveTrain.DriveBase;
 import edu.wpi.first.math.geometry.Pose2d;
 
 
@@ -31,10 +32,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 public final class Autos {
 
-  private static final double moveBack = 1;
+  private static final double moveBack = 0.25;
   public static Pose2d initialPose;
   public static Pose2d currentPose;
   public static boolean moveAuto = true;
+  public static boolean visionOnline = false;
   public static boolean shooterAuto = false;
   public static double setSpeed = -moveBack * 0.25;
 
@@ -72,7 +74,8 @@ public final class Autos {
 //   }
 //   */
 
-public static Command autonomousFull() {
+public static Command autonomousFull(DriveBase base) {
+    initialPose = base.getInitialPose();
     return Commands.sequence(
         Commands.runOnce(() -> {
             moveAuto = true;

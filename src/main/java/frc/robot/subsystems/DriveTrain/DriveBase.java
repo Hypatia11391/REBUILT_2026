@@ -284,6 +284,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     );
   }
 
+  public Pose2d getInitialPose(){
+    return this.poseEstimator.getEstimatedPosition().toPose2d();
+  }
+
   public void getPoseFunc() {
 
     if (firstAuto) {
