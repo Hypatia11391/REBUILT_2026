@@ -236,7 +236,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         double currentAngle = gyroAngle.getRadians();
         double finalAngle = -Math.PI;
 
-        while (Math.abs(currentAngle - finalAngle)  > 0.1) {
+        while (Math.abs(currentAngle - finalAngle)  > 0.5) {
           zRot = -MAX_SPEED * 0.25;
         }
 
