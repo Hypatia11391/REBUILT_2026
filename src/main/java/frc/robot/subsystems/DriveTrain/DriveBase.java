@@ -45,6 +45,7 @@ import frc.utils.gyro.Navx;
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
 import frc.robot.commands.Aim;
+import frc.robot.commands.Autos;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -80,6 +81,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final MecanumDriveKinematics driveKinematics;
 
   private static Pose2d currentPose;
+  private static boolean firstAuto = true;
+
 
   /** Called once at the beginning of the robot program. */
   public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
@@ -214,7 +217,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
-      SmartDashboard.putNumber("ySpeed", ySpeed);
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
@@ -228,6 +230,14 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
+
+      if (Autos.moveAuto) {
+        ySpeed = Autos.setSpeed;
+        ySpeed = Math.max(ySpeed, MAX_SPEED);
+      }
+      else {
+        SmartDashboard.putNumber("ySpeed", ySpeed);
+      }
 
 
       
@@ -256,8 +266,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
   
   public void aimingFunction() {
-    Pose3d temp = this.poseEstimator.getEstimatedPosition();
-    Pose2d position = temp.toPose2d();
+    Pose2d position = this.poseEstimator.getEstimatedPosition().toPose2d();
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
     Aim.updateAim(
@@ -267,6 +276,18 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       DriverStation.getAlliance()
       .orElse(Alliance.Red) == Alliance.Red
     );
+  }
+
+  public void getPoseFunc() {
+
+    if (firstAuto) {
+      Autos.initialPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+      firstAuto = false;
+    }
+    else
+      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+
   }
 
 }

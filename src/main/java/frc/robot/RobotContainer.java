@@ -97,6 +97,8 @@ public class RobotContainer {
   private final DriveBase m_driveBase =
       new DriveBase(navx,poseEstimator,DRIVE_KINEMATICS);
 
+  
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -140,8 +142,10 @@ public class RobotContainer {
    * Returns the command that will run during autonomous mode.
    * Called by {@link Robot} when autonomous starts.
    */
+
+
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull("pathplanner/paths.txt",this);
+    return Autos.autonomousFull();
   }
 
 }
