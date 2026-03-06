@@ -23,9 +23,9 @@ public class OperateWithJoystick extends Command{
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
 
-    private static final double INTAKE_LIFT_PWR_UP = 0.35;
+    public static final double INTAKE_LIFT_PWR_UP = 0.35;
     public static final double INTAKE_LIFT_PWR_DOWN = -0.35;
-    public static final double INTAKE_FEED_PWR = 0.3;
+    public static final double INTAKE_FEED_PWR = 0.5;
 
     private double atSpeedSince = -1.0;
 

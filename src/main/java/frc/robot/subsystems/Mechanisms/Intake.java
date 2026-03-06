@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
 
     private final RelativeEncoder liftEncoder;
-    private static final double MIN_POS = -52.0/1.2;
+    private static final double MIN_POS = -32;
     private static final double MAX_POS = -7;
     private static final double START_POS = 0.0;
 
@@ -70,13 +70,14 @@ public class Intake extends SubsystemBase {
     public void setLiftMotorSpeed(double power){
 
       if (Math.abs(power) < 0.05) power = 0;
-
-      // scale kinda
       targetPos += power; // Establishes setpoint to current position to avoid moving
 
       if (targetPos > START_POS)targetPos = START_POS;
       if (targetPos < MIN_POS)targetPos = MIN_POS;
       if (targetPos > MAX_POS)targetPos = MAX_POS;
+
+      if(Math.abs(targetPos - liftEncoder.getPosition()) < 0.3) targetPos = liftEncoder.getPosition();
+
 
       liftLoop.setSetpoint(targetPos, ControlType.kPosition);
       // if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
