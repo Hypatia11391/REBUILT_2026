@@ -35,6 +35,9 @@ public class OperateWithJoystick extends Command{
     enum IntakeLiftState {OFF, UP, DOWN};
     private IntakeLiftState intakeLiftState = IntakeLiftState.OFF;
 
+    enum FeedState {OFF, REV, ON};
+    private FeedState feedState = FeedState.OFF;
+
     public OperateWithJoystick(Shooter shooter, Joystick stick, Intake intake, Kicker kicker, Feed feed){
         this.stick = stick;
         this.shooter = shooter;
@@ -117,14 +120,30 @@ public class OperateWithJoystick extends Command{
                 intake.setFeedMotorSpeed(0);
                 break;
         }
+
+        // feed out
+        boolean b = stick.getRawButtonPressed(Buttons.B.ordinal() + 1);
+        if (b){
+            if (feedState == FeedState.OFF || feedState == FeedState.ON){
+                feed.setFeedSpeed(-FEED_PWR);
+                feedState = FeedState.REV;
+            }if (feedState == FeedState.REV){
+                feed.setFeedSpeed(0);
+                feedState = FeedState.OFF;
+            }
+        }
         
         // shooter + delayed feed & kicker
         double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
+        double ltSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.LT.ordinal()), 0.08);
 
-        SmartDashboard.putNumber("Joystick/RT", stick.getRawAxis(JoystickAxes.RT.ordinal()));
+        // SmartDashboard.putNumber("Joystick/RT", stick.getRawAxis(JoystickAxes.RT.ordinal()));
         
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
+
+        double rightTarget5 = ltSHOOT * 5000;
+        double leftTarget5 = ltSHOOT * 5000;
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
@@ -141,6 +160,42 @@ public class OperateWithJoystick extends Command{
             shooter.setTargetRPM(rightTarget, leftTarget);
             kicker.setKickerSpeed(KICKER_PWR);
             }
+
+            boolean ready = shooter.atSpeed();
+        
+            if (ready){
+                if(atSpeedSince < 0.0) atSpeedSince = Timer.getFPGATimestamp();
+        }else{
+            atSpeedSince = -1.0;
+        }
+
+        boolean feedAllowed = (atSpeedSince >= 0.0) && (Timer.getFPGATimestamp() - atSpeedSince >= 0.20);
+
+        if (feedAllowed){
+            if (feedState == FeedState.REV){
+                feed.setFeedSpeed(FEED_PWR);
+                feedState = FeedState.ON;
+            }else{
+                feed.setFeedSpeed(FEED_PWR);
+                feedState = FeedState.ON;
+            }
+            
+        }else{
+            // kicker.stop(); // lol it was just this line
+            feed.stop();
+        }
+        }else{
+            shooter.stop();
+            feed.stop();
+            feedState = FeedState.OFF;
+            kicker.stop();
+        }
+
+        if (ltSHOOT != 0.0){
+            // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+
+            shooter.setTargetRPM(rightTarget5, leftTarget5);
+            kicker.setKickerSpeed(KICKER_PWR);
 
             boolean ready = shooter.atSpeed();
         
