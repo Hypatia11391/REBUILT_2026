@@ -13,10 +13,7 @@ package frc.robot;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
@@ -88,11 +85,10 @@ public class RobotContainer {
     );
 
     
-  /* ???????????????
-    public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
-      return poseEstimator;
-    };
-    */
+
+  public Pose3d getEstimatedPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
 
     private final VisionManager visionManager = new VisionManager(poseEstimator);
 
@@ -143,7 +139,7 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull(m_driveBase);
+    return Autos.autonomousFull(this);
   }
 
 }
