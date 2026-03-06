@@ -17,14 +17,14 @@ public class OperateWithJoystick extends Command{
     private final Intake intake;
     private final Kicker kicker;
     private final Feed feed;
-    private static final double HIGH_LEFT_RPM = 3000; // A is one motor TODO: make 1500
-    private static final double HIGH_RIGHT_RPM = 3000; // B is another motor TODO: make 1500
+    private static final double HIGH_LEFT_RPM = 3000;
+    private static final double HIGH_RIGHT_RPM = 3000;
 
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
 
     private static final double INTAKE_LIFT_PWR_UP = 0.35;
-    public static final double INTAKE_LIFT_PWR_DOWN = -0.20;
+    public static final double INTAKE_LIFT_PWR_DOWN = -0.35;
     public static final double INTAKE_FEED_PWR = 0.3;
 
     private double atSpeedSince = -1.0;
@@ -35,11 +35,6 @@ public class OperateWithJoystick extends Command{
     enum IntakeLiftState {OFF, UP, DOWN};
     private IntakeLiftState intakeLiftState = IntakeLiftState.OFF;
 
-
-
-      // private double spinupStartTime = 0;
-
-
     public OperateWithJoystick(Shooter shooter, Joystick stick, Intake intake, Kicker kicker, Feed feed){
         this.stick = stick;
         this.shooter = shooter;
@@ -48,8 +43,6 @@ public class OperateWithJoystick extends Command{
         this.feed = feed;
         addRequirements(shooter, intake, kicker, feed);
     }
-
-    
 
     @Override
     public void initialize(){
@@ -143,12 +136,10 @@ public class OperateWithJoystick extends Command{
                 RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);
                 shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
                 kicker.setKickerSpeed(KICKER_PWR);
-
             }
             else {
-            kicker.setKickerSpeed(KICKER_PWR);
             shooter.setTargetRPM(rightTarget, leftTarget);
-            // feed.setFeedSpeed(FEED_PWR);
+            kicker.setKickerSpeed(KICKER_PWR);
             }
 
             boolean ready = shooter.atSpeed();

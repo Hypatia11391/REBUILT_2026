@@ -2,6 +2,7 @@ package frc.robot.poseEstimation;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class VisionManager {
                         PosePacket.BYTES
                     )
                 );
+                System.out.println("added new channel");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -47,39 +49,55 @@ public class VisionManager {
     }
 
     private Stream<PosePacket> pollForPose(BufferedFixedLengthChannel channel) {
-        return channel.pollFullBuffers().map(PosePacket::fromBuf);
+        try {
+            return channel.pollFullBuffers().map(PosePacket::fromBuf);
+        } catch (Exception e) {
+            System.out.println("Error reading vision packets: ");
+            e.printStackTrace();
+            return Stream.empty();
+        }
+        
     }
 
     private Stream<PosePacket> poll() {
         acceptNewConnections();
         Stream<PosePacket> packetStream = Stream.empty();
         for(BufferedFixedLengthChannel channel : channels) {
+            if(!channel.isOpen()) {
+                System.out.println("channel closed");
+            }
             packetStream = Stream.concat(packetStream,pollForPose(channel));
         }
         return packetStream;
     }
 
-    private static final double TRANSLATION_ERR_CONSTANT = 1;
-    private static final double ROTATION_ERR_CONSTANT = 1;
+    private static final double TRANSLATION_ERR_CONSTANT = 0.05;
+    private static final double ROTATION_ERR_CONSTANT = 0.05;
 
-    private long lastVisionPoseUpdate = 0;
+    private double firstVisionTimestampMyTime = -1;
+    private double firstVisionTimestampPITime = -1;
+    private long lastVisionPoseUpdatePITime = -1;
 
     public void update() {
         poll().forEach((posePacket) -> {
+            if(firstVisionTimestampMyTime == -1) {
+                firstVisionTimestampMyTime = Timer.getFPGATimestamp();
+                firstVisionTimestampPITime = posePacket.time().toEpochMilli() / 1000.0;
+            }
             poseEstimator3d.addVisionMeasurement(
                 posePacket.pose(),
-                posePacket.time().toEpochMilli() / 1000.0,
+                posePacket.time().toEpochMilli() / 1000.0 - firstVisionTimestampPITime + firstVisionTimestampMyTime,
                 VecBuilder.fill(
-                    TRANSLATION_ERR_CONSTANT,
-                    TRANSLATION_ERR_CONSTANT,
-                    TRANSLATION_ERR_CONSTANT,
+                    posePacket.translationErr() * TRANSLATION_ERR_CONSTANT,
+                    posePacket.translationErr() * TRANSLATION_ERR_CONSTANT,
+                    posePacket.translationErr() * TRANSLATION_ERR_CONSTANT,
                     ROTATION_ERR_CONSTANT
                 )
             );
-            this.lastVisionPoseUpdate = posePacket.time().toEpochMilli();
+            this.lastVisionPoseUpdatePITime = posePacket.time().toEpochMilli();
         }
         );
 
-        SmartDashboard.putNumber("LastVisionUpdateTimeStamp", lastVisionPoseUpdate);
+        SmartDashboard.putNumber("LastVisionUpdateTimeStamp", lastVisionPoseUpdatePITime);
     }
 }

@@ -66,6 +66,7 @@ public class Intake extends SubsystemBase {
       configureIntakeLiftMotor(intakeLift, true);
     }
 
+
     public void setLiftMotorSpeed(double power){
 
       if (Math.abs(power) < 0.05) power = 0;
@@ -76,7 +77,7 @@ public class Intake extends SubsystemBase {
       if (targetPos > START_POS)targetPos = START_POS;
       if (targetPos < MIN_POS)targetPos = MIN_POS;
       if (targetPos > MAX_POS)targetPos = MAX_POS;
-      
+
       liftLoop.setSetpoint(targetPos, ControlType.kPosition);
       // if (power > 0 && pos >= MAX_POS){intakeLift.set(0); return;}
       // if (power < 0 && pos <= MIN_POS){intakeLift.set(0); return;}
@@ -96,7 +97,12 @@ public class Intake extends SubsystemBase {
     }
     @Override
     public void periodic(){
-      SmartDashboard.putNumber("LiftPos", liftEncoder.getPosition());
+      SmartDashboard.putNumber("Lift/Pos", liftEncoder.getPosition());
+    //   double current = intakeLift.getOutputCurrent();
+    //   double MAX_CURR = 0;
+    //   if (current > MAX_CURR)MAX_CURR=current;
+    //   SmartDashboard.putNumber("Lift/OutputCurrent", current);
+    //   SmartDashboard.putNumber("Lift/MaxCurr", MAX_CURR);
     }
 
     public void configureIntakeLiftMotor(SparkMax motor, boolean isInverted){

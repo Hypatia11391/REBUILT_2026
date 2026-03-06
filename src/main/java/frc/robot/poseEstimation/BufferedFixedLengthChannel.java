@@ -44,5 +44,9 @@ public class BufferedFixedLengthChannel {
         this.incompleteBuffer = null;
         return justGoneBuffer;
     }
+
+    public boolean isOpen() {
+        return channel.isOpen();
+    }
 }
 

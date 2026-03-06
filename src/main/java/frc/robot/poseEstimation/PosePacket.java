@@ -19,9 +19,15 @@ import java.time.Instant;
 /// If so, a shared other timestamp could be found and used
 public record PosePacket(Pose3d pose, double translationErr, double rotationErr, Instant time) {
     //                   Rotation Quaternion| Position Vector       | Time of measurement
-    public static int BYTES = Long.BYTES + 3 * Double.BYTES + 3 * 3 * Double.BYTES;
+    public static int BYTES = Long.BYTES + 2 * Double.BYTES + 4 * 4 * Double.BYTES;
 
     public static PosePacket fromBuf(ByteBuffer buf) {
+        ByteBuffer testBuf = buf.duplicate();
+        while(testBuf.hasRemaining()) {
+            System.out.print(testBuf.get());
+        }
+        System.out.println(buf);
+
         double[] matrixValues = new double[4 * 4];
         // reading order (left to right then top to bottom)
         for(int i=0;i<4;i++) {
@@ -32,7 +38,7 @@ public record PosePacket(Pose3d pose, double translationErr, double rotationErr,
         Matrix<N4,N4> matrix = new Matrix<>(Nat.N4(), Nat.N4(), matrixValues);
 
         long milliTimestamp = buf.getLong();
-        Instant time = Instant.ofEpochMilli(milliTimestamp);
+        Instant time = Instant.ofEpochMilli(milliTimestamp/1000);
 
         double translationErr = buf.getDouble();
         double rotationErr = buf.getDouble();
