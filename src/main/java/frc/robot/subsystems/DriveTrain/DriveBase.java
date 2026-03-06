@@ -233,6 +233,13 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       if (Autos.moveAuto) {
         ySpeed = Autos.setSpeed;
         ySpeed = Math.max(ySpeed, MAX_SPEED);
+        double initialAngle = gyroAngle.getRadians();
+        double finalAngle = -Math.PI;
+
+        while (initialAngle > finalAngle) {
+          zRot = -MAX_SPEED;
+        }
+
       }
       else {
         SmartDashboard.putNumber("ySpeed", ySpeed);
