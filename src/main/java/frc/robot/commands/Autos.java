@@ -84,7 +84,7 @@ public final class Autos {
                         // We're moving backwards so x will get smaller & eventually hit target
                         double currentX = container.getEstimatedPose().getX();
                         SmartDashboard.putNumber("autoXPos",targetX);
-                        return currentX - targetX > 0;
+                        return currentX - targetX < 0;
                     }
                 ),
                 Commands.run(
