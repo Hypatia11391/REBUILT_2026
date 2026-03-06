@@ -65,10 +65,10 @@ public class RobotContainer {
 
     // TODO!!!!: MEASUREMENTS!!!!! MEASURE THE POSITIONS OF EACH WHEEL RELATIVE TO ROBOT ORIGIN!!!
     private static final MecanumDriveKinematics DRIVE_KINEMATICS = new MecanumDriveKinematics(
-        new Translation2d(0,0),
-        new Translation2d(0,0),
-        new Translation2d(0,0),
-        new Translation2d(0,0)
+        new Translation2d(0,0.32),
+        new Translation2d(0,-0.32),
+        new Translation2d(-0.37,0.32),
+        new Translation2d(-0.37,-0.32)
     );
 
     private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
