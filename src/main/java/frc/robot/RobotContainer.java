@@ -143,7 +143,7 @@ public class RobotContainer {
    * Called by {@link Robot} when autonomous starts.
    */
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull("src/main/deploy/pathplanner/test.txt",this);
+    return Autos.autonomousFull(m_driveBase);
   }
 
 }

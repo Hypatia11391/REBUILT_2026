@@ -253,6 +253,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
   }
+
+  public Pose2d getInitialPose() {
+    return poseEstimator.getEstimatedPosition().toPose2d();
+  }
   
   public void aimingFunction() {
     Pose3d temp = this.poseEstimator.getEstimatedPosition();
