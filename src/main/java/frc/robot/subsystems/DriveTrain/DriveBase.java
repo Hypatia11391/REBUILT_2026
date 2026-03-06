@@ -61,7 +61,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
 
-  // 24 + 11.5 back, 28.2 left, 15 down
   private static final double WHEEL_DIAMETER = 0.1588; // In meters
   public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // In meters
 
