@@ -17,15 +17,17 @@ public class OperateWithJoystick extends Command{
     private final Intake intake;
     private final Kicker kicker;
     private final Feed feed;
-    private static final double HIGH_LEFT_RPM = 3000;
-    private static final double HIGH_RIGHT_RPM = 3000;
+    private static final double HIGH_LEFT_RPM = 3000; // A is one motor TODO: make 1500
+    private static final double HIGH_RIGHT_RPM = 3000; // B is another motor TODO: make 1500
 
     private static final double KICKER_PWR = 0.7;
     private static final double FEED_PWR = 0.7;
 
     private static final double INTAKE_LIFT_PWR_UP = 0.35;
-    public static final double INTAKE_LIFT_PWR_DOWN = -0.35;
+    private static final double INTAKE_LIFT_PWR_DOWN = -0.20;
     public static final double INTAKE_FEED_PWR = 0.3;
+
+    public static double test = 1;
 
     private double atSpeedSince = -1.0;
 
@@ -121,18 +123,6 @@ public class OperateWithJoystick extends Command{
                 break;
         }
 
-        // feed out
-        boolean b = stick.getRawButtonPressed(Buttons.B.ordinal() + 1);
-        if (b){
-            if (feedState == FeedState.OFF || feedState == FeedState.ON){
-                feed.setFeedSpeed(-FEED_PWR);
-                feedState = FeedState.REV;
-            }if (feedState == FeedState.REV){
-                feed.setFeedSpeed(0);
-                feedState = FeedState.OFF;
-            }
-        }
-        
         // shooter + delayed feed & kicker
         double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
         double ltSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.LT.ordinal()), 0.08);
@@ -142,8 +132,23 @@ public class OperateWithJoystick extends Command{
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
-        double rightTarget5 = ltSHOOT * 5000;
-        double leftTarget5 = ltSHOOT * 5000;
+        if (Autos.shooterAuto && Autos.visionOnline) {
+
+            float shooterRadius = 0.05F;
+            double thing = Aim.exitVelocity;
+            double radiansPerSecond = thing/shooterRadius;
+            double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
+            RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);
+            shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
+            kicker.setKickerSpeed(KICKER_PWR);
+
+        }
+        else if (Autos.shooterAuto) {
+
+            double RPMtoShoot = 3000;
+            shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
+            kicker.setKickerSpeed(KICKER_PWR);
+        }
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
@@ -162,7 +167,7 @@ public class OperateWithJoystick extends Command{
             }
 
             boolean ready = shooter.atSpeed();
-        
+
             if (ready){
                 if(atSpeedSince < 0.0) atSpeedSince = Timer.getFPGATimestamp();
         }else{
@@ -179,7 +184,7 @@ public class OperateWithJoystick extends Command{
                 feed.setFeedSpeed(FEED_PWR);
                 feedState = FeedState.ON;
             }
-            
+
         }else{
             // kicker.stop(); // lol it was just this line
             feed.stop();
@@ -194,7 +199,7 @@ public class OperateWithJoystick extends Command{
         if (ltSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
 
-            shooter.setTargetRPM(rightTarget5, leftTarget5);
+            shooter.setTargetRPM(ltSHOOT * 5000, ltSHOOT * 5000);
             kicker.setKickerSpeed(KICKER_PWR);
 
             boolean ready = shooter.atSpeed();

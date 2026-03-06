@@ -67,10 +67,10 @@ public class RobotContainer {
 
     // TODO!!!!: MEASUREMENTS!!!!! MEASURE THE POSITIONS OF EACH WHEEL RELATIVE TO ROBOT ORIGIN!!!
     private static final MecanumDriveKinematics DRIVE_KINEMATICS = new MecanumDriveKinematics(
-        new Translation2d(0,0),
-        new Translation2d(0,0),
-        new Translation2d(0,0),
-        new Translation2d(0,0)
+        new Translation2d(0,0.32),
+        new Translation2d(0,-0.32),
+        new Translation2d(-0.37,0.32),
+        new Translation2d(-0.37,-0.32)
     );
 
     private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
@@ -100,12 +100,14 @@ public class RobotContainer {
       new DriveBase(navx,poseEstimator,DRIVE_KINEMATICS);
 
 
+
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
     shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed)); // TODO: change to operator
+      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
     configureBindings();
   }
 
@@ -134,7 +136,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::automaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
-    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake)); // TODO: change to operator
+    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
 
 }
 
@@ -142,8 +144,10 @@ public class RobotContainer {
    * Returns the command that will run during autonomous mode.
    * Called by {@link Robot} when autonomous starts.
    */
+
+
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull("src/main/deploy/pathplanner/test.txt",this);
+    return Autos.autonomousFull(this.m_driveBase);
   }
 
 }
