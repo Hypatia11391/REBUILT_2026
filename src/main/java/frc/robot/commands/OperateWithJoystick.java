@@ -25,7 +25,9 @@ public class OperateWithJoystick extends Command{
 
     private static final double INTAKE_LIFT_PWR_UP = 0.35;
     private static final double INTAKE_LIFT_PWR_DOWN = -0.20;
-    private static final double INTAKE_FEED_PWR = 0.3;
+    public static final double INTAKE_FEED_PWR = 0.3;
+
+    public static double test = 1;
 
     private double atSpeedSince = -1.0;
 
@@ -132,6 +134,15 @@ public class OperateWithJoystick extends Command{
         
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
+
+        if (Autos.shooterAuto) {
+            float shooterRadius = 0.05F;
+            double thing = Aim.exitVelocity;
+            double radiansPerSecond = thing/shooterRadius;
+            double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
+            RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
+            kicker.setKickerSpeed(KICKER_PWR);
+        }
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
