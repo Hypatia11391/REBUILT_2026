@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class VisionManager {
     private final ServerSocketChannel channel;
-    private final LinkedList<BufferedFixedLengthChannel> channels = new LinkedList<>();
+    private final LinkedList<NullTerminatedPacketChannel> channels = new LinkedList<>();
     private static final int PORT = 8080;
     private final MecanumDrivePoseEstimator3d poseEstimator3d;
 
@@ -36,10 +38,7 @@ public class VisionManager {
             while ((channel = this.channel.accept()) != null) {
                 channel.configureBlocking(false);
                 this.channels.add(
-                    new BufferedFixedLengthChannel(
-                        channel,
-                        PosePacket.BYTES
-                    )
+                    new NullTerminatedPacketChannel(channel)
                 );
                 System.out.println("added new channel");
             }
@@ -48,26 +47,51 @@ public class VisionManager {
         }
     }
 
-    private Stream<PosePacket> pollForPose(BufferedFixedLengthChannel channel) {
+//    private Stream<PosePacket> pollForPose(BufferedFixedLengthChannel channel) {
+//        try {
+//            return channel.pollFullBuffers().map(PosePacket::fromBuf);
+//        } catch (Exception e) {
+//            System.out.println("Error reading vision packets: ");
+//            e.printStackTrace();
+//            return Stream.empty();
+//        }
+//
+//    }
+
+    private Stream<PosePacket> pollForPose(NullTerminatedPacketChannel channel) {
         try {
-            return channel.pollFullBuffers().map(PosePacket::fromBuf);
+            return channel.pollFullPackets().map(PosePacket::fromString);
         } catch (Exception e) {
             System.out.println("Error reading vision packets: ");
             e.printStackTrace();
             return Stream.empty();
         }
-        
+
     }
 
     private Stream<PosePacket> poll() {
         acceptNewConnections();
         Stream<PosePacket> packetStream = Stream.empty();
+        /*
         for(BufferedFixedLengthChannel channel : channels) {
             if(!channel.isOpen()) {
                 System.out.println("channel closed");
             }
             packetStream = Stream.concat(packetStream,pollForPose(channel));
         }
+         */
+        List<NullTerminatedPacketChannel> channelsToRemove = new ArrayList<>();
+
+        for(NullTerminatedPacketChannel channel : channels) {
+            if(!channel.isOpen()) {
+                System.out.println("channel closed");
+                channelsToRemove.add(channel);
+            }
+            packetStream = Stream.concat(packetStream,pollForPose(channel));
+        }
+
+        this.channels.removeAll(channelsToRemove);
+
         return packetStream;
     }
 
@@ -82,11 +106,11 @@ public class VisionManager {
         poll().forEach((posePacket) -> {
             if(firstVisionTimestampMyTime == -1) {
                 firstVisionTimestampMyTime = Timer.getFPGATimestamp();
-                firstVisionTimestampPITime = posePacket.time().toEpochMilli() / 1000.0;
+                firstVisionTimestampPITime = posePacket.milliTimestamp() / 1000.0;
             }
             poseEstimator3d.addVisionMeasurement(
                 posePacket.pose(),
-                posePacket.time().toEpochMilli() / 1000.0 - firstVisionTimestampPITime + firstVisionTimestampMyTime,
+                posePacket.milliTimestamp() / 1000.0 - firstVisionTimestampPITime + firstVisionTimestampMyTime,
                 VecBuilder.fill(
                     posePacket.translationErr() * TRANSLATION_ERR_CONSTANT,
                     posePacket.translationErr() * TRANSLATION_ERR_CONSTANT,
@@ -94,7 +118,7 @@ public class VisionManager {
                     ROTATION_ERR_CONSTANT
                 )
             );
-            this.lastVisionPoseUpdatePITime = posePacket.time().toEpochMilli();
+            this.lastVisionPoseUpdatePITime = posePacket.milliTimestamp();
         }
         );
 

@@ -1,23 +1,30 @@
 package frc.robot.poseEstimation;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 public class NullTerminatedPacketChannel {
     private ByteBuffer incompleteBuffer;
     private final SocketChannel channel;
-    private final int packetLength;
+
 
     public NullTerminatedPacketChannel(SocketChannel channel) {
         this.channel = channel;
     }
 
-    public Stream<ByteBuffer> pollFullBuffers() {
+    public Stream<String> pollFullPackets() {
         return Stream.iterate(
-            ByteBuffer.allocate(1024),
+            this.pollString(),
             Objects::nonNull,
-            (lastBuf) -> this.pollBuffer()
+            (lastBuf) -> this.pollString()
         );
     }
 
-    public ByteBuffer pollBuffer() {
+    public String pollString() {
         if(this.incompleteBuffer == null) {
             this.incompleteBuffer = ByteBuffer.allocate(1024);
         }
@@ -27,15 +34,44 @@ public class NullTerminatedPacketChannel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        if(incompleteBuffer.position() < this.packetLength) {
-            return null;
+        incompleteBuffer.flip();
+        if(incompleteBuffer.hasRemaining()) {
+            ByteBuffer currentStr = incompleteBuffer.slice();
+            boolean terminated = false;
+            int i;
+            for (i = 0; incompleteBuffer.hasRemaining(); i++) {
+                if(incompleteBuffer.get() == 0x00) {
+                    terminated = true;
+                    break;
+                }
+            }
+            if(terminated) {
+                currentStr.limit(i);
+                if(!incompleteBuffer.hasRemaining()) {
+                    incompleteBuffer = null;
+                } else {
+                    incompleteBuffer = deepCopy(incompleteBuffer.slice());
+                }
+                return StandardCharsets.UTF_8.decode(currentStr).toString();
+            } else {
+                return null;
+            }
         }
+        return null;
+    }
 
-        this.incompleteBuffer.flip();
-        ByteBuffer justGoneBuffer = this.incompleteBuffer;
-        this.incompleteBuffer = null;
-        return justGoneBuffer;
+    public ByteBuffer deepCopy(ByteBuffer source) {
+        int sourceP = source.position();
+        int sourceL = source.limit();
+
+        ByteBuffer target = ByteBuffer.allocate(source.remaining());
+
+        target.put(source);
+        target.flip();
+
+        source.position(sourceP);
+        source.limit(sourceL);
+        return target;
     }
 
     public boolean isOpen() {
