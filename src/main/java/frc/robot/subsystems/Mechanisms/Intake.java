@@ -44,8 +44,8 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
 
     private final RelativeEncoder liftEncoder;
-    private static final double MIN_POS = -52.0;
-    private static final double MAX_POS = -10.0;
+    private static final double MIN_POS = -52.0/1.2;
+    private static final double MAX_POS = -7;
     private static final double START_POS = 0.0;
 
     double targetPos = 0.0;
