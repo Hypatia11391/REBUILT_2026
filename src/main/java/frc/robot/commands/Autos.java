@@ -32,9 +32,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 public final class Autos {
 
-  private static final double moveBack = 1; //Might be 0.86
+  private static final double moveBack = 1.0; //Might be 0.86
   public static Pose2d initialPose;
-  public static Pose2d currentPose;
   public static boolean moveAuto = true;
   public static boolean shooterAuto = false;
   public static boolean visionOnline = false;
@@ -83,10 +82,16 @@ public static Command autonomousFull(DriveBase base) {
 
 
         Commands.waitUntil(() -> {
+          try {
             double yDirInitial = initialPose.getY();
-            double yDirCurrent = currentPose.getY();
+            double yDirCurrent = DriveBase.currentPose.getY();
             
             return !(yDirInitial > yDirCurrent + moveBack); 
+          }
+          catch(Exception e){
+            e.printStackTrace();
+          }
+          return false;
         }),
 
         Commands.runOnce(() -> {

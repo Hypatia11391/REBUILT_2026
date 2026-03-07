@@ -78,7 +78,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final Navx navx;
   private final MecanumDriveKinematics driveKinematics;
 
-  private static Pose2d currentPose;
+  public static Pose2d currentPose;
 
   /** Called once at the beginning of the robot program. */
   public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
@@ -156,8 +156,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   public MecanumDriveWheelSpeeds getWheelSpeeds() {
 
-    Pose3d temp = poseEstimator.getEstimatedPosition();
-    currentPose = temp.toPose2d();
+    currentPose = poseEstimator.getEstimatedPosition().toPose2d();
     m_field.setRobotPose(currentPose);
 
     super.periodic();
