@@ -32,9 +32,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 public final class Autos {
 
-  private static final double moveBack = 1.0; //Might be 0.86
+  private static final double moveBack = 0.0; //Might be 0.86
   public static Pose2d initialPose;
   public static boolean moveAuto = true;
+  public static boolean turnAuto = true;
   public static boolean shooterAuto = false;
   public static boolean visionOnline = false;
   public static double setSpeed = -moveBack * 0.5;
@@ -74,17 +75,18 @@ public final class Autos {
 //   */
 
 public static Command autonomousFull(DriveBase base) {
-  initialPose = base.getInitialPose();
+  initialPose = base.getPose();
     return Commands.sequence(
         Commands.runOnce(() -> {
             moveAuto = true;
+            turnAuto = false;
         }),
-
-
-        Commands.waitUntil(() -> {
+        Commands.waitSeconds(0.5),
+ 
+        /*Commands.waitUntil(() -> {
           try {
             double yDirInitial = initialPose.getY();
-            double yDirCurrent = DriveBase.currentPose.getY();
+            double yDirCurrent = base.getPose().getY();
             
             return !(yDirInitial > yDirCurrent + moveBack); 
           }
@@ -92,11 +94,18 @@ public static Command autonomousFull(DriveBase base) {
             e.printStackTrace();
           }
           return false;
-        }),
+        }),*/
+        
+
 
         Commands.runOnce(() -> {
+            moveAuto = true;
+            turnAuto = true;
+        }),
+        Commands.waitSeconds(1.0),
+        Commands.runOnce(() -> {
             moveAuto = false;
-            Aim.automaticAimControl = true;
+            turnAuto = false;
             shooterAuto = true;
         })
     );

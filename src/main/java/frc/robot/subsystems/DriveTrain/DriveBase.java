@@ -212,8 +212,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
     /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
-      SmartDashboard.putNumber("xSpeed", xSpeed);
-      SmartDashboard.putNumber("ySpeed", ySpeed);
+      SmartDashboard.putNumber("Speed/xSpeed", xSpeed);
+      SmartDashboard.putNumber("Speed/ySpeed", ySpeed);
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
@@ -225,15 +225,23 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
         zRot = rotationPower;
       }
-      else
-        SmartDashboard.putNumber("zRot", zRot);
-
+      else SmartDashboard.putNumber("zRot", zRot);
+    
       if (Autos.moveAuto) {
         xSpeed = Autos.setSpeed;
         xSpeed = Math.min(xSpeed, MAX_SPEED);
       }
 
+      if(Autos.turnAuto) {
+        double zRotCurrent = gyroAngle.getRadians();
+        double zRotTarget = -Math.PI;
+        
 
+        if (Math.abs(zRotTarget-zRotCurrent) > (0.5)) {
+          zRot = MAX_SPEED * 0.25;
+        }
+        else zRot = 0.0;
+      }
       
       m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
@@ -259,7 +267,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       return speed -> controller.set(maxSpeed * speed);
   }
 
-  public Pose2d getInitialPose() {
+  public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition().toPose2d();
   }
   
