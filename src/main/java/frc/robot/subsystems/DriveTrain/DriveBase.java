@@ -44,6 +44,7 @@ import frc.utils.gyro.Navx;
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
 import frc.robot.commands.Aim;
+import frc.robot.commands.Autos;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -226,6 +227,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
+
+      if (Autos.moveAuto) {
+        xSpeed = Autos.setSpeed;
+        xSpeed = Math.min(xSpeed, MAX_SPEED);
+      }
 
 
       
