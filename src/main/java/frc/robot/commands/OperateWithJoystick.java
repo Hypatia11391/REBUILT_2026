@@ -150,6 +150,12 @@ public class OperateWithJoystick extends Command{
             atSpeedSince = -1.0;
         }
 
+        if (Autos.shooterAuto) {
+            shooter.setTargetRPM(HIGH_RIGHT_RPM, HIGH_RIGHT_RPM);
+            kicker.setKickerSpeed(KICKER_PWR);
+        }
+
+
         boolean feedAllowed = (atSpeedSince >= 0.0) && (Timer.getFPGATimestamp() - atSpeedSince >= 0.20);
 
         if (feedAllowed){

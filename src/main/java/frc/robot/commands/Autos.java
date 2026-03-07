@@ -120,6 +120,13 @@ public static Command autonomousFull(DriveBase base) {
             moveAuto = false;
             turnAuto = false;
             shooterAuto = true;
+        }),
+
+        Commands.waitSeconds(10.0),
+        Commands.runOnce(() -> {
+          moveAuto = false;
+          turnAuto = false;
+          shooterAuto = false;
         })
     );
 
