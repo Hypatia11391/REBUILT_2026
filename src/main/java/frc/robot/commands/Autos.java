@@ -77,12 +77,14 @@ public final class Autos {
 public static Command autonomousFull(DriveBase base) {
   initialPose = base.getPose();
     return Commands.sequence(
+      /*
         Commands.runOnce(() -> {
             moveAuto = true;
             turnAuto = false;
         }),
         Commands.waitSeconds(0.5),
- 
+ */
+
         /*Commands.waitUntil(() -> {
           try {
             double yDirInitial = initialPose.getY();
@@ -100,9 +102,20 @@ public static Command autonomousFull(DriveBase base) {
 
         Commands.runOnce(() -> {
             moveAuto = true;
-            turnAuto = true;
+            turnAuto = false;
+        }),
+
+        Commands.waitSeconds(1.0),
+        Commands.runOnce(() -> {
+          moveAuto = false;
         }),
         Commands.waitSeconds(1.0),
+        Commands.runOnce(() -> {
+          turnAuto = false;
+          moveAuto = false;
+        }),
+        Commands.waitSeconds(1.0),
+
         Commands.runOnce(() -> {
             moveAuto = false;
             turnAuto = false;

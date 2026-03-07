@@ -228,7 +228,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       else SmartDashboard.putNumber("zRot", zRot);
     
       if (Autos.moveAuto) {
-        xSpeed = Autos.setSpeed;
+        xSpeed = -MAX_SPEED*0.25;
         xSpeed = Math.min(xSpeed, MAX_SPEED);
       }
 
