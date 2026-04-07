@@ -145,7 +145,8 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return Autos.autonomousFull();
+    //return Autos.autonomousFull();
+    return null;
   }
 
 }

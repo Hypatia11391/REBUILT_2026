@@ -4,9 +4,26 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.math.geometry.Pose2d;
+
+public final class Autos {
+
+  private Autos() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+
+}
+
+
+// /**
+//  * This class contains static methods for autonomous commands
+//  */
+
+// package frc.robot.commands;
+
+// import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.Commands;
+// import edu.wpi.first.math.geometry.Pose2d;
 
 
 // import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
@@ -29,18 +46,19 @@ import edu.wpi.first.math.geometry.Pose2d;
 // import java.util.ArrayList;
 // import java.util.List;
 
-public final class Autos {
+// public final class Autos {
 
-  private static final double moveBack = 1;
-  public static Pose2d initialPose;
-  public static Pose2d currentPose;
-  public static boolean moveAuto = true;
-  public static boolean shooterAuto = false;
-  public static double setSpeed = -moveBack * 0.25;
+//   private static final double moveBack = 1;
+//   public static Pose2d initialPose;
+//   public static Pose2d currentPose;
+//   public static boolean moveAuto = true;
+//   public static boolean shooterAuto = false;
+//   public static double setSpeed = -moveBack * 0.25;
+//   public static boolean visionOnline = false;
 
-  private Autos() {
-    throw new UnsupportedOperationException("This is a utility class!");
-  }
+//   private Autos() {
+//     throw new UnsupportedOperationException("This is a utility class!");
+//   }
 
 //   public static Command followPath(String pathName) {
 //     try {
@@ -72,26 +90,26 @@ public final class Autos {
 //   }
 //   */
 
-public static Command autonomousFull() {
-    return Commands.sequence(
-        Commands.runOnce(() -> {
-            moveAuto = true;
-        }),
+// public static Command autonomousFull() {
+//     return Commands.sequence(
+//         Commands.runOnce(() -> {
+//             moveAuto = true;
+//         }),
 
 
-        Commands.waitUntil(() -> {
-            double yDirInitial = initialPose.getY();
-            double yDirCurrent = currentPose.getY();
+//         Commands.waitUntil(() -> {
+//             double yDirInitial = initialPose.getY();
+//             double yDirCurrent = currentPose.getY();
             
-            return !(yDirInitial > yDirCurrent + moveBack); 
-        }),
+//             return !(yDirInitial > yDirCurrent + moveBack); 
+//         }),
 
-        Commands.runOnce(() -> {
-            moveAuto = false;
-            Aim.automaticAimControl = true;
-            shooterAuto = true;
-        })
-    );
+//         Commands.runOnce(() -> {
+//             moveAuto = false;
+//             Aim.automaticAimControl = true;
+//             shooterAuto = true;
+//         })
+//     );
 
 
 
@@ -134,15 +152,15 @@ public static Command autonomousFull() {
 //             System.out.println("Error loading path: " + pathToRun);
 //             e.printStackTrace();
 //         }
-    // }
-    // return Commands.sequence(commandList.toArray(new Command[0])).withTimeout(20.0);
+//     }
+//     return Commands.sequence(commandList.toArray(new Command[0])).withTimeout(20.0);
 
-  }
+//   }
 
-  public static void updatePos() {
+//   public static void updatePos() {
 
-  }
+//   }
 
-}
+// }
 
 

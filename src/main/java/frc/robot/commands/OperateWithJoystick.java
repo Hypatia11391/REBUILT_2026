@@ -135,23 +135,23 @@ public class OperateWithJoystick extends Command{
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
-        if (Autos.shooterAuto && Autos.visionOnline) {
+        // if (Autos.shooterAuto && Autos.visionOnline) {
 
-            float shooterRadius = 0.05F;
-            double thing = Aim.exitVelocity;
-            double radiansPerSecond = thing/shooterRadius;
-            double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
-            RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                
-            shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
-            kicker.setKickerSpeed(KICKER_PWR);
+        //     float shooterRadius = 0.05F;
+        //     double thing = Aim.exitVelocity;
+        //     double radiansPerSecond = thing/shooterRadius;
+        //     double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
+        //     RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                
+        //     shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
+        //     kicker.setKickerSpeed(KICKER_PWR);
 
-        }
-        else if (Autos.shooterAuto) {
+        // }
+        // else if (Autos.shooterAuto) {
             
-            double RPMtoShoot = 3000;
-            shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
-            kicker.setKickerSpeed(KICKER_PWR);
-        }
+        //     double RPMtoShoot = 3000;
+        //     shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
+        //     kicker.setKickerSpeed(KICKER_PWR);
+        // }
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");

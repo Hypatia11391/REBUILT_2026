@@ -230,13 +230,13 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       else
         SmartDashboard.putNumber("zRot", zRot);
 
-      if (Autos.moveAuto) {
-        ySpeed = Autos.setSpeed;
-        ySpeed = Math.max(ySpeed, MAX_SPEED);
-      }
-      else {
+      // if (Autos.moveAuto) {
+      //   ySpeed = Autos.setSpeed;
+      //   ySpeed = Math.max(ySpeed, MAX_SPEED);
+      // }
+      // else {
         SmartDashboard.putNumber("ySpeed", ySpeed);
-      }
+      // }
 
 
       
@@ -277,16 +277,16 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     );
   }
 
-  public void getPoseFunc() {
+  // public void getPoseFunc() {
 
-    if (firstAuto) {
-      Autos.initialPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-      firstAuto = false;
-    }
-    else
-      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+  //   if (firstAuto) {
+  //     Autos.initialPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+  //     Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
+  //     firstAuto = false;
+  //   }
+  //   else
+  //     Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
 
-  }
+  // }
 
 }
