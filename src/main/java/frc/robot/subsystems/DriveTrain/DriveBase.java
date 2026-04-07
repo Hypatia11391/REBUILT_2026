@@ -45,6 +45,7 @@ import frc.utils.gyro.Navx;
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
 import frc.robot.commands.Aim;
+import frc.robot.commands.AimPacket;
 import frc.robot.commands.Autos;
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
@@ -269,11 +270,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
     Aim.updateAim(
-      position,
-      robotVelocities,
-      4,
-      DriverStation.getAlliance()
-      .orElse(Alliance.Red) == Alliance.Red
+      new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
     );
   }
 

@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public final class Autos {
 
@@ -11,8 +13,18 @@ public final class Autos {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
+  public static Command autonomousCommand() {
+    return null;
+  }
 
+
+  private static String getAlliance() {
+    return DriverStation.getAlliance().toString();
+  }
 }
+
+
+
 
 
 // /**
