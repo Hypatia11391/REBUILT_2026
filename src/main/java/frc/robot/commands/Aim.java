@@ -37,7 +37,8 @@ public final class Aim {
         double time = lastTimeGuess;
         double cotAlpha = 1/Math.tan(shooterAngle);
 
-        updateStuff(aimPacket.getRobotPose(), aimPacket.getFieldRelativeSpeeds());
+        updateRobotState
+(aimPacket.getRobotPose(), aimPacket.getFieldRelativeSpeeds());
         distanceToTarget[0] = targetPosition[0] - shooterPosition[0];
         distanceToTarget[1] = targetPosition[1] - shooterPosition[1];
         distanceToTarget[2] = targetPosition[2] - shooterPosition[2];
@@ -73,7 +74,7 @@ public final class Aim {
             return time;
     }
 
-    private static void updateStuff(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
+    private static void updateRobotState(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
 
         shooterPosition[0] = robotPose.getX();
         shooterPosition[1] = robotPose.getY();

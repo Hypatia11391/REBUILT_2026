@@ -17,10 +17,6 @@ public final class Autos {
     return null;
   }
 
-
-  private static String getAlliance() {
-    return DriverStation.getAlliance().toString();
-  }
 }
 
 
