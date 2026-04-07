@@ -37,8 +37,7 @@ public final class Aim {
         double time = lastTimeGuess;
         double cotAlpha = 1/Math.tan(shooterAngle);
 
-        updateRobotState
-(aimPacket.getRobotPose(), aimPacket.getFieldRelativeSpeeds());
+        updateRobotState(aimPacket.getRobotPose(), aimPacket.getFieldRelativeSpeeds());
         distanceToTarget[0] = targetPosition[0] - shooterPosition[0];
         distanceToTarget[1] = targetPosition[1] - shooterPosition[1];
         distanceToTarget[2] = targetPosition[2] - shooterPosition[2];
@@ -58,7 +57,6 @@ public final class Aim {
 
     private static double newtonsMethodFunc(double[] distanceToTarget, double[] robotVelocities, double time, double height, double cotAlpha, int repetitions) {
             for (int i = 0; i < repetitions; i++) {
-                final double gravity = Aim.gravity;
                 double dx = distanceToTarget[0] - robotVelocities[0] * time;
                 double dy = distanceToTarget[1] - robotVelocities[1] * time;
                 double effectiveDistanceMagnitude = Math.sqrt(dx * dx + dy * dy);
