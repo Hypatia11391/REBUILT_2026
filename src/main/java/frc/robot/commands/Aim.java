@@ -3,6 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
+//TODO Gonna have to refactor everything again for next year probably
+
 public final class Aim {
 
     private static final double shooterAngle = Math.PI/3;
@@ -12,10 +14,9 @@ public final class Aim {
     private static double[] targetPosition = new double[3];
     private static final double[] targetPositionRed = {4.611624, 4.034536,1.8288}; 
     private static final double[] targetPositionBlue = {11.901424, 4.034536,1.8288};
-    private static final double shooterSetHeight = 0.381;
-
     private static double[] robotVelocities = new double[2];
 
+    private static final double shooterSetHeight = 0.381;
     private static double height;
 
     // Feed this into Newtons method to calculate flight time (Seconds)
@@ -50,8 +51,7 @@ public final class Aim {
         rotateBy = Math.atan2(effectiveDistanceY, effectiveDistanceX);
         exitVelocity = (height + 0.5 * gravity * Math.pow(time, 2)) / (time * Math.sin(shooterAngle));
 
-        lastTimeGuess = time;    
-
+        lastTimeGuess = time;
 
     }
 
