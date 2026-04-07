@@ -85,7 +85,7 @@ public final class Aim {
         height = targetPosition[2] - shooterPosition[2];
     }
 
-    public static void automaticAimControl() {
+    public static void toggleAutomaticAimControl() {
         automaticAimControl = !automaticAimControl;
     }
 

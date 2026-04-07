@@ -131,7 +131,7 @@ public class RobotContainer {
     
     // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::automaticAimControl));
+    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::toggleAutomaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
