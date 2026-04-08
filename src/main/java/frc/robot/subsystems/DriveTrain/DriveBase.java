@@ -48,6 +48,8 @@ import frc.robot.commands.Aim;
 import frc.robot.commands.AimPacket;
 import frc.robot.commands.Autos;
 
+//TODO Guys lets maybe move all the constants into the DriveBaseConstants.java file?? Otherwise delete the file.
+
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
 
@@ -81,7 +83,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final MecanumDriveKinematics driveKinematics;
 
   private static Pose2d currentPose;
-  private static boolean firstAuto = true;
+  //private static boolean firstAuto = true;
 
 
   /** Called once at the beginning of the robot program. */
@@ -220,9 +222,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float magicValue = 0.5F; // This help the robot from overshooting the target //TODO rename to somehting meaningfull
+        float overShootConstant = 0.5F; // This help the robot from overshooting the target
 
-        double rotationPower = temp*magicValue;
+        double rotationPower = temp*overShootConstant;
         rotationPower = Math.max(rotationPower, -MAX_SPEED);
         rotationPower = Math.min(rotationPower, MAX_SPEED);
 
@@ -231,7 +233,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       else
         SmartDashboard.putNumber("zRot", zRot);
 
-      // TODO All of Autos.java will be rewritten. Almost definitely should remove all the currently implemented Auto code. 
+      // TODO All of Autos.java will be rewritten. Should remove all the currently implemented Auto code. 
 
       // if (Autos.moveAuto) {
       //   ySpeed = Autos.setSpeed;

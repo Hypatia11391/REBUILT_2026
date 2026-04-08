@@ -55,6 +55,8 @@ public final class Aim {
 
     }
 
+    // Newtons method is an iterative function that calculates the time that an object will be in the air. 
+
     private static double newtonsMethodFunc(double[] distanceToTarget, double[] robotVelocities, double time, double height, double cotAlpha, int repetitions) {
             for (int i = 0; i < repetitions; i++) {
                 double dx = distanceToTarget[0] - robotVelocities[0] * time;

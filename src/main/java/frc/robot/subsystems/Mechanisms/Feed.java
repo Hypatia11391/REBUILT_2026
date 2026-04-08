@@ -27,6 +27,7 @@ public class Feed extends SubsystemBase {
     }
     
     public void setFeedSpeed(double speed){
+        //What ts 0.5 do??
         feedNeo.set(speed*0.5);
     }
 
