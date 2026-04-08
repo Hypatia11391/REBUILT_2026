@@ -220,7 +220,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float magicValue = 0.5F;
+        float magicValue = 0.5F; // This help the robot from overshooting the target //TODO rename to somehting meaningfull
 
         double rotationPower = temp*magicValue;
         rotationPower = Math.max(rotationPower, -MAX_SPEED);
@@ -230,6 +230,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
+
+      // TODO All of Autos.java will be rewritten. Almost definitely should remove all the currently implemented Auto code. 
 
       // if (Autos.moveAuto) {
       //   ySpeed = Autos.setSpeed;
