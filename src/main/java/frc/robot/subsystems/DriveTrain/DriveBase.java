@@ -290,4 +290,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   // }
 
+  public static Pose2d getPose2D() {
+    return currentPose;
+  }
 }
