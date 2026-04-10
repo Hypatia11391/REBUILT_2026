@@ -9,15 +9,35 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* AUTOS PIPELINE: 
+
+* CUSTOM MADE 
+*
  * Build functions to control the robot
  * These functions are then put together and made into one Command
  * Commands is executed and hopefully works
  * 
  * Pros:
- * Easiest to program
+ * Full control
+ * Don't have to learn pathplanner
  * 
  * Cons:
+ * Might be a little harder to program than pathplanner
+ * Hard to orchestrate paths exactly how you want them
  * 
+ * 
+ * USING PATHPLANNER
+ * 
+ * Build Paths in Pathplanner
+ * Use AutoBuilder to configure
+ * 
+ * Pros:
+ * Easiest to do programming wise
+ * Takes less time
+ * 
+ * Cons:
+ * Annoying to learn
+ * Less control over everything
+ * Needs exact measurements of random stuff that might be hard to provide
  * 
 */
 
@@ -26,15 +46,6 @@ public final class Autos {
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
-
-  public static Command autonomousCommand() {
-    return null;
-  }
-
-  public static Command moveRobot(Pose2d targetPose) {
-    return null;
-  }
-  
 
 }
 

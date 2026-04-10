@@ -3,8 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-//TODO Gonna have to refactor everything again for next year probably
-
 public final class Aim {
 
     private static final double shooterAngle = Math.PI/3;
@@ -56,7 +54,6 @@ public final class Aim {
     }
 
     // Newtons method is an iterative function that calculates the time that an object will be in the air. 
-
     private static double newtonsMethodFunc(double[] distanceToTarget, double[] robotVelocities, double time, double height, double cotAlpha, int repetitions) {
             for (int i = 0; i < repetitions; i++) {
                 double dx = distanceToTarget[0] - robotVelocities[0] * time;

@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Aim;
-//import frc.robot.commands.Autos;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.OperateWithJoystick;
@@ -145,7 +144,6 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    //return Autos.autonomousFull();
     return null;
   }
 
