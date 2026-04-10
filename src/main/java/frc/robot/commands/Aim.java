@@ -27,6 +27,7 @@ public final class Aim {
 
     public static boolean automaticAimControl = false;
 
+
     public static void updateAim(AimPacket aimPacket) {
         
         targetPosition = targetPositionBlue;
