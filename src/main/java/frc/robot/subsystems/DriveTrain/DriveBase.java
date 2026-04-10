@@ -52,18 +52,6 @@ import frc.robot.commands.AimPacket;
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
 
-  // tune this to cap max output for testing
-  // private static final double DriveBaseConstants.MAX_SPEED = 1.0;
-  
-  // CAN IDs (spark max)
- // private static final int FRONT_LEFT_ID = 9;
-  // private static final int FRONT_RIGHT_ID = 1;
-  // private static final int REAR_LEFT_ID = 10;
-  // private static final int REAR_RIGHT_ID = 2;
-
-  // private static final double WHEEL_DIAMETER = 0.1588; // In meters
-  // public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // In meters
-
   private final RelativeEncoder frEncoder;
   private final RelativeEncoder flEncoder;
   private final RelativeEncoder rrEncoder;
@@ -80,8 +68,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final MecanumDriveKinematics driveKinematics;
 
   private static Pose2d currentPose;
-  //private static boolean firstAuto = true;
-
 
   /** Called once at the beginning of the robot program. */
   public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
