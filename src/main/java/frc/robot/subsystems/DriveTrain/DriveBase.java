@@ -48,7 +48,6 @@ import frc.robot.commands.Aim;
 import frc.robot.commands.AimPacket;
 import frc.robot.commands.Autos;
 
-//TODO Guys lets maybe move all the constants into the DriveBaseConstants.java file?? Otherwise delete the file.
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
@@ -61,8 +60,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static final int FRONT_RIGHT_ID = 1;
   private static final int REAR_LEFT_ID = 10;
   private static final int REAR_RIGHT_ID = 2;
-
-  private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
 
   private static final double WHEEL_DIAMETER = 0.1588; // In meters
   public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // In meters
@@ -125,40 +122,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SendableRegistry.addChild(m_Drive, rlSparkMax);
     SendableRegistry.addChild(m_Drive, rrSparkMax);
   
-    initPathPlanner();
-
     SmartDashboard.putData("Field", m_field);
     }
     
-  private void initPathPlanner() {
-    RobotConfig config;
-    try {
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-      return;
-    }
-
-    AutoBuilder.configure(
-      () -> poseEstimator.getEstimatedPosition().toPose2d(),
-      (pose) -> poseEstimator.resetPose(new Pose3d(pose)),
-      this::getChassisSpeeds,
-      (speeds, ff) ->
-        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds))
-      ,
-      new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-      ),
-      config,
-      () -> {
-        var alliance = DriverStation.getAlliance();
-        return alliance.filter(value -> value == DriverStation.Alliance.Red).isPresent();
-      },
-      this
-    );
-  }
 
   public MecanumDriveWheelSpeeds getWheelSpeeds() {
 
@@ -210,19 +176,19 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
 
   public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    flSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
-    frSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
-    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearLeftMetersPerSecond);
-    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearRightMetersPerSecond);
+    flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
+    frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
+    rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
+    rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
   }
 
-    /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
+    /* robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float overShootConstant = 0.5F; // This help the robot from overshooting the target
+        float overShootConstant = 0.5F;
 
         double rotationPower = temp*overShootConstant;
         rotationPower = Math.max(rotationPower, -MAX_SPEED);
@@ -233,18 +199,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       else
         SmartDashboard.putNumber("zRot", zRot);
 
-      // TODO All of Autos.java will be rewritten. Should remove all the currently implemented Auto code. 
-
-      // if (Autos.moveAuto) {
-      //   ySpeed = Autos.setSpeed;
-      //   ySpeed = Math.max(ySpeed, MAX_SPEED);
-      // }
-      // else {
         SmartDashboard.putNumber("ySpeed", ySpeed);
-      // }
 
-
-      
       m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
@@ -277,18 +233,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
       new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
     );
   }
-
-  // public void getPoseFunc() {
-
-  //   if (firstAuto) {
-  //     Autos.initialPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-  //     Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-  //     firstAuto = false;
-  //   }
-  //   else
-  //     Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-
-  // }
 
   public static Pose2d getPose2D() {
     return currentPose;
