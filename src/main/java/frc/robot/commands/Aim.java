@@ -19,7 +19,6 @@ public final class Aim {
     private static final double shooterSetHeight = 0.381;
     private static double height;
 
-    // Feed this into Newtons method to calculate flight time (Seconds)
     private static double lastTimeGuess = 1;
     private static final int newtonsMethodIterations = 4;
 

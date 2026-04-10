@@ -53,7 +53,7 @@ import frc.robot.commands.Autos;
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
 
-    // tune this to cap max output for testing
+  // tune this to cap max output for testing
   private static final double MAX_SPEED = 1.0;
   
   // CAN IDs (spark max)
