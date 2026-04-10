@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Feed extends SubsystemBase {
     private static final int FEED_NEO_ID = 7;
+    private static final float SPEED_MULTIPLIER = 0.5F;
 
     private final SparkMax feedNeo;
 
@@ -27,8 +28,8 @@ public class Feed extends SubsystemBase {
     }
     
     public void setFeedSpeed(double speed){
-        //What ts 0.5 do??
-        feedNeo.set(speed*0.5);
+        //What ts 0.5 do??  
+        feedNeo.set(speed*SPEED_MULTIPLIER);
     }
 
     public void configureFeedMotor(SparkMax motor, boolean isInverted){
