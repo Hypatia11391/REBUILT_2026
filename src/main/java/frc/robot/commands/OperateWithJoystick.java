@@ -28,6 +28,8 @@ public class OperateWithJoystick extends Command{
     public static final double INTAKE_FEED_PWR = 0.3;
 
     public static double test = 1;
+    // Why is ts here gang. Doesn't do anything ^^^^^
+
 
     private double atSpeedSince = -1.0;
 
@@ -135,30 +137,32 @@ public class OperateWithJoystick extends Command{
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
-        if (Autos.shooterAuto && Autos.visionOnline) {
+        // if (Autos.shooterAuto && Autos.visionOnline) {
 
-            float shooterRadius = 0.05F;
-            double thing = Aim.exitVelocity;
-            double radiansPerSecond = thing/shooterRadius;
-            double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
-            RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                
-            shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
-            kicker.setKickerSpeed(KICKER_PWR);
+        //     float shooterRadius = 0.05F;
+        //     double thing = Aim.exitVelocity;
+        //     double radiansPerSecond = thing/shooterRadius;
+        //     double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
+        //     RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                
+        //     shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
+        //     kicker.setKickerSpeed(KICKER_PWR);
 
-        }
-        else if (Autos.shooterAuto) {
+        // }
+        // else if (Autos.shooterAuto) {
             
-            double RPMtoShoot = 3000;
-            shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
-            kicker.setKickerSpeed(KICKER_PWR);
-        }
+        //     double RPMtoShoot = 3000;
+        //     shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
+        //     kicker.setKickerSpeed(KICKER_PWR);
+        // }
 
         if (rtSHOOT != 0.0){
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
+
+            //TODO Fix/Refactor aim code here
             if (Aim.automaticAimControl) {
                 float shooterRadius = 0.05F;
-                double thing = Aim.exitVelocity;
-                double radiansPerSecond = thing/shooterRadius;
+                double exitVelocity = Aim.exitVelocity;
+                double radiansPerSecond = exitVelocity/shooterRadius;
                 double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
                 RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);
                 shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);

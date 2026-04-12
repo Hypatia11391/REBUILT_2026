@@ -12,11 +12,11 @@
 
 package frc.robot.subsystems.DriveTrain;
 
-import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+// import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.config.PIDConstants;
+// import com.pathplanner.lib.config.RobotConfig;
+// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -45,24 +45,12 @@ import frc.utils.gyro.Navx;
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
 import frc.robot.commands.Aim;
-import frc.robot.commands.Autos;
+import frc.robot.commands.AimPacket;
+//import frc.robot.commands.Autos;
+
 
 public class DriveBase extends SubsystemBase { // main class that extend TimedRobot
   private final MecanumDrive m_Drive; // mecanum drive object
-
-    // tune this to cap max output for testing
-  private static final double MAX_SPEED = 1.0;
-  
-  // CAN IDs (spark max)
-  private static final int FRONT_LEFT_ID = 9;
-  private static final int FRONT_RIGHT_ID = 1;
-  private static final int REAR_LEFT_ID = 10;
-  private static final int REAR_RIGHT_ID = 2;
-
-  private static final double WHEEL_POWER_TO_METERS_PER_SECOND = 1; // TODO: I have no clue how to measure this or calibrate it but I hope there's something we can do
-
-  private static final double WHEEL_DIAMETER = 0.1588; // In meters
-  public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // In meters
 
   private final RelativeEncoder frEncoder;
   private final RelativeEncoder flEncoder;
@@ -80,8 +68,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private final MecanumDriveKinematics driveKinematics;
 
   private static Pose2d currentPose;
-  private static boolean firstAuto = true;
-
 
   /** Called once at the beginning of the robot program. */
   public DriveBase(Navx navx, MecanumDrivePoseEstimator3d poseEstimator, MecanumDriveKinematics kinematics) { // constructor
@@ -90,14 +76,14 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     this.driveKinematics = kinematics;
 
     // wheel motors
-    flSparkMax = new SparkMax(FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    frSparkMax = new SparkMax(FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-    rlSparkMax = new SparkMax(REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    rrSparkMax = new SparkMax(REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    flSparkMax = new SparkMax(DriveBaseConstants.FRONT_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    frSparkMax = new SparkMax(DriveBaseConstants.FRONT_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
+    rlSparkMax = new SparkMax(DriveBaseConstants.REAR_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
+    rrSparkMax = new SparkMax(DriveBaseConstants.REAR_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
     
     AbsoluteEncoderConfig conf = new AbsoluteEncoderConfig();
-    conf = conf.positionConversionFactor(WHEEL_CIRCUMFERENCE);
-    conf = conf.velocityConversionFactor(WHEEL_CIRCUMFERENCE);
+    conf = conf.positionConversionFactor(DriveBaseConstants.WHEEL_CIRCUMFERENCE);
+    conf = conf.velocityConversionFactor(DriveBaseConstants.WHEEL_CIRCUMFERENCE);
 
     configureMotor(flSparkMax, true, conf);
     configureMotor(frSparkMax, false, conf);
@@ -110,10 +96,10 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     this.rrEncoder = rrSparkMax.getEncoder();
 
     m_Drive = new MecanumDrive(
-      cappedSetter(flSparkMax, MAX_SPEED),
-      cappedSetter(rlSparkMax, MAX_SPEED),
-      cappedSetter(frSparkMax, MAX_SPEED),
-      cappedSetter(rrSparkMax, MAX_SPEED)
+      cappedSetter(flSparkMax, DriveBaseConstants.MAX_SPEED),
+      cappedSetter(rlSparkMax, DriveBaseConstants.MAX_SPEED),
+      cappedSetter(frSparkMax, DriveBaseConstants.MAX_SPEED),
+      cappedSetter(rrSparkMax, DriveBaseConstants.MAX_SPEED)
     );
 
     // motors visible in shuffleboard
@@ -122,40 +108,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SendableRegistry.addChild(m_Drive, rlSparkMax);
     SendableRegistry.addChild(m_Drive, rrSparkMax);
   
-    initPathPlanner();
-
     SmartDashboard.putData("Field", m_field);
     }
     
-  private void initPathPlanner() {
-    RobotConfig config;
-    try {
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-      return;
-    }
-
-    AutoBuilder.configure(
-      () -> poseEstimator.getEstimatedPosition().toPose2d(),
-      (pose) -> poseEstimator.resetPose(new Pose3d(pose)),
-      this::getChassisSpeeds,
-      (speeds, ff) ->
-        this.driveAtSpeeds(driveKinematics.toWheelSpeeds(speeds))
-      ,
-      new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-      ),
-      config,
-      () -> {
-        var alliance = DriverStation.getAlliance();
-        return alliance.filter(value -> value == DriverStation.Alliance.Red).isPresent();
-      },
-      this
-    );
-  }
 
   public MecanumDriveWheelSpeeds getWheelSpeeds() {
 
@@ -207,39 +162,31 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   }
 
   public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    flSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontLeftMetersPerSecond);
-    frSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.frontRightMetersPerSecond);
-    rlSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearLeftMetersPerSecond);
-    rrSparkMax.set(WHEEL_POWER_TO_METERS_PER_SECOND * wheelSpeeds.rearRightMetersPerSecond);
+    flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
+    frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
+    rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
+    rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
   }
 
-    /** robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
+    /* robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
 
       if (Aim.automaticAimControl){
         double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float magicValue = 0.5F;
+        float overShootConstant = 0.5F;
 
-        double rotationPower = temp*magicValue;
-        rotationPower = Math.max(rotationPower, -MAX_SPEED);
-        rotationPower = Math.min(rotationPower, MAX_SPEED);
+        double rotationPower = temp*overShootConstant;
+        rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
+        rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
 
         zRot = rotationPower;
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
 
-      if (Autos.moveAuto) {
-        ySpeed = Autos.setSpeed;
-        ySpeed = Math.max(ySpeed, MAX_SPEED);
-      }
-      else {
         SmartDashboard.putNumber("ySpeed", ySpeed);
-      }
 
-
-      
       m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle); 
     }
     public void driveCartesian(double xSpeed, double ySpeed, double zRot){
@@ -269,24 +216,11 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     ChassisSpeeds robotVelocities = this.getChassisSpeeds();
     
     Aim.updateAim(
-      position,
-      robotVelocities,
-      4,
-      DriverStation.getAlliance()
-      .orElse(Alliance.Red) == Alliance.Red
+      new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
     );
   }
 
-  public void getPoseFunc() {
-
-    if (firstAuto) {
-      Autos.initialPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-      firstAuto = false;
-    }
-    else
-      Autos.currentPose = this.poseEstimator.getEstimatedPosition().toPose2d();
-
+  public static Pose2d getPose2D() {
+    return currentPose;
   }
-
 }

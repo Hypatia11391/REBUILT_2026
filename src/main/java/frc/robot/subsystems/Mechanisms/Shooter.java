@@ -39,19 +39,27 @@ public class Shooter extends SubsystemBase {
     private double targetRightRPM = 0.0;
 
     // PID constants
-    private static final double kP = 0.00006;
-    private static final double kI = 0.0;
-    private static final double kD = 0.1; //0.00000001
+
+    /*
+     * kP is a proportional constant used to correct errors between the target and current RPM. It is found via trial and error.
+     * kI is the integral of the error. It is the sum of all past errors. It is used to eliminate error accumulating over time. It is turned off here.
+     * kD is the derivative of the error. It is how fast the error changes over time. It is used as a dampener to prevent overshooting.
+     */
+    private static final double kP = 0.00006;  // Trial and error
+    private static final double kI = 0.0; // 0
+    private static final double kD = 0.1; // Trial and error
 
     // for the pid things
     // private double prevRightError = 0.0;
     // private double prevLeftError = 0.0;
     // private double prevTime = 0.0;
 
-    // NEOs free speed = 5676 rpm
-    private static final double kV = 1.0 / 5676.0; // 0.00005; // feed-forward constant or 12.0 / 5676.0
+    //kV is a velocity feed-forward. It pre-calculates roughly how much voltage is needed to reach the target RPM.
+    private static final double NEO_FREE_SPEED = 5676.0;
+    private static final double kV = 1.0 / NEO_FREE_SPEED; // 0.00005; // feed-forward constant or 12.0 / 5676.0
 
-    private static final double RPM_TOL = 400.0;
+    //Acceptable margin of error before shooting. (In RPM)
+    private static final double RPM_TOLERANCE = 400.0;
 
     public Shooter(){ 
 
@@ -113,7 +121,7 @@ public class Shooter extends SubsystemBase {
     public double getLeftRPM(){return leftEncoder.getVelocity();}
 
     public boolean atSpeed(){
-        return Math.abs(getRightRPM() - targetRightRPM) < RPM_TOL && Math.abs(getLeftRPM() - targetLeftRPM) < RPM_TOL;
+        return Math.abs(getRightRPM() - targetRightRPM) < RPM_TOLERANCE && Math.abs(getLeftRPM() - targetLeftRPM) < RPM_TOLERANCE;
     }
 
     @Override
