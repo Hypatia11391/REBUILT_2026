@@ -34,6 +34,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
@@ -148,7 +149,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   @Override
   public void periodic() {
     this.poseEstimator.updateWithTime(
-        Instant.now().toEpochMilli() / 1000.0,
+        //Instant.now().toEpochMilli() / 1000.0,
+        Timer.getFPGATimestamp(),
         navx.getFullRotation(),
         this.getWheelPositions()
     );
@@ -158,15 +160,14 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SmartDashboard.putNumber("rearLeftVel",rlEncoder.getVelocity());
     SmartDashboard.putNumber("rearRightVel",rrEncoder.getVelocity());
 
-    super.periodic();
   }
 
-  public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
-    frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
-    rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
-    rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
-  }
+  // public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+  //   flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
+  //   frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
+  //   rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
+  //   rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
+  // }
 
     /* robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){

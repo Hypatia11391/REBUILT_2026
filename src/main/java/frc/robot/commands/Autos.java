@@ -39,6 +39,21 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Less control over everything
  * Needs exact measurements of random stuff that might be hard to provide
  * 
+ * 
+ * HYBRID METHOD
+ * 
+ * Using Pathplanner for paths and moving robot
+ * Still have some commands for shooting, aiming, etc.
+ * Integrate both
+ * 
+ * Pros:
+ * Only have to learn pathplanner a little bit
+ * Shooting and aiming commands should be very easy to implement
+ * 
+ * Cons:
+ * Still have to learn pathplanner a little bit
+ * Would be weird arrangment of paths and commands, have to configure manually.
+ * 
 */
 
 public final class Autos {
