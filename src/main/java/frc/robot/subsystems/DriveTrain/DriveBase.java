@@ -48,8 +48,6 @@ import java.util.function.DoubleConsumer;
 
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Aim;
-import frc.robot.commands.AimPacket;
 import frc.robot.commands.AimInstance;
 
 //import frc.robot.commands.Autos;
@@ -226,15 +224,6 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
-  }
-  
-  public void aimingFunction() {
-    Pose2d position = this.poseEstimator.getEstimatedPosition().toPose2d();
-    ChassisSpeeds robotVelocities = getChassisSpeeds();
-    
-    Aim.updateAim(
-      new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
-    );
   }
 
   public static Pose2d getPose2D() {

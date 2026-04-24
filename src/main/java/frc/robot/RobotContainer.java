@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Aim;
 import frc.robot.commands.AimInstance;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
@@ -140,7 +139,7 @@ public class RobotContainer {
     
     // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::toggleAutomaticAimControl));
+    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::updateAimInstance, m_driveBase)).onChange(new InstantCommand(aimInstance::toggleAutomaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));

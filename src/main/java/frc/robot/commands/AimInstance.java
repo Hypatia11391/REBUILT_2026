@@ -21,6 +21,7 @@ public class AimInstance {
     private final double shooterSetHeight = 0.381;
     private double lastTimeGuess = 1;
     private final int newtonsMethodIterations = 4;
+    private final float overShootConstant = 0.5f;
     private double height;
 
 
@@ -134,4 +135,7 @@ public class AimInstance {
         return rotateBy;
     }
     
+    public float getOverShootConstant() {
+        return overShootConstant;
+    }
 }
