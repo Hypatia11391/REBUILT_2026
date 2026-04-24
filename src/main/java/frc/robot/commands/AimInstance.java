@@ -42,16 +42,8 @@ public class AimInstance {
         return robotPose;
     }
 
-    public void setRobotPose(Pose2d robotPose) {
-        this.robotPose = robotPose;
-    }
-
     public ChassisSpeeds getRobotVelocities() {
         return robotVelocities;
-    }
-
-    public void setRobotVelocities(ChassisSpeeds robotVelocities) {
-        this.robotVelocities = robotVelocities;
     }
 
     public boolean isRedTeam() {
