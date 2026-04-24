@@ -45,8 +45,13 @@ import frc.utils.gyro.Navx;
 
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
+
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.commands.Aim;
 import frc.robot.commands.AimPacket;
+import frc.robot.commands.AimInstance;
+
 //import frc.robot.commands.Autos;
 
 
@@ -142,6 +147,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public void resetPose(Pose2d pose) {
     currentPose = pose;
   }
+
   public ChassisSpeeds getChassisSpeeds() {
     return driveKinematics.toChassisSpeeds(getWheelSpeeds());
   }
@@ -154,6 +160,8 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
         navx.getFullRotation(),
         this.getWheelPositions()
     );
+
+    updateAimInstance();
 
     SmartDashboard.putNumber("frontLeftVel",flEncoder.getVelocity());
     SmartDashboard.putNumber("frontRightVel",frEncoder.getVelocity());
@@ -173,15 +181,23 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
 
-      if (Aim.automaticAimControl){
-        double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float overShootConstant = 0.5F;
+      if (RobotContainer.aimInstance.automaticAimControl()){
 
-        double rotationPower = temp*overShootConstant;
-        rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
-        rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
+        // double temp = Aim.rotateBy - gyroAngle.getRadians();
+        // float overShootConstant = 0.5F;
+
+        // double rotationPower = temp*overShootConstant;
+        // rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
+        // rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
+
+        // zRot = rotationPower;
+
+        double temp = RobotContainer.aimInstance.getRequiredRotation() - gyroAngle.getRadians();
+        double rotationPower = temp*RobotContainer.aimInstance.getOverShootConstant();
+        rotationPower = Math.max(-DriveBaseConstants.MAX_SPEED, Math.min(rotationPower, DriveBaseConstants.MAX_SPEED));
 
         zRot = rotationPower;
+
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
@@ -214,7 +230,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   
   public void aimingFunction() {
     Pose2d position = this.poseEstimator.getEstimatedPosition().toPose2d();
-    ChassisSpeeds robotVelocities = this.getChassisSpeeds();
+    ChassisSpeeds robotVelocities = getChassisSpeeds();
     
     Aim.updateAim(
       new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
@@ -224,4 +240,9 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public static Pose2d getPose2D() {
     return currentPose;
   }
+
+  public void updateAimInstance() {
+    RobotContainer.aimInstance.updateRobotState(currentPose, getChassisSpeeds());
+  }
+
 }

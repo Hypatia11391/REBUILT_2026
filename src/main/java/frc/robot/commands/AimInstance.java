@@ -5,6 +5,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class AimInstance {
 
@@ -26,11 +29,10 @@ public class AimInstance {
     private final Pose3d targetPositionRed = new Pose3d(4.611624, 4.034536, 1.8288, defaultRotation); 
     private final Pose3d targetPositionBlue = new Pose3d(11.901424, 4.034536, 1.8288, defaultRotation);
 
-    public double rotateBy;
-    public double exitVelocity;
+    private double rotateBy;
+    private double exitVelocity;
 
-    public boolean automaticAimControl = false;
-
+    private boolean automaticAimControl = false;
 
     public AimInstance(Pose2d robotPose, ChassisSpeeds robotVelocities, boolean redTeam) {
         this.robotPose = robotPose;
@@ -75,7 +77,7 @@ public class AimInstance {
         
         rotateBy = Math.atan2(effectiveDistanceY, effectiveDistanceX);
         exitVelocity = (height + 0.5 * gravity * Math.pow(time, 2)) / (time * Math.sin(shooterAngle));
-
+        
         lastTimeGuess = time;
 
     }
@@ -100,7 +102,7 @@ public class AimInstance {
             return time;
     }
 
-    private void updateRobotState(Pose2d robotPose, ChassisSpeeds robotVelocities) {
+    public void updateRobotState(Pose2d robotPose, ChassisSpeeds robotVelocities) {
 
         shooterPosition = new Pose3d(robotPose.getX(), robotPose.getY(), shooterSetHeight, defaultRotation);
 
@@ -109,12 +111,23 @@ public class AimInstance {
         height = targetPosition.getZ() - shooterPosition.getZ();
     }
 
+    public void updateRobotState(DriveBase driveBase) {
+
+        shooterPosition = new Pose3d(DriveBase.getPose2D().getX(), DriveBase.getPose2D().getY(), shooterSetHeight, defaultRotation);
+
+        this.robotVelocities = driveBase.getChassisSpeeds();
+    }
+
     public void toggleAutomaticAimControl() {
         automaticAimControl = !automaticAimControl;
     }
 
     public double getExitVelocity() {
         return exitVelocity;
+    }
+
+    public boolean automaticAimControl() {
+        return automaticAimControl;
     }
 
     public double getRequiredRotation() {

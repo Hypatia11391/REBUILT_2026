@@ -15,16 +15,20 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Aim;
+import frc.robot.commands.AimInstance;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.OperateWithJoystick;
@@ -83,6 +87,12 @@ public class RobotContainer {
         VISION_STD_DEVS,
         STATE_STD_DEVS
     );
+
+    public static final AimInstance aimInstance = new 
+      AimInstance(
+        STARTING_POSE.toPose2d(), 
+        new ChassisSpeeds(0,0,0), 
+        DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red);
 
     
   /* ???????????????
