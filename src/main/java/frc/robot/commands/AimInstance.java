@@ -5,8 +5,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain.DriveBase;
 
 public class AimInstance {
@@ -52,8 +50,6 @@ public class AimInstance {
     public boolean isRedTeam() {
         return redTeam;
     }    
-
-    //------------------------------------------------------------------//
 
     public void updateAim() {
         
