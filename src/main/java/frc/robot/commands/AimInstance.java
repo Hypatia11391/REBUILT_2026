@@ -37,7 +37,7 @@ public class AimInstance {
         this.robotPose = robotPose;
         this.robotVelocities = robotVelocities;
         this.redTeam = redTeam;
-    }
+    } 
 
     public Pose2d getRobotPose() {
         return robotPose;
