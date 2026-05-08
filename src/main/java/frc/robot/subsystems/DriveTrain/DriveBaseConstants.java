@@ -14,4 +14,7 @@ public class DriveBaseConstants {
     // In meters
     private static final double WHEEL_DIAMETER = 0.1588;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
+
+    // rads/sec
+    public static final double MAX_ANGULAR_SPEED = Math.PI;
 }

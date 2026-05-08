@@ -13,10 +13,11 @@
 package frc.robot.subsystems.DriveTrain;
 
 // import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
-// import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 // import com.pathplanner.lib.config.PIDConstants;
-// import com.pathplanner.lib.config.RobotConfig;
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -113,6 +114,35 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SendableRegistry.addChild(m_Drive, rrSparkMax);
   
     SmartDashboard.putData("Field", m_field);
+
+    RobotConfig config;
+    
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return; 
+    }
+
+    AutoBuilder.configure(
+            DriveBase::getPose2D,
+            this::resetPose, 
+            this::getChassisSpeeds, 
+            (speeds, feedforwards) -> driveRobotRelative(speeds), 
+            new PPHolonomicDriveController( 
+                    new PIDConstants(5.0, 0.0, 0.0), 
+                    new PIDConstants(5.0, 0.0, 0.0) 
+            ),
+            config, 
+            () -> {
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this
+    );
     }
     
 
@@ -168,12 +198,33 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
 
   }
 
+  
+
   // public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
   //   flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
   //   frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
   //   rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
   //   rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
   // }
+
+  /**
+   * Drives the robot using robot-relative ChassisSpeeds.
+   * Required by PathPlanner's AutoBuilder.
+   */
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+
+      
+        double xPercent = speeds.vxMetersPerSecond / DriveBaseConstants.MAX_SPEED;
+        double yPercent = speeds.vyMetersPerSecond / DriveBaseConstants.MAX_SPEED;
+      
+        double rotPercent = speeds.omegaRadiansPerSecond / DriveBaseConstants.MAX_ANGULAR_SPEED; 
+
+        xPercent = Math.max(-1.0, Math.min(1.0, xPercent));
+        yPercent = Math.max(-1.0, Math.min(1.0, yPercent));
+        rotPercent = Math.max(-1.0, Math.min(1.0, rotPercent));
+
+        driveCartesian(xPercent, yPercent, rotPercent, new Rotation2d());
+    }
 
     /* robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){

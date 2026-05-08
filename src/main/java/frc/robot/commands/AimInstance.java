@@ -17,7 +17,7 @@ public class AimInstance {
     private final double gravity = 9.80665;
     private final Rotation3d defaultRotation = new Rotation3d(0, 0, 0);
     private final double shooterSetHeight = 0.381;
-    private double lastTimeGuess = 1;
+    private double timeGuess = 1;
     private final int newtonsMethodIterations = 4;
     private final float overShootConstant = 0.5f;
     private double height;
@@ -58,7 +58,6 @@ public class AimInstance {
             targetPosition = targetPositionRed;
 
         Translation3d distanceToTarget;
-        double time = lastTimeGuess;
         double cotAlpha = 1/Math.tan(shooterAngle);
 
         updateRobotState(robotPose, robotVelocities);
@@ -66,17 +65,15 @@ public class AimInstance {
 
         distanceToTarget = targetPosition.getTranslation().minus(shooterPosition.getTranslation());
         
-        time = newtonsMethodFunc(distanceToTarget, robotVelocities, time, height, cotAlpha, newtonsMethodIterations);
+        timeGuess = newtonsMethodFunc(distanceToTarget, robotVelocities, timeGuess, height, cotAlpha, newtonsMethodIterations);
 
-        double effectiveDistanceX = distanceToTarget.getX() - robotVelocities.vxMetersPerSecond * time;
-        double effectiveDistanceY = distanceToTarget.getY() - robotVelocities.vyMetersPerSecond * time;
+        double effectiveDistanceX = distanceToTarget.getX() - robotVelocities.vxMetersPerSecond * timeGuess;
+        double effectiveDistanceY = distanceToTarget.getY() - robotVelocities.vyMetersPerSecond * timeGuess;
         
         
         rotateBy = Math.atan2(effectiveDistanceY, effectiveDistanceX);
-        exitVelocity = (height + 0.5 * gravity * Math.pow(time, 2)) / (time * Math.sin(shooterAngle));
-        
-        lastTimeGuess = time;
-
+        exitVelocity = (height + 0.5 * gravity * Math.pow(timeGuess, 2)) / (timeGuess * Math.sin(shooterAngle));
+    
     }
 
     // Newtons method is an iterative function that calculates the time that an object will be in the air. 
