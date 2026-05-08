@@ -1,11 +1,16 @@
 package frc.robot.commands;
 
+import java.util.TimeZone;
+
+import com.sun.crypto.provider.KeyGeneratorCore;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.DriveTrain.DriveBase;
+import sun.jvm.hotspot.runtime.vmSymbols;
 
 public class AimInstance {
 
@@ -94,7 +99,32 @@ public class AimInstance {
             }
             return time;
     }
-
+    
+    private double betterNewtonsMethod(Translation3d distanceToTarget, ChassisSpeeds robotVelocities, double initGuess, double ro, int numIters) {
+        double[] T = {distanceToTarget.getX(), distanceToTarget.getY(), distanceToTarget.getZ()};
+        double[] V = {robotVelocities.vxMetersPerSecond, robotVelocities.vyMetersPerSecond, robotVelocities.vzMetersPerSecond};
+        double t = initGuess;
+        
+        for (int i=0; i<numIters; i++) {
+            double[] ffprime = this.functionThatsZeroAndItsDerivative(T, V, t, ro);
+            double f = ffprime[0];
+            double fprime = ffprime[1];
+            t -= fprime/f;
+        }
+        
+        return t;
+    }
+    
+    private double[] functionThatsZeroAndItsDerivative(double[] T, double[] V, double t, double ro) {
+        double Vbx = T[0]/t-V[0];
+        double Vby = T[1]/t-V[1];
+        double Vbz = Math.sqrt(ro*ro - Vbx*Vbx - Vby*Vby);
+        double f = -gravity/2*t*t + V[2]*t + Vbz*t - T[2];
+        double fprime = -gravity*t + V[2] + Vbz + (Vbx+Vby)/(Vbz*t);
+        double[] result = {f,fprime};
+        return result;
+    }
+    
     public void updateRobotState(Pose2d robotPose, ChassisSpeeds robotVelocities) {
 
         shooterPosition = new Pose3d(robotPose.getX(), robotPose.getY(), shooterSetHeight, defaultRotation);
