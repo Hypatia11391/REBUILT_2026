@@ -27,14 +27,12 @@ public final class Autos extends Command{
 
   }
 
-  public Command loadPath() {
-
+  public static Command loadPath() {
     try {
-
       PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
 
       return AutoBuilder.followPath(path);
-
+      
     } catch (Exception e) {
         e.printStackTrace();
         return Commands.none();

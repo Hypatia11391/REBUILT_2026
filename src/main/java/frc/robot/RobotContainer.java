@@ -38,6 +38,7 @@ import frc.robot.subsystems.Mechanisms.Intake;
 import frc.robot.subsystems.Mechanisms.Kicker;
 import frc.robot.subsystems.Mechanisms.Shooter;
 import frc.utils.gyro.Navx;
+import frc.robot.commands.Autos;
 
 
 
@@ -153,7 +154,7 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return null;
+    return Autos.loadPath();
   }
 
 }
