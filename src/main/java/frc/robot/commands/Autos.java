@@ -11,25 +11,9 @@ public final class Autos extends Command{
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
-  @Override
-  public void initialize() {
-
-  }
-
-
-  @Override
-  public void execute() {
-
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-
-  }
-
-  public static Command loadPath() {
+  public static Command loadPath(String name) {
     try {
-      PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
+      PathPlannerPath path = PathPlannerPath.fromPathFile(name);
 
       return AutoBuilder.followPath(path);
       

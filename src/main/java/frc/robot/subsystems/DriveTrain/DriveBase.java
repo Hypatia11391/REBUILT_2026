@@ -125,7 +125,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     }
 
     AutoBuilder.configure(
-            DriveBase::getPose2D,
+            DriveBase::getPose2D, 
             this::resetPose, 
             this::getChassisSpeeds, 
             (speeds, feedforwards) -> driveRobotRelative(speeds), 
