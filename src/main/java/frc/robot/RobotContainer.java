@@ -20,15 +20,17 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimInstance;
+import frc.robot.commands.Autos;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.OperateWithJoystick;
@@ -39,7 +41,6 @@ import frc.robot.subsystems.Mechanisms.Intake;
 import frc.robot.subsystems.Mechanisms.Kicker;
 import frc.robot.subsystems.Mechanisms.Shooter;
 import frc.utils.gyro.Navx;
-import frc.robot.commands.Autos;
 
 
 
@@ -95,6 +96,7 @@ public class RobotContainer {
         new ChassisSpeeds(0,0,0), 
         DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red);
 
+    public SendableChooser<Command> autoChooser;
     
   /* ???????????????
     public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
@@ -155,12 +157,8 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    // Sequential Command thingy so you can stack a buncha paths and it'll work hopefully.
-    return new SequentialCommandGroup(
-
-      Autos.loadPath("Example Path")
-
-    );
+    autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
+    return null;
   }
 
 }
