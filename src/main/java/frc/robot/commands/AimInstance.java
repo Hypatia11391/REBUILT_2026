@@ -22,7 +22,6 @@ public class AimInstance {
     private final float overShootConstant = 0.5f;
     private double height;
 
-
     private Pose3d shooterPosition;
     private Pose3d targetPosition;
     private final Pose3d targetPositionRed = new Pose3d(4.611624, 4.034536, 1.8288, defaultRotation); 

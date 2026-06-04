@@ -26,4 +26,9 @@ public final class Autos extends Command{
     }
   }
 
+  public static Command trackTarget(AimInstance aimInstance) {
+
+    return Commands.none();
+  }
+
 }
