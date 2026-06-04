@@ -15,16 +15,22 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Aim;
+import frc.robot.commands.AimInstance;
+import frc.robot.commands.Autos;
 import frc.robot.commands.Buttons;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.OperateWithJoystick;
@@ -84,6 +90,13 @@ public class RobotContainer {
         STATE_STD_DEVS
     );
 
+    public static final AimInstance aimInstance = new 
+      AimInstance(
+        STARTING_POSE.toPose2d(), 
+        new ChassisSpeeds(0,0,0), 
+        DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red);
+
+    public SendableChooser<Command> autoChooser;
     
   /* ???????????????
     public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
@@ -130,7 +143,7 @@ public class RobotContainer {
     
     // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::aimingFunction, m_driveBase)).onChange(new InstantCommand(Aim::toggleAutomaticAimControl));
+    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::updateAimInstance, m_driveBase)).onChange(new InstantCommand(aimInstance::toggleAutomaticAimControl));
     
     // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
     // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
@@ -144,6 +157,7 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
+    autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
     return null;
   }
 

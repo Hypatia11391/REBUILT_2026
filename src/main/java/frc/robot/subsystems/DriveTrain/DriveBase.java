@@ -13,10 +13,11 @@
 package frc.robot.subsystems.DriveTrain;
 
 // import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
-// import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 // import com.pathplanner.lib.config.PIDConstants;
-// import com.pathplanner.lib.config.RobotConfig;
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -34,6 +35,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
@@ -44,8 +46,11 @@ import frc.utils.gyro.Navx;
 
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
-import frc.robot.commands.Aim;
-import frc.robot.commands.AimPacket;
+
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
+import frc.robot.commands.AimInstance;
+
 //import frc.robot.commands.Autos;
 
 
@@ -109,6 +114,35 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
     SendableRegistry.addChild(m_Drive, rrSparkMax);
   
     SmartDashboard.putData("Field", m_field);
+
+    RobotConfig config;
+    
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return; 
+    }
+
+    AutoBuilder.configure(
+            DriveBase::getPose2D, 
+            this::resetPose, 
+            this::getChassisSpeeds, 
+            (speeds, feedforwards) -> driveRobotRelative(speeds), 
+            new PPHolonomicDriveController( 
+                    new PIDConstants(5.0, 0.0, 0.0), 
+                    new PIDConstants(5.0, 0.0, 0.0) 
+            ),
+            config, 
+            () -> {
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this
+    );
     }
     
 
@@ -141,6 +175,7 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   public void resetPose(Pose2d pose) {
     currentPose = pose;
   }
+
   public ChassisSpeeds getChassisSpeeds() {
     return driveKinematics.toChassisSpeeds(getWheelSpeeds());
   }
@@ -148,39 +183,70 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   @Override
   public void periodic() {
     this.poseEstimator.updateWithTime(
-        Instant.now().toEpochMilli() / 1000.0,
+        //Instant.now().toEpochMilli() / 1000.0,
+        Timer.getFPGATimestamp(),
         navx.getFullRotation(),
         this.getWheelPositions()
     );
+
+    updateAimInstance();
 
     SmartDashboard.putNumber("frontLeftVel",flEncoder.getVelocity());
     SmartDashboard.putNumber("frontRightVel",frEncoder.getVelocity());
     SmartDashboard.putNumber("rearLeftVel",rlEncoder.getVelocity());
     SmartDashboard.putNumber("rearRightVel",rrEncoder.getVelocity());
 
-    super.periodic();
   }
 
-  public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
-    frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
-    rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
-    rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
-  }
+  
+
+  // public void driveAtSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+  //   flSparkMax.set(wheelSpeeds.frontLeftMetersPerSecond);
+  //   frSparkMax.set(wheelSpeeds.frontRightMetersPerSecond);
+  //   rlSparkMax.set(wheelSpeeds.rearLeftMetersPerSecond);
+  //   rrSparkMax.set( wheelSpeeds.rearRightMetersPerSecond);
+  // }
+
+  /**
+   * Drives the robot using robot-relative ChassisSpeeds.
+   * Required by PathPlanner's AutoBuilder.
+   */
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+
+      
+        double xPercent = speeds.vxMetersPerSecond / DriveBaseConstants.MAX_SPEED;
+        double yPercent = speeds.vyMetersPerSecond / DriveBaseConstants.MAX_SPEED;
+      
+        double rotPercent = speeds.omegaRadiansPerSecond / DriveBaseConstants.MAX_ANGULAR_SPEED; 
+
+        xPercent = Math.max(-1.0, Math.min(1.0, xPercent));
+        yPercent = Math.max(-1.0, Math.min(1.0, yPercent));
+        rotPercent = Math.max(-1.0, Math.min(1.0, rotPercent));
+
+        driveCartesian(xPercent, yPercent, rotPercent, new Rotation2d());
+    }
 
     /* robot-oriented if gyroAngle is zero. field-oriented if real gyro angle is passed. */
     public void driveCartesian(double xSpeed, double ySpeed, double zRot, Rotation2d gyroAngle){
       SmartDashboard.putNumber("xSpeed", xSpeed);
 
-      if (Aim.automaticAimControl){
-        double temp = Aim.rotateBy - gyroAngle.getRadians();
-        float overShootConstant = 0.5F;
+      if (RobotContainer.aimInstance.automaticAimControl()){
 
-        double rotationPower = temp*overShootConstant;
-        rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
-        rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
+        // double temp = Aim.rotateBy - gyroAngle.getRadians();
+        // float overShootConstant = 0.5F;
+
+        // double rotationPower = temp*overShootConstant;
+        // rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
+        // rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
+
+        // zRot = rotationPower;
+
+        double temp = RobotContainer.aimInstance.getRequiredRotation() - gyroAngle.getRadians();
+        double rotationPower = temp*RobotContainer.aimInstance.getOverShootConstant();
+        rotationPower = Math.max(-DriveBaseConstants.MAX_SPEED, Math.min(rotationPower, DriveBaseConstants.MAX_SPEED));
 
         zRot = rotationPower;
+
       }
       else
         SmartDashboard.putNumber("zRot", zRot);
@@ -210,17 +276,13 @@ public class DriveBase extends SubsystemBase { // main class that extend TimedRo
   private static DoubleConsumer cappedSetter(SparkMax controller, double maxSpeed) {
       return speed -> controller.set(maxSpeed * speed);
   }
-  
-  public void aimingFunction() {
-    Pose2d position = this.poseEstimator.getEstimatedPosition().toPose2d();
-    ChassisSpeeds robotVelocities = this.getChassisSpeeds();
-    
-    Aim.updateAim(
-      new AimPacket(position, robotVelocities, DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red)
-    );
-  }
 
   public static Pose2d getPose2D() {
     return currentPose;
   }
+
+  public void updateAimInstance() {
+    RobotContainer.aimInstance.updateRobotState(currentPose, getChassisSpeeds());
+  }
+
 }
