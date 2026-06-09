@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.PersistMode;
@@ -44,6 +45,15 @@ public class Feed extends SubsystemBase {
         config, 
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
+    }
+
+    public Command setFeedSpeedCommand(double speed) {
+        return this.run(() -> setFeedSpeed(speed)).finallyDo(() -> stop());
+
+    }
+
+    public Command stopCommand() {
+        return this.run(() -> stop());
     }
 
     public void stop() {

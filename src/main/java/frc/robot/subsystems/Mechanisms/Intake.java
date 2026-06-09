@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Mechanisms;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 // import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.PersistMode;
@@ -128,6 +129,14 @@ public class Intake extends SubsystemBase {
         config, 
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
+    }
+
+    public Command setFeedMotorSpeedCommand(double speed) {
+      return this.run(() -> setFeedMotorSpeed(speed)).finallyDo(() -> stop());
+    }
+
+    public Command stopCommand() {
+      return this.run(() -> stop());
     }
 
     public void stop() {

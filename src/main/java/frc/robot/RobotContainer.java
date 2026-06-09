@@ -127,6 +127,9 @@ public class RobotContainer {
   public Navx getNavx(){
     return navx;
   }
+  public Shooter getShooter() {
+    return shooter;
+  }
 
   public void update() {
     visionManager.update();

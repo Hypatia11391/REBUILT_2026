@@ -13,6 +13,8 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 
@@ -162,6 +164,15 @@ public class Shooter extends SubsystemBase {
             ResetMode.kNoResetSafeParameters, 
             PersistMode.kPersistParameters);
     }
+
+    public Command spinUpCommand(double targetRightRPM, double targetLeftRPM) {
+        return this.run(() -> setTargetRPM(targetRightRPM, targetLeftRPM)).finallyDo(() -> stop());
+    }
+
+    public Command stopCommand() {
+        return this.run(() -> stop());
+    }
+
 
     public void stop() {
         targetRightRPM = 0.0;

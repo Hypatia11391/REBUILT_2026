@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Mechanisms;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.PersistMode;
@@ -44,6 +45,15 @@ public class Kicker extends SubsystemBase {
         ResetMode.kNoResetSafeParameters, 
         PersistMode.kPersistParameters);
     }
+
+    public Command setKickerSpeedCommand(double speed) {
+        return this.run(() -> setKickerSpeed(speed)).finallyDo(() -> stop());
+    }
+
+    public Command stopKickerCommand() {
+        return this.run(() -> stop());
+    }
+
 
     public void stop() {
         kickerCim.stopMotor();
