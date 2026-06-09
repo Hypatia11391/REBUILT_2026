@@ -51,9 +51,8 @@ public class Kicker extends SubsystemBase {
     }
 
     public Command stopKickerCommand() {
-        return this.run(() -> stop());
+        return this.runOnce(() -> stop());
     }
-
 
     public void stop() {
         kickerCim.stopMotor();

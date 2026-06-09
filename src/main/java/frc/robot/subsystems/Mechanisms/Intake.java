@@ -136,7 +136,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command stopCommand() {
-      return this.run(() -> stop());
+      return this.runOnce(() -> stop());
     }
 
     public void stop() {

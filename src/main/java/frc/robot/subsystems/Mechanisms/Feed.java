@@ -44,7 +44,7 @@ public class Feed extends SubsystemBase {
       motor.configureAsync(
         config, 
         ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);
+        PersistMode.kPersistParameters);    
     }
 
     public Command setFeedSpeedCommand(double speed) {
@@ -53,7 +53,7 @@ public class Feed extends SubsystemBase {
     }
 
     public Command stopCommand() {
-        return this.run(() -> stop());
+        return this.runOnce(() -> stop());
     }
 
     public void stop() {
