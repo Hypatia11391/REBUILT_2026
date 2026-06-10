@@ -114,7 +114,7 @@ public class RobotContainer {
   
 
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
     m_driveBase.setDefaultCommand(
       new DriveWithJoystick(m_driveBase, m_driverController, navx));
