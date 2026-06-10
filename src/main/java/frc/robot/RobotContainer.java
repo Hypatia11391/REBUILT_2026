@@ -140,7 +140,7 @@ public class RobotContainer {
   }
 
   private void registerCommands() {
-    NamedCommands.registerCommand("AutoShoot", Autos.ShootSequence(shooter, kicker, feed, 0, 0));
+    NamedCommands.registerCommand("AutoShoot", Autos.shootSequence(shooter, kicker, feed, 0, 0));
   }
 
   /**

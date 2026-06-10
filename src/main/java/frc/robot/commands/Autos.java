@@ -6,7 +6,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Mechanisms.Feed;
-import frc.robot.subsystems.Mechanisms.Intake;
 import frc.robot.subsystems.Mechanisms.Kicker;
 import frc.robot.subsystems.Mechanisms.Shooter;
 
@@ -35,11 +34,9 @@ public final class Autos extends Command{
     return Commands.none();
   }
 
-  public static Command ShootSequence(Shooter shooter, Kicker kicker, Feed feed, double shooterSpeed, double timeout) {
-
-    Command sequence = Commands.sequence(Commands.waitUntil(() -> shooter.atSpeed()), feed.setFeedSpeedCommand(1.0).withTimeout(0.5)); //ignore these magic numbers for now
-    return sequence.deadlineWith(shooter.spinUpCommand(shooterSpeed, shooterSpeed)).withName("Shoot Sequence");
-    
+  public static Command shootSequence(Shooter shooter, Kicker kicker, Feed feed, double shooterSpeed, double timeout) {
+    Command sequence = Commands.sequence(Commands.waitUntil(() -> shooter.atSpeed()), feed.setFeedSpeedCommand(1.0).withTimeout(0.5)); //ignore magic numbers for now
+    return sequence.deadlineWith(shooter.spinUpCommand(shooterSpeed, shooterSpeed).withName("Shoot Sequence"));
   }
 
-}
+} 
