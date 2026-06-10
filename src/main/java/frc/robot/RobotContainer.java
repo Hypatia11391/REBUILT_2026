@@ -10,6 +10,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
@@ -119,6 +121,8 @@ public class RobotContainer {
     shooter.setDefaultCommand(
       new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
     configureBindings();
+
+    registerCommands();
   }
 
   public DriveBase getDriveBase() {
@@ -133,6 +137,10 @@ public class RobotContainer {
 
   public void update() {
     visionManager.update();
+  }
+
+  private void registerCommands() {
+    NamedCommands.registerCommand("AutoShoot", Autos.ShootSequence(shooter, kicker, feed, 0, 0));
   }
 
   /**

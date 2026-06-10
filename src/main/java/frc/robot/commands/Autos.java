@@ -39,6 +39,7 @@ public final class Autos extends Command{
 
     Command sequence = Commands.sequence(Commands.waitUntil(() -> shooter.atSpeed()), feed.setFeedSpeedCommand(1.0).withTimeout(0.5)); //ignore these magic numbers for now
     return sequence.deadlineWith(shooter.spinUpCommand(shooterSpeed, shooterSpeed)).withName("Shoot Sequence");
+    
   }
 
 }
