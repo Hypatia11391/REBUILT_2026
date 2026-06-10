@@ -35,5 +35,11 @@ public final class Autos extends Command{
     return Commands.none();
   }
 
+  public static Command ShootSequence(Shooter shooter, Kicker kicker, Feed feed, double shooterSpeed, double timeout) {
+
+    Command sequence = Commands.sequence(Commands.waitUntil(() -> shooter.atSpeed()), feed.setFeedSpeedCommand(1.0).withTimeout(0.5)); //ignore these magic numbers for now
+    return sequence.deadlineWith(shooter.spinUpCommand(shooterSpeed, shooterSpeed)).withName("Shoot Sequence");
+    
+  }
 
 }
