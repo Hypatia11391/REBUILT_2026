@@ -173,6 +173,10 @@ public class Shooter extends SubsystemBase {
         return this.runOnce(() -> stop());
     }
 
+    public double getMaxSpeed() {
+        return NEO_FREE_SPEED;
+    }
+
 
     public void stop() {
         targetRightRPM = 0.0;
