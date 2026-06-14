@@ -11,10 +11,7 @@ public class PoseHandler {
     private Pose3d turret;
     private Pose3d cameraTurret;
 
-    public PoseHandler() {
-
-    }
-
+    public PoseHandler() {}
 
     public Pose3d getRobotGlobal() {
         return robotGlobal;
@@ -67,6 +64,4 @@ public class PoseHandler {
     public Pose3d convertPose(Pose3d relativePose, Pose3d finalPose) {
         return relativePose.relativeTo(finalPose);
     }
-        
-    
 }
