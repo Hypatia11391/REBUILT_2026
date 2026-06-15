@@ -10,5 +10,5 @@ public enum Buttons {
     BACK,
     START,
     LS,
-    RS
+    RS,
 }

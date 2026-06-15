@@ -1,31 +1,28 @@
-
 package frc.robot.subsystems.Mechanisms;
-
-// import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+// import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.revrobotics.spark.SparkBase.ControlType;
 
-/* 
+/*
  * SHOOTER
  *      brushless NEO x2
- * 
-*/
+ *
+ */
 
 public class Shooter extends SubsystemBase {
-    
+
     private static final int SHOOTER_NEO_LEFT_ID = 3;
     private static final int SHOOTER_NEO_RIGHT_ID = 5;
 
@@ -48,7 +45,7 @@ public class Shooter extends SubsystemBase {
      * kI is the integral of the error. It is the sum of all past errors. It is used to eliminate error accumulating over time. It is turned off here.
      * kD is the derivative of the error. It is how fast the error changes over time. It is used as a dampener to prevent overshooting.
      */
-    private static final double kP = 0.00006;  // Trial and error
+    private static final double kP = 0.00006; // Trial and error
     private static final double kI = 0.0; // 0
     private static final double kD = 0.1; // Trial and error
 
@@ -64,30 +61,34 @@ public class Shooter extends SubsystemBase {
     //Acceptable margin of error before shooting. (In RPM)
     private static final double RPM_TOLERANCE = 400.0;
 
-    public Shooter(){ 
+    public Shooter() {
+        // shooter motors
+        shooterNeoRight = new SparkMax(
+            SHOOTER_NEO_RIGHT_ID,
+            SparkLowLevel.MotorType.kBrushless
+        );
+        shooterNeoLeft = new SparkMax(
+            SHOOTER_NEO_LEFT_ID,
+            SparkLowLevel.MotorType.kBrushless
+        );
 
-    // shooter motors
-    shooterNeoRight = new SparkMax(SHOOTER_NEO_RIGHT_ID, SparkLowLevel.MotorType.kBrushless);
-    shooterNeoLeft = new SparkMax(SHOOTER_NEO_LEFT_ID, SparkLowLevel.MotorType.kBrushless);
-    
-    // must be the opposites
-    configureShooterMotor(shooterNeoLeft, true); 
-    configureShooterMotor(shooterNeoRight, false);
+        // must be the opposites
+        configureShooterMotor(shooterNeoLeft, true);
+        configureShooterMotor(shooterNeoRight, false);
 
-    rightEncoder = shooterNeoRight.getEncoder();
-    leftEncoder = shooterNeoLeft.getEncoder();
+        rightEncoder = shooterNeoRight.getEncoder();
+        leftEncoder = shooterNeoLeft.getEncoder();
 
-    rightLoop = shooterNeoRight.getClosedLoopController();
-    leftLoop = shooterNeoLeft.getClosedLoopController();
-    
-    stop();
+        rightLoop = shooterNeoRight.getClosedLoopController();
+        leftLoop = shooterNeoLeft.getClosedLoopController();
+
+        stop();
     }
 
-    public void setTargetRPM(double targetRightRPM, double targetLeftRPM){
-
+    public void setTargetRPM(double targetRightRPM, double targetLeftRPM) {
         this.targetRightRPM = targetRightRPM;
         this.targetLeftRPM = targetLeftRPM;
-        
+
         // double currentTime = Timer.getFPGATimestamp();
         // double dt = currentTime - prevTime;
         // prevTime = currentTime;
@@ -117,18 +118,25 @@ public class Shooter extends SubsystemBase {
 
         rightLoop.setSetpoint(targetRightRPM, ControlType.kVelocity);
         leftLoop.setSetpoint(targetLeftRPM, ControlType.kVelocity);
-
     }
 
-    public double getRightRPM(){return rightEncoder.getVelocity();}
-    public double getLeftRPM(){return leftEncoder.getVelocity();}
+    public double getRightRPM() {
+        return rightEncoder.getVelocity();
+    }
 
-    public boolean atSpeed(){
-        return Math.abs(getRightRPM() - targetRightRPM) < RPM_TOLERANCE && Math.abs(getLeftRPM() - targetLeftRPM) < RPM_TOLERANCE;
+    public double getLeftRPM() {
+        return leftEncoder.getVelocity();
+    }
+
+    public boolean atSpeed() {
+        return (
+            Math.abs(getRightRPM() - targetRightRPM) < RPM_TOLERANCE &&
+            Math.abs(getLeftRPM() - targetLeftRPM) < RPM_TOLERANCE
+        );
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         SmartDashboard.putNumber("Shooter/TopRPM", getRightRPM());
         SmartDashboard.putNumber("Shooter/BottomRPM", getLeftRPM());
         SmartDashboard.putNumber("Shooter/TopTarget", targetRightRPM);
@@ -140,33 +148,35 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("NeoLeft/actualvelocity", actualVelLeft);
     }
 
-    public void configureShooterMotor(SparkMax motor, boolean isInverted){
+    public void configureShooterMotor(SparkMax motor, boolean isInverted) {
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(isInverted)
+        config
+            .inverted(isInverted)
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40)
             .voltageCompensation(12)
             // .openLoopRampRate(0.25);
             .closedLoopRampRate(0.25);
-        config.encoder
-            .velocityConversionFactor(1);
+        config.encoder.velocityConversionFactor(1);
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(kP, kI, kD)
             .outputRange(-1.0, 1.0);
 
-        config.closedLoop.feedForward
-            .sv(0.0, kV);
-    
+        config.closedLoop.feedForward.sv(0.0, kV);
+
         motor.configureAsync(
-            config, 
-            ResetMode.kNoResetSafeParameters, 
-            PersistMode.kPersistParameters);
+            config,
+            ResetMode.kNoResetSafeParameters,
+            PersistMode.kPersistParameters
+        );
     }
 
     public Command spinUpCommand(double targetRightRPM, double targetLeftRPM) {
-        return this.run(() -> setTargetRPM(targetRightRPM, targetLeftRPM)).finallyDo(() -> stop());
+        return this.run(() ->
+            setTargetRPM(targetRightRPM, targetLeftRPM)
+        ).finallyDo(() -> stop());
     }
 
     public Command stopCommand() {
@@ -177,12 +187,10 @@ public class Shooter extends SubsystemBase {
         return NEO_FREE_SPEED;
     }
 
-
     public void stop() {
         targetRightRPM = 0.0;
         targetLeftRPM = 0.0;
         shooterNeoRight.stopMotor();
         shooterNeoLeft.stopMotor();
     }
-
 }
