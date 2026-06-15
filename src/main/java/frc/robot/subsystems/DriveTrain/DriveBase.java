@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AimInstance;
@@ -249,28 +250,7 @@ public class DriveBase extends SubsystemBase {
     ) {
         SmartDashboard.putNumber("xSpeed", xSpeed);
 
-        if (RobotContainer.aimInstance.isAutomaticAimControl()) {
-            // double temp = Aim.rotateBy - gyroAngle.getRadians();
-            // float overShootConstant = 0.5F;
-
-            // double rotationPower = temp*overShootConstant;
-            // rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
-            // rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
-
-            // zRot = rotationPower;
-
-            double temp =
-                RobotContainer.aimInstance.getRequiredRotation() -
-                gyroAngle.getRadians();
-            double rotationPower =
-                temp * RobotContainer.aimInstance.getOverShootConstant();
-            rotationPower = Math.max(
-                -DriveBaseConstants.MAX_SPEED,
-                Math.min(rotationPower, DriveBaseConstants.MAX_SPEED)
-            );
-
-            zRot = rotationPower;
-        } else SmartDashboard.putNumber("zRot", zRot);
+        SmartDashboard.putNumber("zRot", zRot);
 
         SmartDashboard.putNumber("ySpeed", ySpeed);
 
@@ -332,5 +312,9 @@ public class DriveBase extends SubsystemBase {
         return this.run(() -> driveCartesian(xSpeed, ySpeed, zRot)).finallyDo(
             () -> stop()
         );
+    }
+
+    public Command stopCommand() {
+        return this.run(() -> stop());
     }
 }
