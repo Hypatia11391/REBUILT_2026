@@ -126,16 +126,13 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, IO devices, and commands. */
     public RobotContainer() {
         m_driveBase.setDefaultCommand(
-<<<<<<< HEAD
             new DriveWithJoystick(
                 m_driveBase,
                 m_driverController,
                 navx,
                 aimInstance
             )
-=======
-            new DriveWithJoystick(m_driveBase, m_driverController, navx)
->>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
+
         );
         shooter.setDefaultCommand(
             new OperateWithJoystick(

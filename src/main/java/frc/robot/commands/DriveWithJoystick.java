@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,16 +28,12 @@ public class DriveWithJoystick extends Command {
     private final DriveBase m_drive;
     private final Joystick m_stick;
     private final Navx navX;
-<<<<<<< HEAD
     private final AimInstance aimInstance;
-=======
->>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
 
     private double currX = 0;
     private double currY = 0;
     private double currZ = 0;
 
-<<<<<<< HEAD
     public DriveWithJoystick(
         DriveBase drive,
         Joystick stick,
@@ -47,12 +44,6 @@ public class DriveWithJoystick extends Command {
         m_stick = stick;
         navX = navx;
         this.aimInstance = aimInstance;
-=======
-    public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx) {
-        m_drive = drive;
-        m_stick = stick;
-        navX = navx;
->>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         addRequirements(m_drive);
     }
 
@@ -95,11 +86,11 @@ public class DriveWithJoystick extends Command {
         //Field-oriented, navx yaw as heading
         // Rotation2d heading = Rotation2d.fromDegrees(navX.getFieldHeadingDeg() - NAVX_OFFSET_ANGLE); // navX.getFieldHeadingDeg()
         Rotation2d heading = navX.getHeading();
-<<<<<<< HEAD
 
         if (aimInstance.isAutomaticAimControl()) {
-            double rotationError =
-                aimInstance.getRequiredRotation() - heading.getRadians();
+            double rotationError = MathUtil.angleModulus(
+                aimInstance.getRequiredRotation() - heading.getRadians()
+            );
             double rotationPower =
                 rotationError * aimInstance.getOverShootConstant();
             outZ = Math.max(
@@ -108,8 +99,6 @@ public class DriveWithJoystick extends Command {
             );
         }
 
-=======
->>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         m_drive.driveCartesian(outX, outY, outZ, heading);
     }
 

@@ -249,13 +249,8 @@ public class DriveBase extends SubsystemBase {
         Rotation2d gyroAngle
     ) {
         SmartDashboard.putNumber("xSpeed", xSpeed);
-<<<<<<< HEAD
-        SmartDashboard.putNumber("zRot", zRot);
-=======
-
         SmartDashboard.putNumber("zRot", zRot);
 
->>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         SmartDashboard.putNumber("ySpeed", ySpeed);
 
         m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle);
