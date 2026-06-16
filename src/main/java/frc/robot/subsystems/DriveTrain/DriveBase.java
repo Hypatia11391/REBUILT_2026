@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.utils.gyro.Navx;
@@ -248,7 +249,13 @@ public class DriveBase extends SubsystemBase {
         Rotation2d gyroAngle
     ) {
         SmartDashboard.putNumber("xSpeed", xSpeed);
+<<<<<<< HEAD
         SmartDashboard.putNumber("zRot", zRot);
+=======
+
+        SmartDashboard.putNumber("zRot", zRot);
+
+>>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         SmartDashboard.putNumber("ySpeed", ySpeed);
 
         m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle);
@@ -309,5 +316,9 @@ public class DriveBase extends SubsystemBase {
         return this.run(() -> driveCartesian(xSpeed, ySpeed, zRot)).finallyDo(
             () -> stop()
         );
+    }
+
+    public Command stopCommand() {
+        return this.run(() -> stop());
     }
 }

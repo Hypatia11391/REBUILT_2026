@@ -1,17 +1,16 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.Mechanisms.Shooter;
-import frc.robot.subsystems.Mechanisms.Intake;
-import frc.robot.subsystems.Mechanisms.Kicker;
-import frc.robot.subsystems.Mechanisms.Feed;
-
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Mechanisms.Feed;
+import frc.robot.subsystems.Mechanisms.Intake;
+import frc.robot.subsystems.Mechanisms.Kicker;
+import frc.robot.subsystems.Mechanisms.Shooter;
 
+public class OperateWithJoystick extends Command {
 
-public class OperateWithJoystick extends Command{
     private final Joystick stick;
     private final Shooter shooter;
     private final Intake intake;
@@ -30,21 +29,33 @@ public class OperateWithJoystick extends Command{
     public static double test = 1;
     // Why is ts here gang. Doesn't do anything ^^^^^
 
-
     private double atSpeedSince = -1.0;
 
-    enum IntakeFeedState {OFF, FWD, REV};
-    private IntakeFeedState intakeFeedState = IntakeFeedState.OFF; 
+    enum IntakeFeedState {
+        OFF,
+        FWD,
+        REV,
+    }
 
-    enum IntakeLiftState {OFF, UP, DOWN};
+    private IntakeFeedState intakeFeedState = IntakeFeedState.OFF;
+
+    enum IntakeLiftState {
+        OFF,
+        UP,
+        DOWN,
+    }
+
     private IntakeLiftState intakeLiftState = IntakeLiftState.OFF;
 
+    // private double spinupStartTime = 0;
 
-
-      // private double spinupStartTime = 0;
-
-
-    public OperateWithJoystick(Shooter shooter, Joystick stick, Intake intake, Kicker kicker, Feed feed){
+    public OperateWithJoystick(
+        Shooter shooter,
+        Joystick stick,
+        Intake intake,
+        Kicker kicker,
+        Feed feed
+    ) {
         this.stick = stick;
         this.shooter = shooter;
         this.intake = intake;
@@ -53,10 +64,8 @@ public class OperateWithJoystick extends Command{
         addRequirements(shooter, intake, kicker, feed);
     }
 
-    
-
     @Override
-    public void initialize(){
+    public void initialize() {
         shooter.stop();
         intake.stop();
         kicker.stop();
@@ -64,28 +73,27 @@ public class OperateWithJoystick extends Command{
     }
 
     @Override
-    public void execute(){
-
+    public void execute() {
         // intake lift motor
-        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal()+1); 
-        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal()+1);
-        
-        if (yUP){
-            if (intakeLiftState == IntakeLiftState.UP){
+        boolean aDOWN = stick.getRawButtonPressed(Buttons.A.ordinal() + 1);
+        boolean yUP = stick.getRawButtonPressed(Buttons.Y.ordinal() + 1);
+
+        if (yUP) {
+            if (intakeLiftState == IntakeLiftState.UP) {
                 intakeLiftState = IntakeLiftState.OFF;
-            }else{
+            } else {
                 intakeLiftState = IntakeLiftState.UP;
             }
         }
 
-        if (aDOWN){
-            if (intakeLiftState == IntakeLiftState.DOWN){
+        if (aDOWN) {
+            if (intakeLiftState == IntakeLiftState.DOWN) {
                 intakeLiftState = IntakeLiftState.OFF;
-            }else{
+            } else {
                 intakeLiftState = IntakeLiftState.DOWN;
             }
         }
-        switch (intakeLiftState){
+        switch (intakeLiftState) {
             case UP:
                 intake.setLiftMotorSpeed(INTAKE_LIFT_PWR_UP);
                 break;
@@ -98,21 +106,21 @@ public class OperateWithJoystick extends Command{
         }
 
         // intake feed
-        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal()+1); // intake in
-        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal()+1); // intake out
+        boolean rb = stick.getRawButtonPressed(Buttons.RB.ordinal() + 1); // intake in
+        boolean lb = stick.getRawButtonPressed(Buttons.LB.ordinal() + 1); // intake out
 
-        if (rb){
-            if (intakeFeedState == IntakeFeedState.FWD){
+        if (rb) {
+            if (intakeFeedState == IntakeFeedState.FWD) {
                 intakeFeedState = IntakeFeedState.OFF;
-            }else{
+            } else {
                 intakeFeedState = IntakeFeedState.FWD;
             }
         }
 
-        if (lb){
-            if (intakeFeedState == IntakeFeedState.REV){
+        if (lb) {
+            if (intakeFeedState == IntakeFeedState.REV) {
                 intakeFeedState = IntakeFeedState.OFF;
-            }else{
+            } else {
                 intakeFeedState = IntakeFeedState.REV;
             }
         }
@@ -128,86 +136,58 @@ public class OperateWithJoystick extends Command{
                 intake.setFeedMotorSpeed(0);
                 break;
         }
-        
-        // shooter + delayed feed & kicker
-        double rtSHOOT = applyDeadband(stick.getRawAxis(JoystickAxes.RT.ordinal()), 0.08);
 
-        SmartDashboard.putNumber("Joystick/RT", stick.getRawAxis(JoystickAxes.RT.ordinal()));
-        
+        // shooter + delayed feed & kicker
+        double rtSHOOT = applyDeadband(
+            stick.getRawAxis(JoystickAxes.RT.ordinal()),
+            0.08
+        );
+
+        SmartDashboard.putNumber(
+            "Joystick/RT",
+            stick.getRawAxis(JoystickAxes.RT.ordinal())
+        );
+
         double rightTarget = rtSHOOT * HIGH_RIGHT_RPM;
         double leftTarget = rtSHOOT * HIGH_LEFT_RPM;
 
-        // if (Autos.shooterAuto && Autos.visionOnline) {
-
-        //     float shooterRadius = 0.05F;
-        //     double thing = Aim.exitVelocity;
-        //     double radiansPerSecond = thing/shooterRadius;
-        //     double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
-        //     RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);                
-        //     shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
-        //     kicker.setKickerSpeed(KICKER_PWR);
-
-        // }
-        // else if (Autos.shooterAuto) {
-            
-        //     double RPMtoShoot = 3000;
-        //     shooter.setTargetRPM(RPMtoShoot, HIGH_RIGHT_RPM);
-        //     kicker.setKickerSpeed(KICKER_PWR);
-        // }
-
-
-        if (rtSHOOT != 0.0){
+        if (rtSHOOT != 0.0) {
             // System.out.println("RT pressed, this thing should shoot!!!!!!!!!!!!!!");
 
-            //TODO Fix/Refactor aim code here
-            // if (Aim.automaticAimControl) {
-            //     float shooterRadius = 0.05F;
-            //     double exitVelocity = Aim.exitVelocity;
-            //     double radiansPerSecond = exitVelocity/shooterRadius;
-            //     double RPMtoShoot = (radiansPerSecond/(2*Math.PI))*60;
-            //     RPMtoShoot = Math.min(RPMtoShoot, HIGH_RIGHT_RPM);
-            //     shooter.setTargetRPM(RPMtoShoot, RPMtoShoot);
-            //     kicker.setKickerSpeed(KICKER_PWR);
-
-            // }
-            // else {
             kicker.setKickerSpeed(KICKER_PWR);
             shooter.setTargetRPM(rightTarget, leftTarget);
-            // feed.setFeedSpeed(FEED_PWR);
-            // }
-
 
             boolean ready = shooter.atSpeed();
-        
-            if (ready){
-                if(atSpeedSince < 0.0) atSpeedSince = Timer.getFPGATimestamp();
-        }else{
-            atSpeedSince = -1.0;
-        }
 
-        boolean feedAllowed = (atSpeedSince >= 0.0) && (Timer.getFPGATimestamp() - atSpeedSince >= 0.20);
+            if (ready) {
+                if (atSpeedSince < 0.0) atSpeedSince = Timer.getFPGATimestamp();
+            } else {
+                atSpeedSince = -1.0;
+            }
 
-        if (feedAllowed){
-            feed.setFeedSpeed(FEED_PWR);
-        }else{
-            // kicker.stop(); // lol it was just this line
-            feed.stop();
-        }
-        }else{
+            boolean feedAllowed =
+                (atSpeedSince >= 0.0) &&
+                (Timer.getFPGATimestamp() - atSpeedSince >= 0.20);
+
+            if (feedAllowed) {
+                feed.setFeedSpeed(FEED_PWR);
+            } else {
+                // kicker.stop(); // lol it was just this line
+                feed.stop();
+            }
+        } else {
             shooter.stop();
             feed.stop();
             kicker.stop();
         }
-
     }
 
-    private static double applyDeadband(double x, double db){
+    private static double applyDeadband(double x, double db) {
         return (Math.abs(x) < db) ? 0.0 : x;
     }
 
-
     @Override
-    public void end(boolean interrupted){
+    public void end(boolean interrupted) {
         shooter.stop();
         kicker.stop();
         intake.stop();
@@ -215,7 +195,7 @@ public class OperateWithJoystick extends Command{
     }
 
     @Override
-    public boolean isFinished(){
+    public boolean isFinished() {
         return false;
     }
 }

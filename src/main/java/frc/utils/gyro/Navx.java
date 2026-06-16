@@ -1,20 +1,19 @@
 package frc.utils.gyro;
 
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.studica.frc.AHRS;
+public class Navx extends SubsystemBase {
 
-public class Navx extends SubsystemBase{
     public final AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     // private double yawOffsetDeg = 0.0;
     // private boolean fieldCalibrated = false;
 
-    public Navx(){
-    }
+    public Navx() {}
 
     // public void calibrateFieldOrientationFromCompass(){
     //     double compassDeg = navx.getFusedHeading(); // [0, 360]
@@ -33,12 +32,11 @@ public class Navx extends SubsystemBase{
     // }
 
     // public double getFieldHeadingDeg(){
-    
+
     //     // SmartDashboard.putBoolean("magnometerCalibrated", navx.isMagnetometerCalibrated());
     //     SmartDashboard.putNumber("navX/fusedHead", wrapTo180(navx.getFusedHeading()));
     //     return wrapTo180(navx.getFusedHeading());
     // }
-
 
     // private static double wrapTo180(double deg){
     //     deg = deg % 360.0;
@@ -47,70 +45,73 @@ public class Navx extends SubsystemBase{
     //     return deg;
     // }
 
-    public double getHeadingDeg(){
+    public double getHeadingDeg() {
         return -navx.getYaw();
     }
+
     // Continuous angle (total accumulated yaw angle)
     // Can grow beyond 360. Great for odometry turning
-    public double getAngleDeg(){
-        return navx.getAngle(); 
+    public double getAngleDeg() {
+        return navx.getAngle();
     }
 
     // rate in deg/sec
-    public double getRateDegPerSec(){
+    public double getRateDegPerSec() {
         return navx.getRate();
     }
 
     // Pitch from the IMU in deg
-    public double getPitchDeg(){
+    public double getPitchDeg() {
         return navx.getPitch();
     }
 
     // Roll from the IMU in deg
-    public double getRollDeg(){
+    public double getRollDeg() {
         return navx.getRoll();
     }
 
-    // Raw-ish linear accel in G. 
+    // Raw-ish linear accel in G.
     // Useful for debugging, not for precise motion.
-    public double getWorldLinearAccelX(){
+    public double getWorldLinearAccelX() {
         return navx.getWorldLinearAccelX();
     }
-    public double getWorldLinearAccelY(){
+
+    public double getWorldLinearAccelY() {
         return navx.getWorldLinearAccelY();
     }
 
     // Use to zero the Yaw values at the start of the match
-    public void zeroYaw(){
+    public void zeroYaw() {
         navx.zeroYaw();
     }
 
     // If you use getAngle(), reset it to 0.
-    public void resetNavX(){
+    public void resetNavX() {
         navx.reset();
     }
 
-    public boolean isCalibrating(){
+    public boolean isCalibrating() {
         return navx.isCalibrating();
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return navx.isConnected();
     }
 
-    public Rotation2d getHeading(){
+    public Rotation2d getHeading() {
         return Rotation2d.fromDegrees(navx.getYaw());
     }
-  
+
     public Rotation3d getFullRotation() {
         return new Rotation3d(
             Math.toRadians(getRollDeg()),
             Math.toRadians(getPitchDeg()),
-            getHeading().getRadians()); // possibly getYawDeg();
+            getHeading().getRadians()
+        ); // possibly getYawDeg();
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         SmartDashboard.putBoolean("navX/Connected", isConnected());
         // SmartDashboard.putBoolean("navX/Calibrating", isCalibrating());
         // SmartDashboard.putBoolean("navX/isFieldCalibrated", fieldCalibrated);

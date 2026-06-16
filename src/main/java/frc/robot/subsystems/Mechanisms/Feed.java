@@ -1,55 +1,56 @@
 package frc.robot.subsystems.Mechanisms;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/* 
+/*
  * FEED
  *      brushless NEO x1
-*/
+ */
 
 public class Feed extends SubsystemBase {
+
     private static final int FEED_NEO_ID = 7;
     private static final float SPEED_MULTIPLIER = 0.5F;
 
     private final SparkMax feedNeo;
 
-    public Feed(){
+    public Feed() {
         // feed motor
         feedNeo = new SparkMax(FEED_NEO_ID, SparkLowLevel.MotorType.kBrushless);
 
         configureFeedMotor(feedNeo, false);
     }
-    
-    public void setFeedSpeed(double speed){
-        //What ts 0.5 do??  
-        feedNeo.set(speed*SPEED_MULTIPLIER);
+
+    public void setFeedSpeed(double speed) {
+        //What ts 0.5 do??
+        feedNeo.set(speed * SPEED_MULTIPLIER);
     }
 
-    public void configureFeedMotor(SparkMax motor, boolean isInverted){
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(isInverted)
+    public void configureFeedMotor(SparkMax motor, boolean isInverted) {
+        SparkMaxConfig config = new SparkMaxConfig();
+        config
+            .inverted(isInverted)
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40)
             .voltageCompensation(12)
             .openLoopRampRate(0.1);
 
-      motor.configureAsync(
-        config, 
-        ResetMode.kNoResetSafeParameters, 
-        PersistMode.kPersistParameters);    
+        motor.configureAsync(
+            config,
+            ResetMode.kNoResetSafeParameters,
+            PersistMode.kPersistParameters
+        );
     }
 
     public Command setFeedSpeedCommand(double speed) {
         return this.run(() -> setFeedSpeed(speed)).finallyDo(() -> stop());
-
     }
 
     public Command stopCommand() {
@@ -59,5 +60,4 @@ public class Feed extends SubsystemBase {
     public void stop() {
         feedNeo.stopMotor();
     }
-    
 }

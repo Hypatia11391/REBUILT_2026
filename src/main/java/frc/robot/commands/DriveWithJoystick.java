@@ -27,12 +27,16 @@ public class DriveWithJoystick extends Command {
     private final DriveBase m_drive;
     private final Joystick m_stick;
     private final Navx navX;
+<<<<<<< HEAD
     private final AimInstance aimInstance;
+=======
+>>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
 
     private double currX = 0;
     private double currY = 0;
     private double currZ = 0;
 
+<<<<<<< HEAD
     public DriveWithJoystick(
         DriveBase drive,
         Joystick stick,
@@ -43,6 +47,12 @@ public class DriveWithJoystick extends Command {
         m_stick = stick;
         navX = navx;
         this.aimInstance = aimInstance;
+=======
+    public DriveWithJoystick(DriveBase drive, Joystick stick, Navx navx) {
+        m_drive = drive;
+        m_stick = stick;
+        navX = navx;
+>>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         addRequirements(m_drive);
     }
 
@@ -85,6 +95,7 @@ public class DriveWithJoystick extends Command {
         //Field-oriented, navx yaw as heading
         // Rotation2d heading = Rotation2d.fromDegrees(navX.getFieldHeadingDeg() - NAVX_OFFSET_ANGLE); // navX.getFieldHeadingDeg()
         Rotation2d heading = navX.getHeading();
+<<<<<<< HEAD
 
         if (aimInstance.isAutomaticAimControl()) {
             double rotationError =
@@ -97,6 +108,8 @@ public class DriveWithJoystick extends Command {
             );
         }
 
+=======
+>>>>>>> 8cef887c1b21f3973a803de1ae97ecf86b03f52f
         m_drive.driveCartesian(outX, outY, outZ, heading);
     }
 
