@@ -34,6 +34,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -43,7 +44,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.commands.AimInstance;
 import frc.utils.gyro.Navx;
 import java.time.Instant;
 import java.util.function.DoubleConsumer;
@@ -248,30 +248,7 @@ public class DriveBase extends SubsystemBase {
         Rotation2d gyroAngle
     ) {
         SmartDashboard.putNumber("xSpeed", xSpeed);
-
-        if (RobotContainer.aimInstance.isAutomaticAimControl()) {
-            // double temp = Aim.rotateBy - gyroAngle.getRadians();
-            // float overShootConstant = 0.5F;
-
-            // double rotationPower = temp*overShootConstant;
-            // rotationPower = Math.max(rotationPower, -DriveBaseConstants.MAX_SPEED);
-            // rotationPower = Math.min(rotationPower, DriveBaseConstants.MAX_SPEED);
-
-            // zRot = rotationPower;
-
-            double temp =
-                RobotContainer.aimInstance.getRequiredRotation() -
-                gyroAngle.getRadians();
-            double rotationPower =
-                temp * RobotContainer.aimInstance.getOverShootConstant();
-            rotationPower = Math.max(
-                -DriveBaseConstants.MAX_SPEED,
-                Math.min(rotationPower, DriveBaseConstants.MAX_SPEED)
-            );
-
-            zRot = rotationPower;
-        } else SmartDashboard.putNumber("zRot", zRot);
-
+        SmartDashboard.putNumber("zRot", zRot);
         SmartDashboard.putNumber("ySpeed", ySpeed);
 
         m_Drive.driveCartesian(ySpeed, xSpeed, zRot, gyroAngle);

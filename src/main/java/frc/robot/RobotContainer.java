@@ -11,7 +11,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator3d;
@@ -25,8 +24,8 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -44,8 +43,6 @@ import frc.robot.subsystems.Mechanisms.Kicker;
 import frc.robot.subsystems.Mechanisms.Shooter;
 import frc.utils.gyro.Navx;
 
-
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -53,123 +50,154 @@ import frc.utils.gyro.Navx;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
 
-  private final Joystick m_driverController =
-      new Joystick(OperatorConstants.kDriverControllerPort);
-  private final Joystick m_operatorController =
-      new Joystick(OperatorConstants.kOperateControllerPort);
-  private final Navx navx = 
-      new Navx();
-  private final Shooter shooter =
-      new Shooter();
-  public final Intake intake =
-      new Intake();
-  private final Kicker kicker =
-      new Kicker();
-  private final Feed feed =
-      new Feed();
+    // The robot's subsystems and commands are defined here...
+
+    private final Joystick m_driverController = new Joystick(
+        OperatorConstants.kDriverControllerPort
+    );
+    private final Joystick m_operatorController = new Joystick(
+        OperatorConstants.kOperateControllerPort
+    );
+    private final Navx navx = new Navx();
+    private final Shooter shooter = new Shooter();
+    public final Intake intake = new Intake();
+    private final Kicker kicker = new Kicker();
+    private final Feed feed = new Feed();
 
     // TODO!!!!: MEASUREMENTS!!!!! MEASURE THE POSITIONS OF EACH WHEEL RELATIVE TO ROBOT ORIGIN!!!
-    private static final MecanumDriveKinematics DRIVE_KINEMATICS = new MecanumDriveKinematics(
-        new Translation2d(0,0.32),
-        new Translation2d(0,-0.32),
-        new Translation2d(-0.37,0.32),
-        new Translation2d(-0.37,-0.32)
-    );
+    private static final MecanumDriveKinematics DRIVE_KINEMATICS =
+        new MecanumDriveKinematics(
+            new Translation2d(0, 0.32),
+            new Translation2d(0, -0.32),
+            new Translation2d(-0.37, 0.32),
+            new Translation2d(-0.37, -0.32)
+        );
 
-    private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
-    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(0.05, 0.05, 0.05, 0.05);
+    private static final Matrix<N4, N1> VISION_STD_DEVS = VecBuilder.fill(
+        0.1,
+        0.1,
+        0.1,
+        0.1
+    );
+    private static final Matrix<N4, N1> STATE_STD_DEVS = VecBuilder.fill(
+        0.05,
+        0.05,
+        0.05,
+        0.05
+    );
 
     private static final Pose3d STARTING_POSE = Pose3d.kZero; // TODO: Correct to be the actual starting pose!
 
-    private final MecanumDrivePoseEstimator3d poseEstimator = new MecanumDrivePoseEstimator3d(
-        DRIVE_KINEMATICS,
-        navx.getFullRotation(),
-        new MecanumDriveWheelPositions(), // This could have some problem if the default position for the wheels are not "zero"
-        STARTING_POSE,
-        VISION_STD_DEVS,
-        STATE_STD_DEVS
+    private final MecanumDrivePoseEstimator3d poseEstimator =
+        new MecanumDrivePoseEstimator3d(
+            DRIVE_KINEMATICS,
+            navx.getFullRotation(),
+            new MecanumDriveWheelPositions(), // This could have some problem if the default position for the wheels are not "zero"
+            STARTING_POSE,
+            VISION_STD_DEVS,
+            STATE_STD_DEVS
+        );
+
+    public static final AimInstance aimInstance = new AimInstance(
+        STARTING_POSE.toPose2d(),
+        new ChassisSpeeds(0, 0, 0),
+        DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
     );
 
-    public static final AimInstance aimInstance = new 
-      AimInstance(
-        STARTING_POSE.toPose2d(), 
-        new ChassisSpeeds(0,0,0), 
-        DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red);
-
     public SendableChooser<Command> autoChooser;
-    
-  /* ???????????????
+
+    /* ???????????????
     public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
       return poseEstimator;
     };
     */
 
-    private final VisionManager visionManager = new VisionManager(poseEstimator);
+    private final VisionManager visionManager = new VisionManager(
+        poseEstimator
+    );
 
-  private final DriveBase m_driveBase =
-      new DriveBase(navx,poseEstimator,DRIVE_KINEMATICS);
+    private final DriveBase m_driveBase = new DriveBase(
+        navx,
+        poseEstimator,
+        DRIVE_KINEMATICS
+    );
 
-  
+    /** The container for the robot. Contains subsystems, IO devices, and commands. */
+    public RobotContainer() {
+        m_driveBase.setDefaultCommand(
+            new DriveWithJoystick(
+                m_driveBase,
+                m_driverController,
+                navx,
+                aimInstance
+            )
+        );
+        shooter.setDefaultCommand(
+            new OperateWithJoystick(
+                shooter,
+                m_operatorController,
+                intake,
+                kicker,
+                feed
+            )
+        );
+        configureBindings();
 
+        registerCommands();
+    }
 
-  /** The container for the robot. Contains subsystems, IO devices, and commands. */
-  public RobotContainer() {
-    m_driveBase.setDefaultCommand(
-      new DriveWithJoystick(m_driveBase, m_driverController, navx));
-    shooter.setDefaultCommand(
-      new OperateWithJoystick(shooter, m_operatorController, intake, kicker, feed));
-    configureBindings();
+    public DriveBase getDriveBase() {
+        return m_driveBase;
+    }
 
-    registerCommands();
-  }
+    public Navx getNavx() {
+        return navx;
+    }
 
-  public DriveBase getDriveBase() {
-    return m_driveBase;
-  }
-  public Navx getNavx(){
-    return navx;
-  }
-  public Shooter getShooter() {
-    return shooter;
-  }
+    public Shooter getShooter() {
+        return shooter;
+    }
 
-  public void update() {
-    visionManager.update();
-  }
+    public void update() {
+        visionManager.update();
+    }
 
-  private void registerCommands() {
-    NamedCommands.registerCommand("AutoShoot", Autos.shootSequence(shooter, kicker, feed, 0, 0));
-  }
+    private void registerCommands() {
+        NamedCommands.registerCommand(
+            "AutoShoot",
+            Autos.shootSequence(shooter, kicker, feed, 0, 0)
+        );
+    }
 
-  /**
-   * Maps driver inputs (buttons/triggers) to commands.
-   * This is where controller buttons are bound to robot actions.
-   * Called once during robot initialization.
-   */
+    /**
+     * Maps driver inputs (buttons/triggers) to commands.
+     * This is where controller buttons are bound to robot actions.
+     * Called once during robot initialization.
+     */
 
+    private void configureBindings() {
+        // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
 
-  private void configureBindings() {
-    
-    // new JoystickButton(m_driverController, Buttons.LS.ordinal()).onTrue(new InstantCommand(navx::zeroYaw, navx));
+        new JoystickButton(m_driverController, Buttons.X.ordinal())
+            .whileTrue(
+                new InstantCommand(m_driveBase::updateAimInstance, m_driveBase)
+            )
+            .onChange(
+                new InstantCommand(aimInstance::toggleAutomaticAimControl)
+            );
 
-    new JoystickButton(m_driverController, Buttons.X.ordinal()).whileTrue(new InstantCommand(m_driveBase::updateAimInstance, m_driveBase)).onChange(new InstantCommand(aimInstance::toggleAutomaticAimControl));
-    
-    // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
-    // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
+        // new JoystickButton(m_driverController, Buttons.X.ordinal() +1).onTrue(new InstantCommand(navx::calibrateFieldOrientation, navx));
+        // new JoystickButton(m_operatorController, Buttons.B.ordinal() + 1).onTrue(new InstantCommand(intake::zeroLift, intake));
+    }
 
-}
+    /**
+     * Returns the command that will run during autonomous mode.
+     * Called by {@link Robot} when autonomous starts.
+     */
 
-  /**
-   * Returns the command that will run during autonomous mode.
-   * Called by {@link Robot} when autonomous starts.
-   */
-
-
-  public Command getAutonomousCommand() {
-    autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
-    return null;
-  }
-
+    public Command getAutonomousCommand() {
+        autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
+        return null;
+    }
 }
