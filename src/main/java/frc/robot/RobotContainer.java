@@ -105,7 +105,7 @@ public class RobotContainer {
         DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
     );
 
-    public SendableChooser<Command> autoChooser;
+    public SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* ???????????????
     public MecanumDrivePoseEstimator3d getPositionFromPoseEstimator() {
@@ -132,7 +132,6 @@ public class RobotContainer {
                 navx,
                 aimInstance
             )
-
         );
         shooter.setDefaultCommand(
             new OperateWithJoystick(
@@ -146,6 +145,10 @@ public class RobotContainer {
         configureBindings();
 
         registerCommands();
+
+        autoChooser.setDefaultOption("Do Nothing", Commands.none());
+        autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public DriveBase getDriveBase() {
@@ -198,7 +201,6 @@ public class RobotContainer {
      */
 
     public Command getAutonomousCommand() {
-        autoChooser.addOption("Path One", Autos.loadPath("Example Path"));
-        return null;
+        return autoChooser.getSelected();
     }
 }

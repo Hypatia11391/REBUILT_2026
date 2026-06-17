@@ -34,15 +34,14 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; // later can switch to the shuffleboard
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.utils.gyro.Navx;
@@ -166,12 +165,6 @@ public class DriveBase extends SubsystemBase {
     }
 
     public MecanumDriveWheelSpeeds getWheelSpeeds() {
-        Pose3d temp = poseEstimator.getEstimatedPosition();
-        currentPose = temp.toPose2d();
-        m_field.setRobotPose(currentPose);
-
-        super.periodic();
-
         return new MecanumDriveWheelSpeeds(
             flEncoder.getVelocity(),
             frEncoder.getVelocity(),
@@ -200,11 +193,13 @@ public class DriveBase extends SubsystemBase {
     @Override
     public void periodic() {
         this.poseEstimator.updateWithTime(
-            //Instant.now().toEpochMilli() / 1000.0,
             Timer.getFPGATimestamp(),
             navx.getFullRotation(),
             this.getWheelPositions()
         );
+
+        currentPose = poseEstimator.getEstimatedPosition().toPose2d();
+        m_field.setRobotPose(currentPose);
 
         updateAimInstance();
 

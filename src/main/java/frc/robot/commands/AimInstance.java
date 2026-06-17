@@ -50,6 +50,7 @@ public class AimInstance {
         this.robotPose = robotPose;
         this.robotVelocities = robotVelocities;
         this.redTeam = redTeam;
+        this.targetPosition = redTeam ? targetPositionRed : targetPositionBlue;
     }
 
     public Pose2d getRobotPose() {
@@ -65,8 +66,7 @@ public class AimInstance {
     }
 
     public void updateAim() {
-        targetPosition = targetPositionBlue;
-        if (redTeam) targetPosition = targetPositionRed;
+        targetPosition = redTeam ? targetPositionRed : targetPositionBlue;
 
         Translation3d distanceToTarget;
         double cotAlpha = 1 / Math.tan(shooterAngle);
